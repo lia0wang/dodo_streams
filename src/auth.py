@@ -18,9 +18,9 @@ def auth_register_v1(email, password, name_first, name_last):
     elif len(password) < 6:
         raise InputError("Error: Invalid password")
     elif len(name_first) < 1 or len(name_first) > 50:
-        raise InputError("Error: Invalid first name ")
+        raise InputError("Error: Invalid first name")
     elif len(name_last) < 1 or len(name_last) > 50:
-        raise InputError("Error: Invalid first name ")
+        raise InputError("Error: Invalid last name")
 
     # Fetch data
     store = data_store.get()
