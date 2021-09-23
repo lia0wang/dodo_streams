@@ -11,6 +11,7 @@ def auth_login_v1(email, password):
     }
 
 def auth_register_v1(email, password, name_first, name_last):
+    #
     if not re.fullmatch(regex, email):
         raise InputError("Error: Invalid email")
     elif len(password) < 6:
@@ -23,15 +24,21 @@ def auth_register_v1(email, password, name_first, name_last):
     store = data_store.get()
     # Check for duplicate email only if users list is not empty
     if len(store['users']) != 0:
+
         # Put all emails in list
         emails = []
         for user in store['users']:
             emails.append(user['email'])
+
+        # append input email
+        emails.append(email)
         # Check for dupliates in list of emails
         if len(emails) != len(set(emails)):
             raise InputError("Error: email taken")
 
-    id = len(store['users'])
+    # Create user id
+    id = len(store['users']) + 1
+    
     # If inputs have passed the checks append user dictionary
     user = {
         'user_id': id,
