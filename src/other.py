@@ -5,5 +5,4 @@ def clear_v1():
     store['users'] = []
     store['channels'] = []
     store['latest_message_id'] = 0
-
     data_store.set(store)
