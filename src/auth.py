@@ -38,7 +38,8 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError("Error: email taken")
 
     # Generate handle
-        # If handle is longer than 20 chars, cut off at 20 chars
+        # Concatenate lowercase name_first and name_last
+        # If concatenation is longer than 20 chars, cut off at 20 chars
         # Loop through users looking for repeated handles
         # Increment a repetition counter which will be added to repeated handle
     handle_str = name_first.lower() + name_last.lower()
