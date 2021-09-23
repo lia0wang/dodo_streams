@@ -23,22 +23,22 @@ def test_password_short():
 def test_name_first_long():
     clear_v1()
     with pytest.raises(InputError):
-        auth_register_v1("11037.666@gmail.com", "arm11", "MynameisYoshikageKira.Im33yearsold.MyhouseisinthenortheastsectionofMorioh", "Schneider")
+        auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "MynameisYoshikageKira.Im33yearsold.MyhouseisinthenortheastsectionofMorioh", "Schneider")
 
 def test_name_last_long():
     clear_v1()
     with pytest.raises(InputError):
-        auth_register_v1("11037.666@gmail.com", "arm11", "Isaac", "MynameisYoshikageKira.Im33yearsold.MyhouseisinthenortheastsectionofMorioh")
+        auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "MynameisYoshikageKira.Im33yearsold.MyhouseisinthenortheastsectionofMorioh")
 
 def test_name_first_short():
     clear_v1()
     with pytest.raises(InputError):
-        auth_register_v1("11037.666@gmail.com", "arm11", "", "Schneider")
+        auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "", "Schneider")
 
 def test_name_last_short():
     clear_v1()
     with pytest.raises(InputError):
-        auth_register_v1("11037.666@gmail.com", "arm11", "Isaac", "")
+        auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "")
 
 def test_valid_user():
     clear_v1()

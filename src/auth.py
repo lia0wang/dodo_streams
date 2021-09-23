@@ -16,9 +16,9 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError("Error: Invalid email")
     elif len(password) < 6:
         raise InputError("Error: Invalid password")
-    elif len(name_first) < 1 and len(name_first) > 50:
+    elif len(name_first) < 1 or len(name_first) > 50:
         raise InputError("Error: Invalid first name ")
-    elif len(name_last) < 1 and len(name_last) > 50:
+    elif len(name_last) < 1 or len(name_last) > 50:
         raise InputError("Error: Invalid first name ")
 
     store = data_store.get()
@@ -32,13 +32,13 @@ def auth_register_v1(email, password, name_first, name_last):
 
         # append input email
         emails.append(email)
-        # Check for dupliates in list of emails
+        # Check for duplicates in list of emails
         if len(emails) != len(set(emails)):
             raise InputError("Error: email taken")
 
     # Create user id
     id = len(store['users']) + 1
-    
+
     # If inputs have passed the checks append user dictionary
     user = {
         'user_id': id,
