@@ -67,30 +67,17 @@ def test_store_valid_users():
     assert store['users'][1]['name_last'] == "KLMNOPQRSTabc"
     assert store['users'][1]['handle_str'] == "1abcdefghijklmnopqrs"
 
-
-def test_handle_rep_char_count_under20():
+def test_handle_cut():
     clear_v1()
-    auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
+    auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
     store = data_store.get()
-    assert store['users'][0]['handle_str'] == "isaacschneider"
+    assert store['users'][0]['handle_str'] == "abcdefghijklmnopqrst"
 
-    auth_register_v1("11037.66@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
+    auth_register_v1("11037.66@gmail.com", "armStrongCann0n", "ABCDEFGHIJabc", "KLMNOPQRST")
     store = data_store.get()
-    assert store['users'][1]['handle_str'] == "isaacschneider0"
+    assert store['users'][1]['handle_str'] == "abcdefghijabcklmnopq"
 
-    auth_register_v1("11037.6@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
-    store = data_store.get()
-    assert store['users'][2]['handle_str'] == "isaacschneider1"
-
-    auth_register_v1("11037.@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
-    store = data_store.get()
-    assert store['users'][3]['handle_str'] == "abcdefghijklmnopqrst"
-
-    auth_register_v1("11037@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
-    store = data_store.get()
-    assert store['users'][4]['handle_str'] == "abcdefghijklmnopqrst0"
-
-def test_handle_rep_char_count_over20():
+def test_handle_repeat():
     clear_v1()
     auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
     store = data_store.get()
@@ -107,5 +94,33 @@ def test_handle_rep_char_count_over20():
     auth_register_v1("11037.@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
     store = data_store.get()
     assert store['users'][3]['handle_str'] == "abcdefghijklmnopqrst2"
+
+    auth_register_v1("11037@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
+    store = data_store.get()
+    assert store['users'][4]['handle_str'] == "abcdefghijklmnopqrst3"
+
+
+def test_handle_repeat_mix():
+    clear_v1()
+    auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
+    store = data_store.get()
+    assert store['users'][0]['handle_str'] == "isaacschneider"
+
+    auth_register_v1("11037.@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
+    store = data_store.get()
+    assert store['users'][1]['handle_str'] == "abcdefghijklmnopqrst"
+
+    auth_register_v1("11037.66@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
+    store = data_store.get()
+    assert store['users'][2]['handle_str'] == "isaacschneider0"
+
+    auth_register_v1("11037.6@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
+    store = data_store.get()
+    assert store['users'][3]['handle_str'] == "isaacschneider1"
+
+    auth_register_v1("11037@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
+    store = data_store.get()
+    assert store['users'][4]['handle_str'] == "abcdefghijklmnopqrst0"
+
 
     
