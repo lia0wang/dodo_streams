@@ -56,11 +56,11 @@ def auth_register_v1(email, password, name_first, name_last):
         handle_str = handle_str + str(handle_rep_num)
 
     # Generate id
-    id = len(store['users']) + 1
+    user_id = len(store['users']) + 1
 
     # Create and store account
     user = {
-        'u_id': id,
+        'u_id': user_id,
         'email': email,
         'password': password,
         'name_first': name_first,
@@ -71,5 +71,5 @@ def auth_register_v1(email, password, name_first, name_last):
     data_store.set(store)
 
     return {
-        'auth_user_id': id,
+        'auth_user_id': user_id,
     }
