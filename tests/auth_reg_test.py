@@ -9,6 +9,11 @@ def test_email_invalid():
     clear_v1()
     with pytest.raises(InputError):
         auth_register_v1("11037.666@gmail&.com", "armStrongCann0n", "Isaac", "Schneider")
+    with pytest.raises(InputError):
+        auth_register_v1("@xample.com", "armStrongCann0n", "Isaac", "Schneider")  
+    with pytest.raises(InputError):
+        auth_register_v1("email.example.com", "armStrongCann0n", "Isaac", "Schneider")     
+    
 
 def test_email_duplicate():
     clear_v1()
@@ -42,7 +47,7 @@ def test_name_last_short():
     with pytest.raises(InputError):
         auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "")
 
-def test_valid_users():
+def test_store_valid_users():
     clear_v1()
     auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
     store = data_store.get()
@@ -53,17 +58,17 @@ def test_valid_users():
     assert store['users'][0]['name_last'] == "Schneider"
     assert store['users'][0]['handle_str'] == "isaacschneider"
 
-    auth_register_v1("11037.66@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
+    auth_register_v1("11037.66@gmail.com", "armStrongCann0n", "1ABCDEFGHIJ", "KLMNOPQRSTabc")
     store = data_store.get()
     assert store['users'][1]['u_id'] == 2
     assert store['users'][1]['email'] == "11037.66@gmail.com"
     assert store['users'][1]['password'] == "armStrongCann0n"
-    assert store['users'][1]['name_first'] == "ABCDEFGHIJ"
+    assert store['users'][1]['name_first'] == "1ABCDEFGHIJ"
     assert store['users'][1]['name_last'] == "KLMNOPQRSTabc"
-    assert store['users'][1]['handle_str'] == "abcdefghijklmnopqrst"
+    assert store['users'][1]['handle_str'] == "1abcdefghijklmnopqrs"
 
 
-def test_handle_rep():
+def test_handle_rep_char_count_under20():
     clear_v1()
     auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
     store = data_store.get()
@@ -85,7 +90,7 @@ def test_handle_rep():
     store = data_store.get()
     assert store['users'][4]['handle_str'] == "abcdefghijklmnopqrst0"
 
-def test_handle_rep2():
+def test_handle_rep_char_count_over20():
     clear_v1()
     auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
     store = data_store.get()

@@ -55,7 +55,7 @@ def auth_register_v1(email, password, name_first, name_last):
     if handle_rep_num != -1:
         handle_str = handle_str + str(handle_rep_num)
 
-    # Generate user id
+    # Generate id
     id = len(store['users']) + 1
 
     # Create and store account
