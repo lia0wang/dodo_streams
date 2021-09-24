@@ -84,17 +84,9 @@ def test_handle_repeat():
     assert store['users'][0]['handle_str'] == "abcdefghijklmnopqrst"
 
     auth_register_v1("11037.66@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
-    store = data_store.get()
-    assert store['users'][1]['handle_str'] == "abcdefghijklmnopqrst0"
-
     auth_register_v1("11037.6@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
-    store = data_store.get()
-    assert store['users'][2]['handle_str'] == "abcdefghijklmnopqrst1"
-
     auth_register_v1("11037.@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
-    store = data_store.get()
-    assert store['users'][3]['handle_str'] == "abcdefghijklmnopqrst2"
-
+   
     auth_register_v1("11037@gmail.com", "armStrongCann0n", "ABCDEFGHIJ", "KLMNOPQRSTabc")
     store = data_store.get()
     assert store['users'][4]['handle_str'] == "abcdefghijklmnopqrst3"
