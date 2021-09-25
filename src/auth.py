@@ -6,9 +6,14 @@ import re
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
 def auth_login_v1(email, password):
-    return {
-        'auth_user_id': 1,
-    }
+    store = data_store.get()
+    for user in store['users']:
+        if user['email'] == email:
+            if user['password'] == password:
+                return user['u_id']
+            else:
+                raise InputError('Error: Invalid password')
+    raise InputError('Error: Invalid email')
 
 def auth_register_v1(email, password, name_first, name_last):
 
