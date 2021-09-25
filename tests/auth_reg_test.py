@@ -115,4 +115,12 @@ def test_handle_repeat_mix():
     assert store['users'][4]['handle_str'] == "abcdefghijklmnopqrst0"
 
 
-    
+def test_handle_nonalphanumeric_name():
+    clear_v1()
+    auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "#12Isaac*^", "Sch&ne$ider")
+    store = data_store.get()
+    assert store['users'][0]['handle_str'] == "12isaacschneider"
+
+    auth_register_v1("11037.@gmail.com", "armStrongCann0n", "8A:*B!CDEFGH~IJ", "KLMN&|OPQRSTab+c")
+    store = data_store.get()
+    assert store['users'][1]['handle_str'] == "8abcdefghijklmnopqrs"
