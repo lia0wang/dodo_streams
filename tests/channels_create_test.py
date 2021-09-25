@@ -9,6 +9,7 @@ def test_channel_is_dict():
     u_id = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
     channel_id = channels_create_v1(u_id, 'league', True)
     
+    # isinstance returns True when the 2 parameters are euqal.
     assert(isinstance(channel_id, dict) == True) 
 
 def test_multiple_channels_id():
