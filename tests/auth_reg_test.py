@@ -3,7 +3,6 @@ import pytest
 from src.auth import auth_register_v1
 from src.error import InputError
 from src.other import clear_v1
-from src.data_store import data_store
 
 def test_email_invalid():
     clear_v1()
