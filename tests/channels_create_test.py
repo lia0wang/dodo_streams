@@ -10,10 +10,12 @@ def test_channel_type():
     '''
     clear_v1()
     u_id = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
-    channel_id = channels_create_v1(u_id, 'league', True)
+    channel_id = channels_create_v1(u_id['auth_user_id'], 'league', True)
     
     # isinstance returns true when the type of 2 parameters are equal.
-    assert(isinstance(channel_id, dict) == True) 
+    assert(isinstance(channel_id, dict) == True)
+    assert(isinstance(u_id, dict) == True) 
+    assert(isinstance(u_id['auth_user_id'], int) == True) 
 
 def test_multiple_channels():
     '''
@@ -22,8 +24,8 @@ def test_multiple_channels():
     clear_v1()
     u_id1 = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
     u_id2 = auth_register_v1('liaowang@gmail.com', 'liaowang0207', 'wang', 'liao')
-    channel_id_1 = channels_create_v1(u_id1, 'league', True)
-    channel_id_2 = channels_create_v1(u_id2, 'league', False)
+    channel_id_1 = channels_create_v1(u_id1['auth_user_id'], 'league', True)
+    channel_id_2 = channels_create_v1(u_id2['auth_user_id'], 'league', False)
     
     assert(channel_id_1['channel_id'] == 1)
     assert(channel_id_2['channel_id'] == 2)
@@ -36,7 +38,7 @@ def test_no_channel_name():
     u_id = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
 
     with pytest.raises(InputError):
-        channels_create_v1(u_id, "", True)
+        channels_create_v1(u_id['auth_user_id'], "", True)
 
 def channel_invalid_user_id():
     '''
@@ -59,9 +61,9 @@ def test_invalid_channel_name_short():
     u_id = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
     
     with pytest.raises(InputError):
-        channels_create_v1(u_id, "", True)
+        channels_create_v1(u_id['auth_user_id'], "", True)
     with pytest.raises(InputError):
-        channels_create_v1(u_id, "", False)
+        channels_create_v1(u_id['auth_user_id'], "", False)
 
 def test_invalid_channel_name_long():
     '''
@@ -71,6 +73,6 @@ def test_invalid_channel_name_long():
     u_id = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
     
     with pytest.raises(InputError):
-        channels_create_v1(u_id, "aaaabbbbccccddddeeee1", True)
+        channels_create_v1(u_id['auth_user_id'], "aaaabbbbccccddddeeee1", True)
     with pytest.raises(InputError):
-        channels_create_v1(u_id, "1234567890??????????????", False)
+        channels_create_v1(u_id['auth_user_id'], "1234567890??????????????", False)
