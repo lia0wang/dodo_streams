@@ -10,7 +10,9 @@ def auth_login_v1(email, password):
     for user in store['users']:
         if user['email'] == email:
             if user['password'] == password:
-                return user['u_id']
+                return {
+                    'auth_user_id' : user['u_id']
+                }
             else:
                 raise InputError('Error: Invalid password')
     raise InputError('Error: Invalid email')
