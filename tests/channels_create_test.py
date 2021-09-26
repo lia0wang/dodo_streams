@@ -2,7 +2,7 @@ import pytest
 from src.other import clear_v1
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
-from src.error import InputError
+from src.error import AccessError, InputError
 
 def test_channel_type():
     '''
@@ -17,7 +17,7 @@ def test_channel_type():
     assert(isinstance(u_id, dict) == True) 
     assert(isinstance(u_id['auth_user_id'], int) == True) 
 
-def test_multiple_channels():
+def test_create_multiple_channels():
     '''
     Test when create multipel channels with unique channel_id.
     '''
@@ -40,18 +40,16 @@ def test_no_channel_name():
     with pytest.raises(InputError):
         channels_create_v1(u_id['auth_user_id'], "", True)
 
-def channel_invalid_user_id():
+def test_channel_invalid_user_id():
     '''
     Test create the channels with invalid user ID.
     '''
     clear_v1()
-    invalid_u_id1 = 0
-    invalid_u_id2 = -1
+    u_id = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+    invalid_u_id = u_id['auth_user_id'] + 1
 
-    with pytest.raises(InputError):
-        channels_create_v1(invalid_u_id1, "name", True)
-    with pytest.raises(InputError):
-        channels_create_v1(invalid_u_id2, "name", False)
+    with pytest.raises(AccessError):
+        channels_create_v1(invalid_u_id, "name", False)
     
 def test_invalid_channel_name_short():
     '''
