@@ -58,23 +58,10 @@ def channels_create_v1(auth_user_id, name, is_public):
     # Get the auth_user info
     # The user who created it becomes one of the members.
     # the initail channel owner (who created the channel).
-    def get_user_info(id):
-        '''
-        The function is to get user's info and return them as a dict
-        '''
-        for user in store['users']:
-            if user['u_id'] == id:
-                return {
-                    'u_id': id,
-                    'email': user['email'],
-                    'password': user['password'],
-                    'name_first': user['name_first'],
-                    'name_last': user['name_last'],
-                    'handle_str': user['handle_str']
-                }
-        return {}
-    member_dict = get_user_info(auth_user_id)
-    owner_dict = get_user_info(auth_user_id)
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            member_dict = user
+            owner_dict = user
 
     # Creates a new channel with:
     channel = {
