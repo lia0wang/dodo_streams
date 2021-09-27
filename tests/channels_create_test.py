@@ -27,8 +27,8 @@ def test_create_multiple_channels():
     channel_1 = channels_create_v1(user_1['auth_user_id'], 'league', True)
     channel_2 = channels_create_v1(user_2['auth_user_id'], 'league', False)
     
-    assert(channel_1['channel'] == 1)
-    assert(channel_2['channel'] == 2)
+    assert(channel_1['channel_id'] == 1)
+    assert(channel_2['channel_id'] == 2)
     
 def test_no_channel_name():
     '''
