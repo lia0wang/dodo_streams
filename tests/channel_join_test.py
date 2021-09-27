@@ -14,9 +14,9 @@ def test_invalid_uid():
     channel = channels_create_v1(user['auth_user_id'], 'league', True)
 
     invalid_user = user['auth_user_id'] + 1
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         channel_join_v1(invalid_user, channel['channel_id'])
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         channel_join_v1(-1, channel['channel_id'])
 
 def test_join_private_channel():
