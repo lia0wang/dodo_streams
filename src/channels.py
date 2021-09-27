@@ -1,3 +1,4 @@
+import re
 from src.data_store import data_store
 from src.error import AccessError, InputError
 
@@ -54,20 +55,41 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     # Generate the channel_id
     new_channel_id = len(store['channels']) + 1
-
+    
+    # Get the auth_user info
     # The user who created it becomes one of the members.
-    members = [{'auth_user_id': auth_user_id}]
+    # the initail channel owner (who created the channel).
+    def get_user_info(id):
+        '''
+        The function is to get user's info and return them as a dict
+        '''
+        for user in store['users']:
+            if user['u_id'] == id:
+                return {
+                    'u_id': id,
+                    'email': user['email'],
+                    'password': user['password'],
+                    'name_first': user['name_first'],
+                    'name_last': user['name_last'],
+                    'handle_str': user['handle_str']
+                }
+        return {}
+
+    member_lst = get_user_info(auth_user_id)
+    owner_lst = get_user_info(auth_user_id)
+
     # Creates a new channel with:
     channels = {
         'channel_id': new_channel_id,
         'name': name, # the given name
         'is_public': is_public, # is either a public or private channel. 
-        'owner': auth_user_id, # the only channel owner (who created the channel).
-        'members': members # Since members are many, it supposed to be a dict type.
+        'owner_members': owner_lst,
+        'all_members': member_lst # Since members are many, it supposed to be a dict type.
     }
-
     store['channels'].append(channels)
     data_store.set(store)
+
+
 
     return {
         'channel_id': new_channel_id,
