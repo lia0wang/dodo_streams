@@ -10,7 +10,7 @@ from src.error import InputError
 # Entered auth_u_id is incorrect
 def test_nonexistent_auth_uid():
     clear_v1()
-    channels_list_v1(35) == {}
+    assert channels_list_v1(35) == {}
 
 # No channels are created
 def test_no_channels():
