@@ -74,16 +74,16 @@ def channels_create_v1(auth_user_id, name, is_public):
                     'handle_str': user['handle_str']
                 }
         return {}
-    member_lst = get_user_info(auth_user_id)
-    owner_lst = get_user_info(auth_user_id)
+    member_dict = get_user_info(auth_user_id)
+    owner_dict = get_user_info(auth_user_id)
 
     # Creates a new channel with:
     channel = {
         'channel_id': new_channel_id,
         'name': name, # the given name
         'is_public': is_public, # is either a public or private channel. 
-        'owner_members': owner_lst,
-        'all_members': member_lst # Since members are many, it supposed to be a dict type.
+        'owner_members': [owner_dict],
+        'all_members': [member_dict] # Since members are many, it supposed to be a dict type.
     }
 
     # Append the created channel to channels database
