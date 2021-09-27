@@ -80,7 +80,7 @@ def channel_join_v1(auth_user_id, channel_id):
     if valid == False:
         raise InputError("Invalid channel ID!")
     
-    # A user can' join a channel where he is alreday a member.
+    # A user can't join a channel where he is alreday a member.
     for old_member in member_lst:
         if old_member == new_member:
             raise AccessError("Sorry, you can't join the same channel agian.")
