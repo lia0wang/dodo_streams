@@ -34,13 +34,14 @@ def auth_register_v1(email, password, name_first, name_last):
         # Put all emails in list
         # Append 'input email' to emails list
         # Check for duplicates in list of emails
-    emails = []
-    for user in store['users']:
-        emails.append(user['email'])
+    if len(store['users']) != 0:
+        emails = []
+        for user in store['users']:
+            emails.append(user['email'])
 
-    emails.append(email)
-    if len(emails) != len(set(emails)):
-        raise InputError("Error: email taken")
+        emails.append(email)
+        if len(emails) != len(set(emails)):
+            raise InputError("Error: email taken")
 
     # Generate handle
         # Concatenate lowercase name_first and name_last
@@ -53,14 +54,15 @@ def auth_register_v1(email, password, name_first, name_last):
     
     if len(handle_str) > 20:
         handle_str = handle_str[0:20]
+        
+    if len(store['users']) != 0:
+        handle_rep_num = -1
 
-    handle_rep_num = -1
-
-    for user in store['users']:
-        if user['handle_str'][0:len(handle_str)] == handle_str:
-            handle_rep_num += 1
-    if handle_rep_num != -1:
-        handle_str = handle_str + str(handle_rep_num)
+        for user in store['users']:
+            if user['handle_str'][0:len(handle_str)] == handle_str:
+                handle_rep_num += 1
+        if handle_rep_num != -1:
+            handle_str = handle_str + str(handle_rep_num)
 
     # Generate id
     user_id = len(store['users']) + 1
