@@ -1,5 +1,5 @@
 from src.data_store import data_store
-from src.error import InputError
+from src.error import AccessError, InputError
 
 def channels_list_v1(auth_user_id):
     return {
@@ -40,25 +40,40 @@ def channels_create_v1(auth_user_id, name, is_public):
     # Fetch data
     store = data_store.get()
     
+    # Check if the auth_user_id is valid
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            valid = True
+    if valid == False:
+        raise AccessError("Invalid user ID!")
+
     # Raise an InputError when the channel's name is less than 1 char or greater than 20 char 
     if len(name) < 1 or len(name) > 20:
         raise InputError('The name length is not between 1 and 20 characters.')
 
     # Generate the channel_id
     new_channel_id = len(store['channels']) + 1
-
+    
+    # Get the auth_user info
     # The user who created it becomes one of the members.
-    members = [{'auth_user_id': auth_user_id}]
+    # the initail channel owner (who created the channel).
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            member_dict = user
+            owner_dict = user
+
     # Creates a new channel with:
-    channels = {
+    channel = {
         'channel_id': new_channel_id,
         'name': name, # the given name
         'is_public': is_public, # is either a public or private channel. 
-        'owner': auth_user_id, # the only channel owner (who created the channel).
-        'members': members # Since members are many, it supposed to be a dict type.
+        'owner_members': [owner_dict],
+        'all_members': [member_dict] # Since members are many, it supposed to be a dict type.
     }
 
-    store['channels'].append(channels)
+    # Append the created channel to channels database
+    store['channels'].append(channel)
     data_store.set(store)
 
     return {
