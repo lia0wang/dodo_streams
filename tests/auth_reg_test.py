@@ -48,7 +48,7 @@ def test_name_last_short():
 
 def test_store_valid_users():
     clear_v1()
-    assert auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
+    auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
    
 
 
