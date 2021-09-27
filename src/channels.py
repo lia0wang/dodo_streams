@@ -2,6 +2,18 @@ from src.data_store import data_store
 from src.error import AccessError, InputError
 
 def channels_list_v1(auth_user_id):
+    store = data_store.get()
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            valid = True
+    
+    if not valid:
+        print("Not valid")
+        return {}
+    
+
+
     return {
         'channels': [
         	{
