@@ -40,5 +40,20 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
 
 def channel_join_v1(auth_user_id, channel_id):
+    """
+    Add authorised users to the channel with given channel_id
+    Arguments:
+        auth_user_id (int) - The ID of the authorised valid user
+        channel_id (int)   - The ID of the channel where the user will join in
+    Exceptions:
+        InputError  - Channel_id is invalid
+        AccessError - Channel_id refers to a channel that is private
+                      and the authorised user is not already a channel member
+                      and is not a global owner
+    Return Value:
+        Return an empty dictionary
+    """
+
+    
     return {
     }
