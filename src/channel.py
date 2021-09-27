@@ -1,3 +1,6 @@
+from src.data_store import data_store
+from src.error import AccessError, InputError
+
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
     }
@@ -54,6 +57,27 @@ def channel_join_v1(auth_user_id, channel_id):
         Return an empty dictionary
     """
 
+    # Fetch data
+    store = data_store.get()
     
+    # Check if the auth_user_id is valid
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            valid = True
+    if valid == False:
+        raise AccessError("Invalid user ID!")
+    
+    # Check if the channel_id is valid
+    valid = False
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            valid = True
+    if valid == False:
+        raise InputError("Invalid channel ID!")
+
+    # Check when the user is not a member nor an owner and the channel is private
+    
+
     return {
     }
