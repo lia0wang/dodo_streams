@@ -12,8 +12,10 @@ def test_invalid_uid():
     clear_v1()
     user = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
     channel = channels_create_v1(user['auth_user_id'], 'league', True)
-
+    
+    # The invalid user ID which is not existing.
     invalid_user = user['auth_user_id'] + 1
+    
     with pytest.raises(AccessError):
         channel_join_v1(invalid_user, channel['channel_id'])
     with pytest.raises(AccessError):
@@ -25,9 +27,10 @@ def test_join_private_channel():
     '''
     clear_v1()
     user_1 = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+    
     # Create a private channel called channel_id with user_1 as its member and owner.
     channel = channels_create_v1(user_1['auth_user_id'], 'league', False)
-
+    
     # Create another user who is not either a channel member or global owner.
     user_2 = auth_register_v1('shifan@gmail.com', 'shifan0207', 'shifan', 'chen')
 
@@ -44,8 +47,8 @@ def test_duplicated_joins():
     user = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
     channel = channels_create_v1(user['auth_user_id'], 'league', True)
     
-    # Now the user is the member in the created channel, try joining the channel again.
-    with pytest.raises(InputError):
+    # Now the user where the member in the created channel, try joining the channel again.
+    with pytest.raises(AccessError):
         channel_join_v1(user['auth_user_id'], channel['channel_id'])
 
 def test_invalid_channel_id():
@@ -57,8 +60,8 @@ def test_invalid_channel_id():
     channel = channels_create_v1(user['auth_user_id'], 'league', True)
     
     # the invalid_channel_id_1 does not exist
-    invalid_channel_id_1 = channel['channel_id'] + 1
     # the invalid_channel_id_2 is negative
+    invalid_channel_id_1 = channel['channel_id'] + 1
     invalid_channel_id_2 = -1
 
     with pytest.raises(InputError):
