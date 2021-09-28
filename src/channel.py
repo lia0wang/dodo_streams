@@ -1,3 +1,6 @@
+from src.data_store import data_store
+from src.error import AccessError, InputError
+
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
     }
@@ -54,6 +57,41 @@ def channel_join_v1(auth_user_id, channel_id):
         Return an empty dictionary
     """
 
+    # Fetch data
+    store = data_store.get()
     
+    # Check if the auth_user_id is valid
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            new_member = user # Catch the new_member
+            valid = True
+    if valid == False:
+        raise AccessError("Invalid user ID!")
+    
+    # Check if the channel_id is valid
+    valid = False
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            valid = True
+            target_channel = channel # Catch the channel where the new_member is gonna join
+            is_public = channel['is_public']
+            member_lst = channel['all_members']
+    if valid == False:
+        raise InputError("Invalid channel ID!")
+    
+    # A user can't join a channel where he is alreday a member.
+    for old_member in member_lst:
+        if old_member == new_member:
+            raise AccessError("Sorry, you can't join the same channel agian.")
+
+    # A user can't join the private channel when the use is not a member nor a global owner.
+    if is_public == False:
+        raise AccessError("Sorry, you can't join the private channel.")
+
+    # Append the new member to the target channel
+    target_channel['all_members'].append(new_member)
+    data_store.set(store)
+
     return {
     }
