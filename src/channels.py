@@ -40,29 +40,24 @@ def channels_create_v1(auth_user_id, name, is_public):
     # Fetch data
     store = data_store.get()
     
-    # Check if the auth_user_id is valid.
+    # Check if the auth_user_id is valid
     valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             valid = True
-            # Get the user's info if its a valid user.
             user_info = {
-                'u_id': id,
+                'u_id': auth_user_id,
                 'email': user['email'],
                 'name_first': user['name_first'],
                 'name_last': user['name_last'],
-                'handle_str': user['handle_str']
+                'handle_str': user['handle_str'],
             }
     if valid == False:
         raise AccessError("Invalid user ID!")
 
-    # Raise an InputError when the channel's name is less than 1 char or greater than 20 char.
+    # Raise an InputError when the channel's name is less than 1 char or greater than 20 char 
     if len(name) < 1 or len(name) > 20:
-        raise InputError('Sorry, your channel name must be between 1 and 20 characters long.')
-    
-    # The user who created it becomes one of the members and the owner.
-    member_dict = user_info
-    owner_dict = user_info
+        raise InputError('The name length is not between 1 and 20 characters.')
 
     # Generate the channel_id
     new_channel_id = len(store['channels']) + 1
@@ -72,8 +67,8 @@ def channels_create_v1(auth_user_id, name, is_public):
         'channel_id': new_channel_id,
         'name': name, # the given name
         'is_public': is_public, # is either a public or private channel. 
-        'owner_members': [owner_dict],
-        'all_members': [member_dict], # Since members are many, it supposed to be a dict type.
+        'owner_members': [user_info],
+        'all_members': [user_info], # Since members are many, it supposed to be a dict type.
         'messages': []
     }
 
