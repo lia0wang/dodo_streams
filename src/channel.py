@@ -75,18 +75,16 @@ def channel_join_v1(auth_user_id, channel_id):
         if channel['channel_id'] == channel_id:
             valid = True
             target_channel = channel # Catch the channel where the new_member is gonna join
-            is_public = channel['is_public']
-            member_lst = channel['all_members']
     if valid == False:
         raise InputError("Invalid channel ID!")
     
     # A user can't join a channel where he is alreday a member.
-    for old_member in member_lst:
-        if old_member == new_member:
+    for old_member in target_channel['all_members']:
+        if old_member['u_id'] == new_member['u_id']:
             raise AccessError("Sorry, you can't join the same channel agian.")
 
     # A user can't join the private channel when the use is not a member nor a global owner.
-    if is_public == False:
+    if target_channel['is_public'] == False:
         raise AccessError("Sorry, you can't join the private channel.")
 
     # Append the new member to the target channel
