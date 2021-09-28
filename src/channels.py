@@ -61,14 +61,6 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     # Generate the channel_id
     new_channel_id = len(store['channels']) + 1
-    
-    # Get the auth_user info
-    # The user who created it becomes one of the members.
-    # the initail channel owner (who created the channel).
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            member_dict = user
-            owner_dict = user
 
     # Creates a new channel with:
     channel = {
