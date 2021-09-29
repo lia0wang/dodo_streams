@@ -64,13 +64,7 @@ def channel_join_v1(auth_user_id, channel_id):
     valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
-            new_member = {
-                'u_id': auth_user_id,
-                'email': user['email'],
-                'name_first': user['name_first'],
-                'name_last': user['name_last'],
-                'handle_str': user['handle_str'],
-            } # Catch the new_member without password
+            new_member = user # Catch the new_member
             valid = True
     if valid == False:
         raise AccessError("Invalid user ID!")
