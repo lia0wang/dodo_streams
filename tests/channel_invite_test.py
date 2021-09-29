@@ -71,6 +71,6 @@ def test_assigned_user():
 
     channel_invite_v1(auth_id1,channel_id,auth_id2)
     with pytest.raises(InputError):
-        channel_invite_v1(auth_id1, channel_id, auth_id12)
+        channel_invite_v1(auth_id1, channel_id, auth_id2)
 
 '''Access Error Testing Module'''
