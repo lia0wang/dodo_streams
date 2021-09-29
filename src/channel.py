@@ -116,7 +116,7 @@ def channel_join_v1(auth_user_id, channel_id):
 
     # Fetch data
     store = data_store.get()
-    
+
     # Check if the auth_user_id is valid
     valid = False
     for user in store['users']:
@@ -129,25 +129,25 @@ def channel_join_v1(auth_user_id, channel_id):
                 'handle_str': user['handle_str'],
             } # Catch the new_member without password
             valid = True
-    if valid == False:
+    if not valid:
         raise AccessError("Invalid user ID!")
-    
+
     # Check if the channel_id is valid
     valid = False
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
             valid = True
             target_channel = channel # Catch the channel where the new_member is gonna join
-    if valid == False:
+    if not valid:
         raise InputError("Invalid channel ID!")
-    
+
     # A user can't join a channel where he is alreday a member.
     for old_member in target_channel['all_members']:
         if old_member['u_id'] == new_member['u_id']:
             raise AccessError("Sorry, you can't join the same channel agian.")
 
     # A user can't join the private channel when the use is not a member nor a global owner.
-    if target_channel['is_public'] == False:
+    if not target_channel['is_public']:
         raise AccessError("Sorry, you can't join the private channel.")
 
     # Append the new member to the target channel
