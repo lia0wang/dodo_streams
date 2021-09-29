@@ -9,6 +9,14 @@ def channel_details_v1(auth_user_id, channel_id):
     # Fetch data
     store = data_store.get()
 
+    # Check if auth_user_id refers to existing user
+    valid_user = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            valid_user = True
+    if valid_user == False:
+        raise InputError("Error: Invalid auth_user_id")
+    
     # Check if channel_id refers to valid channel
     # Find and save target channel if it exists
     valid_channel = False
@@ -21,11 +29,11 @@ def channel_details_v1(auth_user_id, channel_id):
 
     # Check if authorised user is a member of the target channel
     # Search list of members in the target channel
-    valid_auth_user = False
+    is_member = False
     for member in target_channel['all_members']:
         if member['u_id'] == auth_user_id:
-            valid_auth_user = True
-    if valid_auth_user == False:
+            is_member = True
+    if is_member == False:
         raise AccessError("Error: Authorised user is not a member")
 
     # Return details

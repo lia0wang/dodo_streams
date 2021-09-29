@@ -7,6 +7,14 @@ from src.error import InputError
 from src.error import AccessError
 from src.other import clear_v1
 
+def test_invalid_user():
+    clear_v1()
+    u_id1 = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+    channel_id_1 = channels_create_v1(u_id1['auth_user_id'], 'passione', True)  
+    invalid_auth_user_id = u_id1['auth_user_id'] + 1
+    with pytest.raises(InputError):
+        channel_details_v1(invalid_auth_user_id, channel_id_1['channel_id'])  
+
 def test_invalid_channel_id():
     clear_v1()
     u_id1 = auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
