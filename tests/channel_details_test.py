@@ -2,7 +2,7 @@ import pytest
 
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
-from src.channel import channel_join_v1, channel_details_v1
+from src.channel import channel_join_v1, channel_details_v1, channel_invite_v1
 from src.error import InputError
 from src.error import AccessError
 from src.other import clear_v1
@@ -68,7 +68,7 @@ def test_multiple_members_channel_details():
     u_id3 = auth_register_v1('liaowang@gmail.com', 'liaowang0207', 'wang', 'liao')
     channel_id = channels_create_v1(u_id1['auth_user_id'], 'TheRealMonsters', True)
     channel_join_v1(u_id2['auth_user_id'], channel_id['channel_id'])
-    channel_join_v1(u_id3['auth_user_id'], channel_id['channel_id'])
+    channel_invite_v1(u_id1['auth_user_id'], channel_id['channel_id'], u_id3['auth_user_id'])
 
     details = channel_details_v1(u_id1['auth_user_id'], channel_id['channel_id'])
 
