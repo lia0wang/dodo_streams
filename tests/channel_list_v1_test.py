@@ -17,7 +17,7 @@ def test_no_channels():
     clear_v1()
     auth_user_id = auth_register_v1("bob123@gmail.com", "qwerty", "Bob", "Marley")
     # Need to check this
-    assert channels_list_v1(auth_user_id) == {}
+    assert channels_list_v1(auth_user_id) == {'channels': []}
 
 
 # No channels the auth_u_id is part of
@@ -26,7 +26,7 @@ def test_no_channels_for_user():
     auth_user_id0 = auth_register_v1("bob123@gmail.com", "qwerty", "Bob", "Marley")
     auth_user_id1 = auth_register_v1("bill123@gmail.com", "asdfgh", "Bill", "Gates")
     channels_create_v1(auth_user_id1, "test_channel", False)
-    assert channels_list_v1(auth_user_id0) == {}
+    assert channels_list_v1(auth_user_id0) == {'channels': []}
 
 
 
@@ -35,7 +35,8 @@ def test_no_members_of_channel():
     clear_v1()
     auth_user_id0 = auth_register_v1("bob123@gmail.com", "qwerty", "Bob", "Marley")
     channel_id = channels_create_v1(auth_user_id0, "test_channel", False)
-    assert channels_list_v1(auth_user_id0) == {'channels': [{'channel_id': channel_id, 'name': "test_channel"}]}
+    assert channels_list_v1(auth_user_id0) == {'channels': [{'channel_id': channel_id, 'name': "test_channel", 'is_public': False,
+                                                            'owner': auth_user_id0, 'members': auth_user_id0}]}
 
 
 # Public channel with many users
@@ -49,7 +50,8 @@ def test_many_users_in_channel():
     channel_invite_v1(auth_user_id0, channel_id, auth_user_id1)
     channel_invite_v1(auth_user_id0, channel_id, auth_user_id2)
     channel_invite_v1(auth_user_id0, channel_id, auth_user_id3)
-    assert channels_list_v1(auth_user_id0) == {'channels': [{'channel_id': channel_id, 'name': "test_channel"}]}
+    assert channels_list_v1(auth_user_id0) == {'channels': [{'channel_id': channel_id, 'name': "test_channel", 'is_public': True,
+                                                            'owner': auth_user_id0, 'members': auth_user_id0}]}
 
 
 
