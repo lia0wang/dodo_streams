@@ -45,6 +45,13 @@ def channels_create_v1(auth_user_id, name, is_public):
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             valid = True
+            user_info = {
+                'u_id': auth_user_id,
+                'email': user['email'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last'],
+                'handle_str': user['handle_str'],
+            }
     if valid == False:
         raise AccessError("Invalid user ID!")
 
@@ -54,22 +61,14 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     # Generate the channel_id
     new_channel_id = len(store['channels']) + 1
-    
-    # Get the auth_user info
-    # The user who created it becomes one of the members.
-    # the initail channel owner (who created the channel).
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            member_dict = user
-            owner_dict = user
 
     # Creates a new channel with:
     channel = {
         'channel_id': new_channel_id,
         'name': name, # the given name
         'is_public': is_public, # is either a public or private channel. 
-        'owner_members': [owner_dict],
-        'all_members': [member_dict], # Since members are many, it supposed to be a dict type.
+        'owner_members': [user_info],
+        'all_members': [user_info], # Since members are many, it supposed to be a dict type.
         'messages': []
     }
 
