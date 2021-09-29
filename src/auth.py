@@ -56,7 +56,7 @@ def auth_register_v1(email, password, name_first, name_last):
     
     if len(handle_str) > 20:
         handle_str = handle_str[0:20]
-        
+
     if len(store['users']) != 0:
         handle_rep_num = -1
 
