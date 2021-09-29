@@ -76,8 +76,8 @@ def test_assigned_user():
 '''Access Error Testing Module'''
 
 def test_noaccess():
-'''tests for channel_id is valid and the authorised user is not a member of the channel'''
     pass
-    
+'''tests for channel_id is valid and the authorised user is not a member of the channel'''
+
 
         
