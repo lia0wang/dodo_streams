@@ -6,41 +6,34 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     valid_user1 = False
     valid_user2 = False
     valid_channel = False
-    isMember = False
+    isMember = False 
     new_member = {}
-    # Check authorised user
+    # Check if auth_user_id is valid
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             valid_user1 = True
-
-    # Check user being invited
+    # Check if u_id is valid
     for user in store['users']:
         if user['u_id'] == u_id:
             valid_user2 = True
-            new_member = {
-                'u_id': u_id,
-                'email': user['email'],
-                'name_first': user['name_first'],
-                'name_last': user['name_last'],
-                'handle_str': user['handle_str'],
-            }
-            
+            new_member = user
+    # auth_user_id is invalid         
     if valid_user1 == False:
         raise InputError("Authorised u_id does not refer to a valid user")
-
+    # u_id is valid
     if valid_user2 == False:
         raise InputError("u_id does not refer to a valid user")
         
-    # Check channel 
+    # Check channel_id is valid 
     for chan in store['channels']:
         if chan['channel_id'] == channel_id:
             valid_channel = True
             for user in chan["all_members"]:
                 if user['u_id'] == auth_user_id:
-                    isMember = True
+                    isMember = True # Check if authorised user is a member of the channel
                     break
             for user in chan["all_members"]:
-                if user['u_id'] == new_member['u_id']:
+                if user['u_id'] == new_member['u_id']: # Duplicated user
                     raise InputError("The user is already a member of the channel")
                 
     if valid_channel == False:
@@ -49,7 +42,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     if isMember == False:
         raise AccessError("Authorised user is not a member of the channel")
    
-    # Add u_id to the channel after checking
+    # Add user to the channel after checking all conditions
     channel_join_v1(u_id,channel_id)
 
 
