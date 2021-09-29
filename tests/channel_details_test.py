@@ -32,12 +32,6 @@ def test_not_member():
     channel_join_v1(u_id3['auth_user_id'], channel_id_1['channel_id'])
     with pytest.raises(AccessError):
         channel_details_v1(u_id2['auth_user_id'], channel_id_1['channel_id'])   
-    
-def test_valid_channel_id_and_member():
-    clear_v1()
-    u_id1 = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
-    channel_id_1 = channels_create_v1(u_id1['auth_user_id'], 'passione', True)  
-    channel_details_v1(u_id1['auth_user_id'], channel_id_1['channel_id'])
 
 def test_one_member_channel_details():
     clear_v1()
