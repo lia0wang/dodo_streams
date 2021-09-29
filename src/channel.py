@@ -3,24 +3,37 @@ from src.error import AccessError, InputError
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     store = data_store.get()
-    valid_user = False
+    valid_user1 = False
+    valid_user2 = False
     valid_channel = False
     isMember = False
-    
+    # Authorised user
     for user in store['users']:
         if user['u_id'] == auth_user_id:
-            print('tes')
-            valid_user = True
+            valid_user1 = True
             user_info = {
-                'u_id': auth_user_id,
+                'auth_user_id': auth_user_id,
                 'email': user['email'],
                 'name_first': user['name_first'],
                 'name_last': user['name_last'],
             }
-    if valid_user == False:
-        print('rs')
-        raise InputError("u_id does not refer to a valid user")
+    # Invited user
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            valid_user2 = True
+            user_info = {
+                'auth_user_id': u_id,
+                'email': user['email'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last'],
+            }
+            
+    if valid_user1 == False:
+        raise InputError("Authorised u_id does not refer to a valid user")
 
+    if valid_user2 == False:
+        raise InputError("u_id does not refer to a valid user")
+        
     
     for chan in store['channels']:
         if chan['channel_id'] == channel_id:

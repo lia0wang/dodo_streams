@@ -36,10 +36,28 @@ def test_invalid_channel():
     channel = channels_create_v1(auth_id1, 'comp1531', True)
     channel_id = channel["channel_id"]
     channel_invite_v1(auth_id1,channel_id,auth_id2)
-    invalid_channel = -1
+    invalid_channel = channel_id + 1
 
     with pytest.raises(InputError):
         channel_invite_v1(auth_id1, invalid_channel, auth_id2)
+
+def test_invalid_user():
+    '''tests for valid channel_invite_v1 with invalid auth_user_id or u_id'''
+    clear_v1()
+    user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
+    user2 = auth_register_v1("JohnSmith@hotmail.com", "abcd1234", "John", "Smith")
+    auth_id1 = user1['auth_user_id']
+    auth_id2 = user2['auth_user_id']
+    invalid_u_id1= auth_id1 - 1
+    invalid_u_id2 = auth_id2 + 1
+    channel = channels_create_v1(auth_id1, 'comp1531', True)
+    channel_id = channel["channel_id"]
+    
+    with pytest.raises(InputError):
+        channel_invite_v1(invalid_u_id1, channel_id, auth_id2)
+
+    with pytest.raises(InputError):
+        channel_invite_v1(auth_id1, channel_id, invalid_u_id2)
 
 
 
