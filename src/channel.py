@@ -6,26 +6,34 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     }
 
 def channel_details_v1(auth_user_id, channel_id):
+    # Fetch data
+    store = data_store.get()
+
+    # Check if channel_id refers to valid channel
+    # Find and save target channel if it exists
+    valid_channel = False
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            target_channel = channel
+            valid_channel = True
+    if valid_channel == False:
+        raise InputError("Error: Invalid channel_id")
+
+    # Check if authorised user is a member of the target channel
+    # Search list of members in the target channel
+    valid_auth_user = False
+    for member in target_channel['all_members']:
+        if member['u_id'] == auth_user_id:
+            valid_auth_user = True
+    if valid_auth_user == False:
+        raise AccessError("Error: Authorised user is not a member")
+
+    # Return details
     return {
-        'name': 'Hayden',
-        'owner_members': [
-            {
-                'u_id': 1,
-                'email': 'example@gmail.com',
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-                'handle_str': 'haydenjacobs',
-            }
-        ],
-        'all_members': [
-            {
-                'u_id': 1,
-                'email': 'example@gmail.com',
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-                'handle_str': 'haydenjacobs',
-            }
-        ],
+        'name': target_channel['name'],
+        'is_public': target_channel['is_public'],
+        'owner_members': target_channel['owner_members'],
+        'all_members': target_channel['all_members']
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
