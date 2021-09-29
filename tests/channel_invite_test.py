@@ -74,10 +74,3 @@ def test_assigned_user():
         channel_invite_v1(auth_id1, channel_id, auth_id12)
 
 '''Access Error Testing Module'''
-
-def test_noaccess():
-    pass
-'''tests for channel_id is valid and the authorised user is not a member of the channel'''
-
-
-        
