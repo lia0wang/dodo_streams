@@ -1,4 +1,5 @@
 import pytest
+from src.other import clear_v1
 from src.auth import auth_register_v1
 from src.channel import channel_join_v1
 from src.channel import channel_invite_v1
@@ -75,7 +76,7 @@ def test_assigned_user():
 '''Access Error Testing Module'''
 
 def test_noaccess():
-'''tests for whannel_id is valid and the authorised user is not a member of the channel'''
+'''tests for channel_id is valid and the authorised user is not a member of the channel'''
     pass
     
 
