@@ -24,4 +24,23 @@ def test_valid_input():
     
     assert output == 1
 
+'''Input Error Testing Module'''
 
+def test_invalid_channel():
+    '''tests for valid channel_invite_v1 with invalid channel_id'''
+    clear_v1()
+    user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
+    user2 = auth_register_v1("JohnSmith@hotmail.com", "abcd1234", "John", "Smith")
+    auth_id1 = user1['auth_user_id']
+    auth_id2 = user2['auth_user_id']
+    channel = channels_create_v1(auth_id1, 'comp1531', True)
+    channel_id = channel["channel_id"]
+    channel_invite_v1(auth_id1,channel_id,auth_id2)
+    invalid_channel = -1
+
+    with pytest.raises(InputError):
+        channel_invite_v1(auth_id1, invalid_channel, auth_id2)
+
+
+
+'''Access Error Testing Module'''
