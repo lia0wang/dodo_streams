@@ -22,13 +22,13 @@ def channels_listall_v1(auth_user_id):
     }
 
 def channels_create_v1(auth_user_id, name, is_public):
-    ''' 
+    '''
     Creates a new channel with the given name that is either a public or private channel.
-    The user who created it automatically joins the channel. 
+    The user who created it automatically joins the channel.
     The only channel owner is the user who created the channel.
     Arguments:
         auth_user_id (int)  - The ID of the valid user.
-        name (string)       - The name of the channel. 
+        name (string)       - The name of the channel.
         is_public (boolean) - The state tells if the channel is private or public.
                               True for public and False for private.
     Exceptions:
@@ -39,7 +39,7 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     # Fetch data
     store = data_store.get()
-    
+
     # Check if the auth_user_id is valid
     valid = False
     for user in store['users']:
@@ -52,10 +52,10 @@ def channels_create_v1(auth_user_id, name, is_public):
                 'name_last': user['name_last'],
                 'handle_str': user['handle_str'],
             }
-    if valid == False:
+    if not valid:
         raise AccessError("Invalid user ID!")
 
-    # Raise an InputError when the channel's name is less than 1 char or greater than 20 char 
+    # Raise an InputError when the channel's name is less than 1 char or greater than 20 char
     if len(name) < 1 or len(name) > 20:
         raise InputError('The name length is not between 1 and 20 characters.')
 
@@ -66,7 +66,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     channel = {
         'channel_id': new_channel_id,
         'name': name, # the given name
-        'is_public': is_public, # is either a public or private channel. 
+        'is_public': is_public, # is either a public or private channel.
         'owner_members': [user_info],
         'all_members': [user_info], # Since members are many, it supposed to be a dict type.
         'messages': []
