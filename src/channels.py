@@ -3,16 +3,41 @@ from src.error import AccessError, InputError
 
 def channels_list_v1(auth_user_id):
     store = data_store.get()
+    channels_list = dict()
+    
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            valid = True
+        
+    if valid:
+        channels_list['channels'] = []
+
+    for channel in store['channels']:
+        if channel['members']['auth_user_id'] == auth_user_id:
+            channels_list['channels'].append(channel)
+    
+    return channels_list
+    '''
+    # Checking the auth_user_id is valid
     valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             valid = True
     
     if not valid:
-        print("Not valid")
         return {}
     
+    # Checking if the auth_user_id is in any channels
+    valid = False
+    for channels in store['channels']:
+        if channel['members']['auth_user_id'] == auth_user_id:
+            valid == True
+        
+    if not valid:
+        return {}
 
+    channels_list = []
 
     return {
         'channels': [
@@ -22,6 +47,7 @@ def channels_list_v1(auth_user_id):
         	}
         ],
     }
+    '''
 
 def channels_listall_v1(auth_user_id):
     return {
