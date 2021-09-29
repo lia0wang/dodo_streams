@@ -12,7 +12,7 @@ assumptions: for iteration 1 we have no messages and so total messsages
  as in iteration 1 we do not have create messages.
 
 '''
-def start_more_than_total():
+def test_start_more_than_total():
     clear_v1()
     user_1 = auth_register_v1("JoJo@gmail.com", "HermitPurple", "Joseph", "Joestar")
     channel_id = channels_create_v1(user_1['auth_user_id'], 'league', True)
@@ -20,7 +20,7 @@ def start_more_than_total():
     with pytest.raises(InputError):
         channel_messages_v1(user_1['auth_user_id'], channel_id, start)
 
-def channel_id_not_valid():
+def test_channel_id_not_valid():
     ''' 
     When a channel id does not exist/not created
     '''
@@ -31,7 +31,7 @@ def channel_id_not_valid():
     with pytest.raises(InputError):
         channel_messages_v1(user_1['auth_user_id'], channel_id, start)
 
-def auth_user_id_not_member_of_channel():
+def test_auth_user_id_not_member_of_channel():
     '''
     Tests when auth_user_id is not a member of a channel 
     first case: is_public ->true
@@ -50,7 +50,7 @@ def auth_user_id_not_member_of_channel():
     with pytest.raises(AccessError):
         channel_messages_v1(invalid_user_id, channel_id2, start)
     
-def channel_id_and_auth_user_id_invalid():
+def test_channel_id_and_auth_user_id_invalid():
     '''
     Tests when auth_user_id is not a member of a channel and channel id 
     is not valid.    
