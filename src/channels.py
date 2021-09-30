@@ -28,6 +28,28 @@ def channels_list_v1(auth_user_id):
 
 
 def channels_listall_v1(auth_user_id):
+    store = data_store.get()
+    channels_list = dict()
+    
+    # Checking if the auth_user_id is correct
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            valid = True
+        
+    if valid:
+        channels_list['channels'] = []
+
+    # Adding all channels to the dictionary
+    for channel in store['channels']:
+        channel_dict = {
+            'channel_id': channel['channel_id'],
+            'name': channel['name']
+        }
+        channels_list['channels'].append(channel_dict)
+
+    return channels_list
+    '''
     return {
         'channels': [
         	{
@@ -36,6 +58,7 @@ def channels_listall_v1(auth_user_id):
         	}
         ],
     }
+    '''
 
 def channels_create_v1(auth_user_id, name, is_public):
     ''' 
