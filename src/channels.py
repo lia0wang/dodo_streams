@@ -49,16 +49,6 @@ def channels_listall_v1(auth_user_id):
         channels_list['channels'].append(channel_dict)
 
     return channels_list
-    '''
-    return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
-    }
-    '''
 
 def channels_create_v1(auth_user_id, name, is_public):
     ''' 
