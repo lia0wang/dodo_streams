@@ -16,7 +16,13 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     for user in store['users']:
         if user['u_id'] == u_id:
             valid_user2 = True
-            new_member = user
+            new_member = {
+                'u_id': u_id,
+                'email': user['email'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last'],
+                'handle_str': user['handle_str'],
+            } 
     # auth_user_id is invalid         
     if valid_user1 == False:
         raise InputError("Authorised u_id does not refer to a valid user")
@@ -28,6 +34,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     for chan in store['channels']:
         if chan['channel_id'] == channel_id:
             valid_channel = True
+            target_channel = chan
             for user in chan["all_members"]:
                 if user['u_id'] == auth_user_id:
                     isMember = True # Check if authorised user is a member of the channel
@@ -43,8 +50,8 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         raise AccessError("Authorised user is not a member of the channel")
    
     # Add user to the channel after checking all conditions
-    channel_join_v1(u_id,channel_id)
-
+    target_channel['all_members'].append(new_member)
+    data_store.set(store)
 
 def channel_details_v1(auth_user_id, channel_id):
     # Fetch data
