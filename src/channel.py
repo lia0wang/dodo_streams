@@ -7,7 +7,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     valid_user2 = False
     valid_channel = False
     isMember = False
-    new_member = {}
+    new_member = {} 
     # Check if auth_user_id is valid
     for user in store['users']:
         if user['u_id'] == auth_user_id:
@@ -93,6 +93,27 @@ def channel_details_v1(auth_user_id, channel_id):
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
+    """
+    Checks validty of authorised users and see if they are a member of
+    a valid channel_id. Then returns 'end' which is the 'start + 50th message',
+    the return data behaviour is pagination. Note: in first iteration,
+    it will return an empty message list, and end is undeclared, this function
+    is limited in iteration 1.
+    Arguments:
+        auth_user_id (int) - The ID of the authorised valid user
+        channel_id (int)   - The ID of the channel where the user will join in
+        start (int) - the starting index of messages which the user specifies 
+    Exceptions:
+        InputError  - Channel_id is invalid
+        InputError - start is greater than the total number of messages in the 
+                    channel
+        AccessError - channel_id is valid and the authorised user is not a 
+                        member of the channe;
+    Return Value:
+        Returns start on condition that start <= total messages
+        Returns end 
+        Returns messages 
+    """
         
     store = data_store.get()
     # Check if the channel_id is valid
