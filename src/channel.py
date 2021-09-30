@@ -16,7 +16,13 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     for user in store['users']:
         if user['u_id'] == u_id:
             valid_user2 = True
-            new_member = user
+            new_member = {
+                'u_id': u_id,
+                'email': user['email'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last'],
+                'handle_str': user['handle_str'],
+            } 
     # auth_user_id is invalid         
     if valid_user1 == False:
         raise InputError("Authorised u_id does not refer to a valid user")
