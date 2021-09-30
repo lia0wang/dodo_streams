@@ -5,65 +5,45 @@ from src.data_store import data_store
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.channel import channel_invite_v1
-from src.error import InputError
 
-# Entered auth_u_id is incorrect
+
 def test_nonexistent_auth_uid():
     clear_v1()
     assert channels_list_v1(35) == {}
 
-# No channels are created
 def test_no_channels():
     clear_v1()
     auth_user_id = auth_register_v1("bob123@gmail.com", "qwerty", "Bob", "Marley")
-    # Need to check this
-    assert channels_list_v1(auth_user_id) == {'channels': []}
+    assert channels_list_v1(auth_user_id['auth_user_id']) == {'channels': []}
 
 
-# No channels the auth_u_id is part of
 def test_no_channels_for_user():
     clear_v1()
     auth_user_id0 = auth_register_v1("bob123@gmail.com", "qwerty", "Bob", "Marley")
     auth_user_id1 = auth_register_v1("bill123@gmail.com", "asdfgh", "Bill", "Gates")
-    channels_create_v1(auth_user_id1, "test_channel", False)
-    assert channels_list_v1(auth_user_id0) == {'channels': []}
+    channels_create_v1(auth_user_id1['auth_user_id'], "test_channel", False)
+    assert channels_list_v1(auth_user_id0['auth_user_id']) == {'channels': []}
 
 
-
-# No members except auth_u_id in channels
-def test_no_members_of_channel():
+def test_single_channel():
     clear_v1()
     auth_user_id0 = auth_register_v1("bob123@gmail.com", "qwerty", "Bob", "Marley")
-    channel_id = channels_create_v1(auth_user_id0, "test_channel", False)
-    assert channels_list_v1(auth_user_id0) == {'channels': [{'channel_id': channel_id, 'name': "test_channel", 'is_public': False,
-                                                            'owner': auth_user_id0, 'members': auth_user_id0}]}
+    channel_id = channels_create_v1(auth_user_id0['auth_user_id'], "test_channel", False)
+    assert channels_list_v1(auth_user_id0['auth_user_id']) == {'channels': [{'channel_id': channel_id['channel_id'], 
+    'name': "test_channel"}]}
 
 
-# Public channel with many users
-def test_many_users_in_channel():
+def test_multiple_channels():
     clear_v1()
     auth_user_id0 = auth_register_v1("bob123@gmail.com", "qwerty", "Bob", "Marley")
-    channel_id = channels_create_v1(auth_user_id0, "test_channel", True)
     auth_user_id1 = auth_register_v1("bill123@gmail.com", "asdfgh", "Bill", "Gates")
     auth_user_id2 = auth_register_v1("tardis@gmail.com", "thedoctor", "John", "Smith")
     auth_user_id3 = auth_register_v1("sauron@gmail.com", "theshire", "Frodo", "Baggins")
-    channel_invite_v1(auth_user_id0, channel_id, auth_user_id1)
-    channel_invite_v1(auth_user_id0, channel_id, auth_user_id2)
-    channel_invite_v1(auth_user_id0, channel_id, auth_user_id3)
-    assert channels_list_v1(auth_user_id0) == {'channels': [{'channel_id': channel_id, 'name': "test_channel", 'is_public': True,
-                                                            'owner': auth_user_id0, 'members': auth_user_id0}]}
-
-
-
-# Private channel with auth_u_id
-def test_private_channels():
-    clear_v1()
-    auth_user_id0 = auth_register_v1("bob123@gmail.com", "qwerty", "Bob", "Marley")
-    channel_id = channels_create_v1(auth_user_id0, "test_channel", False)
-    auth_user_id1 = auth_register_v1("bill123@gmail.com", "asdfgh", "Bill", "Gates")
-    auth_user_id2 = auth_register_v1("tardis@gmail.com", "thedoctor", "John", "Smith")
-    auth_user_id3 = auth_register_v1("sauron@gmail.com", "theshire", "Frodo", "Baggins")
-    channel_invite_v1(auth_user_id0, channel_id, auth_user_id1)
-    channel_invite_v1(auth_user_id0, channel_id, auth_user_id2)
-    channel_invite_v1(auth_user_id0, channel_id, auth_user_id3)
-    assert channels_list_v1(auth_user_id0) == {'channels': [{'channel_id': channel_id, 'name': "test_channel"}]}
+    channel_id1 = channels_create_v1(auth_user_id0['auth_user_id'], "test_channel1", True)
+    channel_id2 = channels_create_v1(auth_user_id0['auth_user_id'], "test_channel2", True)
+    channel_id3 = channels_create_v1(auth_user_id0['auth_user_id'], "test_channel3", True)
+    channel_invite_v1(auth_user_id0['auth_user_id'], channel_id1['channel_id'], auth_user_id1['auth_user_id'])
+    channel_invite_v1(auth_user_id0['auth_user_id'], channel_id2['channel_id'], auth_user_id2['auth_user_id'])
+    channel_invite_v1(auth_user_id0['auth_user_id'], channel_id3['channel_id'], auth_user_id3['auth_user_id'])
+    assert channels_list_v1(auth_user_id0['auth_user_id']) == {'channels': [{'channel_id': channel_id1['channel_id'], 'name': "test_channel1"},
+    {'channel_id': channel_id2['channel_id'], 'name': "test_channel2"}, {'channel_id': channel_id3['channel_id'], 'name': "test_channel3"}]}
