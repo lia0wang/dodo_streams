@@ -6,7 +6,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     valid_user1 = False
     valid_user2 = False
     valid_channel = False
-    isMember = False 
+    isMember = False
     new_member = {}
     # Check if auth_user_id is valid
     for user in store['users']:
@@ -17,14 +17,14 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         if user['u_id'] == u_id:
             valid_user2 = True
             new_member = user
-    # auth_user_id is invalid         
+    # auth_user_id is invalid
     if valid_user1 == False:
         raise InputError("Authorised u_id does not refer to a valid user")
     # u_id is valid
     if valid_user2 == False:
         raise InputError("u_id does not refer to a valid user")
-        
-    # Check channel_id is valid 
+    
+    # Check channel_id is valid
     for chan in store['channels']:
         if chan['channel_id'] == channel_id:
             valid_channel = True
@@ -86,18 +86,32 @@ def channel_details_v1(auth_user_id, channel_id):
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
+        
+    store = data_store.get()
+    # Check if the channel_id is valid
+    valid_channel = False
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            valid_channel = True
+            target_channel = channel
+    if valid_channel == False:
+        raise InputError("Invalid channel ID!")
+
+    # Check if authorised user is a member of the target channel
+    # Search list of members in the target channel
+    is_member = False
+    for member in target_channel['all_members']:
+        if member['u_id'] == auth_user_id:
+            is_member = True
+    if is_member == False:
+        raise AccessError("Error: Authorised user is not a member")
+
     return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
-            }
-        ],
-        'start': 0,
-        'end': 50,
+        'messages': [],
+        'start': start,
+        'end': 0,
     }
+
 
 def channel_join_v1(auth_user_id, channel_id):
     """
