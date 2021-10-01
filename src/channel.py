@@ -138,7 +138,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if start > total_messages:
         raise InputError("Error: Start must be lower than total_messages")
 
-
     return {
         'messages': [
             {
