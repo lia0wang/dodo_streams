@@ -39,8 +39,10 @@ def channels_listall_v1(auth_user_id):
         if user['u_id'] == auth_user_id:
             valid = True
         
-    if valid:
-        channels_list['channels'] = []
+    if not valid:
+        raise InputError("Error: Invalid auth_user_id")
+    
+    channels_list['channels'] = []
 
     # Adding all channels to the dictionary
     for channel in store['channels']:
