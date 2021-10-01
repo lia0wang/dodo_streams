@@ -10,10 +10,10 @@ def channels_list_v1(auth_user_id):
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             valid = True
-        
+    
     if not valid:
         raise InputError("Error: Invalid auth_user_id")
-    
+
     channels_list['channels'] = []
 
     # Adding all channels the user is part of to the dictionary

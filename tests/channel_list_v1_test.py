@@ -12,6 +12,7 @@ def test_nonexistent_auth_uid():
     with pytest.raises(InputError):
         channels_list_v1(35)
 
+
 def test_no_channels():
     clear_v1()
     auth_user_id = auth_register_v1("bob123@gmail.com", "qwerty", "Bob", "Marley")
