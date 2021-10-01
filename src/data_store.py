@@ -27,6 +27,9 @@ Example usage:
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'users': [],
+    'channels':[],
+    'latest_message_id':0,
+    'message_count':0,
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
