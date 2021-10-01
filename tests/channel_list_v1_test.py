@@ -4,11 +4,13 @@ from src.other import clear_v1
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.channel import channel_invite_v1
+from src.error import InputError
 
 
 def test_nonexistent_auth_uid():
     clear_v1()
-    assert channels_list_v1(35) == {}
+    with pytest.raises(InputError):
+        channels_list_v1(35)
 
 def test_no_channels():
     clear_v1()
