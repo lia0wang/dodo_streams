@@ -134,11 +134,24 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if is_member == False:
         raise AccessError("Error: Authorised user is not a member")
 
+    total_messages = 0
+    if start > total_messages:
+        raise InputError("Error: Start must be lower than total_messages")
+
+
     return {
-        'messages': [],
+        'messages': [
+            {
+                'message_id': 1,
+                'u_id': 1,
+                'message': 'Hello world',
+                'time_created': 1582426789,
+            }
+        ],
         'start': start,
-        'end': 0,
+        'end': -1,
     }
+
 
 
 def channel_join_v1(auth_user_id, channel_id):

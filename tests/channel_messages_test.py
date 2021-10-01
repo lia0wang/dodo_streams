@@ -8,12 +8,21 @@ from src.other import clear_v1
 '''
 assumptions: for iteration 1 we have no messages and so total messsages
  is zero and we return an empty list for messages.
- Cannot do the condition For start > total number of messages, returns inputerror
- as in iteration 1 we do not have create messages function. Therefore 
- messages total is always empty.
  End cannot return -1 in iteration 1 as there is no messages.
 
 '''
+def test_start_more_than_total_messages():
+    '''
+    When start is more than total messsages it returns input error
+    '''
+    clear_v1()
+    user = auth_register_v1(
+        "JoJo@gmail.com", "HermitPurple", "Joseph", "Joestar")
+    channel = channels_create_v1(user['auth_user_id'], 'league', True)
+    start = 1
+
+    with pytest.raises(InputError):
+        channel_messages_v1(user['auth_user_id'], channel['channel_id'], start)
 
 def test_channel_id_not_valid():
     '''
@@ -75,3 +84,4 @@ def test_channel_id_and_auth_user_id_invalid():
 
     with pytest.raises(InputError):
         channel_messages_v1(invalid_user_id, invalid_channel_id_1, start)
+
