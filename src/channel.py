@@ -25,7 +25,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
             } 
     # auth_user_id is invalid         
     if valid_user1 == False:
-        raise InputError("Authorised u_id does not refer to a valid user")
+        raise AccessError("Authorised u_id does not refer to a valid user")
     # u_id is valid
     if valid_user2 == False:
         raise InputError("u_id does not refer to a valid user")
@@ -52,7 +52,9 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     # Add user to the channel after checking all conditions
     target_channel['all_members'].append(new_member)
     data_store.set(store)
-
+    return {
+    }
+    
 def channel_details_v1(auth_user_id, channel_id):
     # Fetch data
     store = data_store.get()
@@ -63,7 +65,7 @@ def channel_details_v1(auth_user_id, channel_id):
         if user['u_id'] == auth_user_id:
             valid_user = True
     if valid_user == False:
-        raise InputError("Error: Invalid auth_user_id")
+        raise AccessError("Error: Invalid user id")
     
     # Check if channel_id refers to valid channel
     # Find and save target channel if it exists
@@ -73,7 +75,7 @@ def channel_details_v1(auth_user_id, channel_id):
             target_channel = channel
             valid_channel = True
     if valid_channel == False:
-        raise InputError("Error: Invalid channel_id")
+        raise InputError("Error: Invalid channel id")
 
     # Check if authorised user is a member of the target channel
     # Search list of members in the target channel
@@ -170,7 +172,7 @@ def channel_join_v1(auth_user_id, channel_id):
 
     # Fetch data
     store = data_store.get()
-    
+
     # Check if the auth_user_id is valid
     valid = False
     for user in store['users']:
@@ -183,25 +185,25 @@ def channel_join_v1(auth_user_id, channel_id):
                 'handle_str': user['handle_str'],
             } # Catch the new_member without password
             valid = True
-    if valid == False:
+    if not valid:
         raise AccessError("Invalid user ID!")
-    
+
     # Check if the channel_id is valid
     valid = False
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
             valid = True
             target_channel = channel # Catch the channel where the new_member is gonna join
-    if valid == False:
+    if not valid:
         raise InputError("Invalid channel ID!")
-    
+
     # A user can't join a channel where he is alreday a member.
     for old_member in target_channel['all_members']:
         if old_member['u_id'] == new_member['u_id']:
             raise AccessError("Sorry, you can't join the same channel agian.")
 
     # A user can't join the private channel when the use is not a member nor a global owner.
-    if target_channel['is_public'] == False:
+    if not target_channel['is_public']:
         raise AccessError("Sorry, you can't join the private channel.")
 
     # Append the new member to the target channel
