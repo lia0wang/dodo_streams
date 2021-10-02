@@ -32,7 +32,7 @@ def test_not_member():
     with pytest.raises(AccessError):
         channel_details_v1(u_id2['auth_user_id'], channel_id_1['channel_id'])   
 
-def test_one_member_details():
+def test_one_member_channel_details():
     clear_v1()
     u_id1 = auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
     channel_id = channels_create_v1(u_id1['auth_user_id'], 'TheRealMonsters', True)
@@ -54,7 +54,7 @@ def test_one_member_details():
     assert details['all_members'][0]['name_last'] == "Schneider"
     assert details['all_members'][0]['handle_str'] == "isaacschneider" 
 
-def test_multiple_members_details():
+def test_multiple_members_channel_details():
     clear_v1()
     u_id1 = auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
     u_id2 = auth_register_v1("StandUser@gmail.com", "StandPower", "Generic", "name")
@@ -88,7 +88,7 @@ def test_multiple_members_details():
     assert details['all_members'][2]['handle_str'] == "wangliao"  
 
 
-def test_multiple_channels_details():
+def test_multiple_channel_details_test():
     clear_v1()
     u_id1 = auth_register_v1('liaowang@gmail.com', 'liaowang0207', 'wang', 'liao')
     u_id2 = auth_register_v1("StandUser@gmail.com", "StandPower", "Generic", "name")
