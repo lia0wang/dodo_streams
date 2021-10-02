@@ -7,3 +7,6 @@ def clear_v1():
     store['latest_message_id'] = 0
     store['message_count'] = 0
     data_store.set(store)
+
+    return {
+    }
