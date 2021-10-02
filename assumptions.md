@@ -25,3 +25,10 @@
 
 ## Data store
 
+1. There will be an entry for storing the information of users.
+2. There will be an entry for storing the information of channels.
+3. There will be an entry for storing messages.
+
+## Other
+
+1. clear_v1 will clean all the users, channels, and messages.
