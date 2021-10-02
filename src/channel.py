@@ -52,7 +52,9 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     # Add user to the channel after checking all conditions
     target_channel['all_members'].append(new_member)
     data_store.set(store)
-
+    return {
+    }
+    
 def channel_details_v1(auth_user_id, channel_id):
     # Fetch data
     store = data_store.get()
