@@ -82,7 +82,7 @@ def test_repeated_user():
 
 '''Access Error Testing Module'''
 
-def test_repeated_user():
+def test_unauthorised_user():
     '''tests for channel_id is valid and the authorised user is not a member of the channel'''
     clear_v1()
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
