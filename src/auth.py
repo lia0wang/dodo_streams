@@ -84,6 +84,12 @@ def auth_register_v1(email, password, name_first, name_last):
         if handle_rep_num != -1:
             handle_str = handle_str + str(handle_rep_num)
 
+    # Generate permission_id
+    if len(store['users']) == 0:
+        permission_id = 1
+    else:
+        permission_id = 2
+
     # Generate id
     user_id = len(store['users']) + 1
 
@@ -94,7 +100,8 @@ def auth_register_v1(email, password, name_first, name_last):
         'password': password,
         'name_first': name_first,
         'name_last': name_last,
-        'handle_str': handle_str
+        'handle_str': handle_str,
+        'permission_id': permission_id
     }
     store['users'].append(user)
     data_store.set(store)
