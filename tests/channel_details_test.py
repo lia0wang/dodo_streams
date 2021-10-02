@@ -3,8 +3,7 @@ import pytest
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
 from src.channel import channel_join_v1, channel_details_v1, channel_invite_v1
-from src.error import InputError
-from src.error import AccessError
+from src.error import InputError, AccessError
 from src.other import clear_v1
 
 def test_invalid_user():
@@ -12,7 +11,7 @@ def test_invalid_user():
     u_id1 = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
     channel_id_1 = channels_create_v1(u_id1['auth_user_id'], 'passione', True)  
     invalid_auth_user_id = u_id1['auth_user_id'] + 1
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         channel_details_v1(invalid_auth_user_id, channel_id_1['channel_id'])  
 
 def test_invalid_channel_id():
@@ -139,6 +138,3 @@ def test_multiple_channel_details_test():
     assert details_2['all_members'][1]['name_first'] == "Isaac"
     assert details_2['all_members'][1]['name_last'] == "Schneider"
     assert details_2['all_members'][1]['handle_str'] == "isaacschneider"    
-
-
-    

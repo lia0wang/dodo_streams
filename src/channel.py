@@ -25,7 +25,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
             } 
     # auth_user_id is invalid         
     if valid_user1 == False:
-        raise InputError("Authorised u_id does not refer to a valid user")
+        raise AccessError("Authorised u_id does not refer to a valid user")
     # u_id is valid
     if valid_user2 == False:
         raise InputError("u_id does not refer to a valid user")
@@ -65,7 +65,7 @@ def channel_details_v1(auth_user_id, channel_id):
         if user['u_id'] == auth_user_id:
             valid_user = True
     if valid_user == False:
-        raise InputError("Error: Invalid auth_user_id")
+        raise AccessError("Error: Invalid user id")
     
     # Check if channel_id refers to valid channel
     # Find and save target channel if it exists
@@ -75,7 +75,7 @@ def channel_details_v1(auth_user_id, channel_id):
             target_channel = channel
             valid_channel = True
     if valid_channel == False:
-        raise InputError("Error: Invalid channel_id")
+        raise InputError("Error: Invalid channel id")
 
     # Check if authorised user is a member of the target channel
     # Search list of members in the target channel
