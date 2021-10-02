@@ -2,8 +2,34 @@ import pytest
 from src.other import clear_v1
 from src.auth import auth_register_v1
 from src.channel import channel_join_v1
-from src.channels import channels_create_v1
+from src.channels import channels_create_v1, channels_list_v1
 from src.error import InputError, AccessError
+
+
+def test_global_owner():
+    '''
+    Test if a global owner can join the private channel.
+    '''
+    clear_v1()
+    global_owner = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+    user_2 = auth_register_v1('shifan@gmail.com', 'shifan0207', 'shifan', 'chen')
+    user_3 = auth_register_v1('jojo@gmail.com', 'jojo1234', 'jo', 'jo')
+
+    channel = channels_create_v1(user_3['auth_user_id'], 'league', False)
+    channel_join_v1(global_owner['auth_user_id'], channel['channel_id'])
+
+    # the first created user is a global owner who can join the private channel.
+    assert channels_list_v1(global_owner['auth_user_id']) == {'channels': [{'channel_id': 1, 'name': 'league'}]}
+    
+    # the user 2 is not a global owner nor a member so he cant join the private channel.
+    with pytest.raises(AccessError):
+        channel_join_v1(user_2['auth_user_id'], channel['channel_id'])
+        
+def test_none_existing_channel():
+    clear_v1()
+    user = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+    with pytest.raises(InputError):
+        channel_join_v1(user['auth_user_id'], 1)
 
 def test_invalid_uid():
     '''

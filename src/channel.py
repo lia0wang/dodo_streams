@@ -183,6 +183,7 @@ def channel_join_v1(auth_user_id, channel_id):
                 'name_first': user['name_first'],
                 'name_last': user['name_last'],
                 'handle_str': user['handle_str'],
+                'permission_id': user['permission_id']
             } # Catch the new_member without password
             valid = True
     if not valid:
@@ -202,8 +203,8 @@ def channel_join_v1(auth_user_id, channel_id):
         if old_member['u_id'] == new_member['u_id']:
             raise AccessError("Sorry, you can't join the same channel agian.")
 
-    # A user can't join the private channel when the use is not a member nor a global owner.
-    if not target_channel['is_public']:
+    # If the channel is private and the useer is not a member nor a global owner.
+    if not target_channel['is_public'] and new_member['permission_id'] != 1:
         raise AccessError("Sorry, you can't join the private channel.")
 
     # Append the new member to the target channel
