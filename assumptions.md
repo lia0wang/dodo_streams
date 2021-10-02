@@ -14,6 +14,7 @@
 ### channel_messsages_v1
 
 1. In iteration 1, total messages is zero as messages cannot be created.
+2. End return -1, in iteration 1 as there is no messages.
 
 ## Channel
 
