@@ -12,7 +12,7 @@ def channels_list_v1(auth_user_id):
             valid = True
     
     if not valid:
-        raise InputError("Error: Invalid auth_user_id")
+        raise AccessError("Error: Invalid user id")
 
     channels_list['channels'] = []
 
@@ -27,8 +27,6 @@ def channels_list_v1(auth_user_id):
                 channels_list['channels'].append(channel_dict)
     return channels_list
 
-
-
 def channels_listall_v1(auth_user_id):
     store = data_store.get()
     channels_list = dict()
@@ -40,7 +38,7 @@ def channels_listall_v1(auth_user_id):
             valid = True
         
     if not valid:
-        raise InputError("Error: Invalid auth_user_id")
+        raise AccessError("Error: Invalid user id")
     
     channels_list['channels'] = []
 
