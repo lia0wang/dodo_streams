@@ -36,6 +36,27 @@ def auth_login_v1(email, password):
     raise InputError('Error: Invalid email')
 
 def auth_register_v1(email, password, name_first, name_last):
+    '''
+    Using a given email, password and first and lastnames, creates a new account
+    and appends account to list of users in database.
+
+    Arguments:
+        email (string)
+        password (string)
+        name_first (string)
+        name_last (string)
+
+    Exceptions:
+        InputError - occurs when email entered is not a valid email
+        InputError - occurs when email is being used by another user
+        InputError - occurs when length of password is less than 6 characters
+        InputError - occurs when first name is not between 1 and 50 characters
+        InputError - occurs when last name is not between 1 and 50 characters
+
+    Return Value:
+        Returns auth_user_id (integer in a dictionary accessed using key 'auth_user_id')
+        on the condition that the email, password first and last names are all valid
+    '''
 
     # Check for input errors
     if not re.fullmatch(regex, email):
