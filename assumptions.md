@@ -15,6 +15,7 @@
 
 1. In iteration 1, total messages is zero as messages cannot be created.
 2. End return -1, in iteration 1 as there is no messages.
+3. In iteraton 1, messages returns an empty list as no messages can be created.
 
 ## Channel
 
