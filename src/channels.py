@@ -2,24 +2,57 @@ from src.data_store import data_store
 from src.error import AccessError, InputError
 
 def channels_list_v1(auth_user_id):
-    return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
-    }
+    store = data_store.get()
+    channels_list = dict()
+    
+    # Checking if the auth_user_id is correct
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            valid = True
+    
+    if not valid:
+        raise InputError("Error: Invalid auth_user_id")
+
+    channels_list['channels'] = []
+
+    # Adding all channels the user is part of to the dictionary
+    for channel in store['channels']:
+        for member in channel['all_members']:
+            if member['u_id'] == auth_user_id:
+                channel_dict = {
+                    'channel_id': channel['channel_id'],
+                    'name': channel['name']
+                }
+                channels_list['channels'].append(channel_dict)
+    return channels_list
+
+
 
 def channels_listall_v1(auth_user_id):
-    return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
-    }
+    store = data_store.get()
+    channels_list = dict()
+    
+    # Checking if the auth_user_id is correct
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            valid = True
+        
+    if not valid:
+        raise InputError("Error: Invalid auth_user_id")
+    
+    channels_list['channels'] = []
+
+    # Adding all channels to the dictionary
+    for channel in store['channels']:
+        channel_dict = {
+            'channel_id': channel['channel_id'],
+            'name': channel['name']
+        }
+        channels_list['channels'].append(channel_dict)
+
+    return channels_list
 
 def channels_create_v1(auth_user_id, name, is_public):
     ''' 
@@ -45,6 +78,13 @@ def channels_create_v1(auth_user_id, name, is_public):
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             valid = True
+            user_info = {
+                'u_id': auth_user_id,
+                'email': user['email'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last'],
+                'handle_str': user['handle_str'],
+            }
     if valid == False:
         raise AccessError("Invalid user ID!")
 
@@ -54,22 +94,15 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     # Generate the channel_id
     new_channel_id = len(store['channels']) + 1
-    
-    # Get the auth_user info
-    # The user who created it becomes one of the members.
-    # the initail channel owner (who created the channel).
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            member_dict = user
-            owner_dict = user
 
     # Creates a new channel with:
     channel = {
         'channel_id': new_channel_id,
         'name': name, # the given name
         'is_public': is_public, # is either a public or private channel. 
-        'owner_members': [owner_dict],
-        'all_members': [member_dict] # Since members are many, it supposed to be a dict type.
+        'owner_members': [user_info],
+        'all_members': [user_info], # Since members are many, it supposed to be a dict type.
+        'messages': []
     }
 
     # Append the created channel to channels database
