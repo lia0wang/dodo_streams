@@ -56,6 +56,40 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     }
     
 def channel_details_v1(auth_user_id, channel_id):
+    '''
+    A channel and authorised user is given. If the authorised user is a member
+    of the channel then details about the channel are provided. These details include the
+    channel's name, its members, owners and 'public-or-private' status.
+    
+    Arguments:
+        auth_user_id (int)
+        channel_id (int)
+        
+    Exceptions:
+        AccessError - occurs if auth_user_id does not refer to existing user
+        InputError - occurs if channel_id does not refer to existing channel
+        AccessError - occurs if auth_user_id does not refer to member of the valid channel
+        
+    Return Value:
+        Returns dictionary if auth_user_id and channel_id, together, are valid
+        Dictionary includes:
+            - name (string)
+            - is_public (boolean)
+            - owner_members (list of dictionaries)
+                Each dictionary contains:
+                    u_id (int)
+                    email (string)
+                    name_first (string)
+                    name_last (string)
+                    handle_str (string)
+            - all_members (list of dictionaries)
+                Each dictionary contains:
+                    u_id (int)
+                    email (string)
+                    name_first (string)
+                    name_last (string)
+                    handle_str (string)
+    '''
     # Fetch data
     store = data_store.get()
 
@@ -86,12 +120,37 @@ def channel_details_v1(auth_user_id, channel_id):
     if is_member == False:
         raise AccessError("Error: Authorised user is not a member")
 
+    # Generate list of owner members and members 
+    # 'permission_id' and 'password' are excluded from member details
+    owner_members = []
+    all_members = []
+
+    for owner_member in target_channel['owner_members']:
+        owner_member_details = {
+                'u_id': owner_member['u_id'],
+                'email': owner_member['email'],
+                'name_first': owner_member['name_first'],
+                'name_last': owner_member['name_last'],
+                'handle_str': owner_member['handle_str'],
+        }
+        owner_members.append(owner_member_details)
+    
+    for member in target_channel['all_members']:
+        member_details = {
+                'u_id': member['u_id'],
+                'email': member['email'],
+                'name_first': member['name_first'],
+                'name_last': member['name_last'],
+                'handle_str': member['handle_str'],
+        }
+        all_members.append(member_details)
+
     # Return details
     return {
         'name': target_channel['name'],
         'is_public': target_channel['is_public'],
-        'owner_members': target_channel['owner_members'],
-        'all_members': target_channel['all_members']
+        'owner_members': owner_members,
+        'all_members': all_members
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
