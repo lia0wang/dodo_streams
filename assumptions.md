@@ -15,6 +15,7 @@
 
 1. In iteration 1, total messages is zero as messages cannot be created.
 2. End return -1, in iteration 1 as there is no messages.
+3. In iteraton 1, messages returns an empty list as no messages can be created.
 
 ## Channel
 
@@ -25,3 +26,10 @@
 
 ## Data store
 
+1. There will be an entry for storing the information of users.
+2. There will be an entry for storing the information of channels.
+3. There will be an entry for storing messages.
+
+## Other
+
+1. clear_v1 will clean all the users, channels, and messages.

@@ -2,6 +2,25 @@ from src.data_store import data_store
 from src.error import AccessError, InputError
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
+    '''
+    Let an authorised user with ID auth_user_id to invite a user with ID u_id to j
+    oin a channel with ID channel_id. Once invited, the user is added to the channel immediately.
+    In both public and private channels, all members are able to invite users.
+    
+    Arguments:
+        auth_user_id (int)
+        channel_id (int)
+        u_id (int)
+        
+    Exceptions:
+        InputError - occurs if channel_id does not refer to existing channel
+        InputError - occurs if u_id does not refer to existing user
+        InputError - occurs if u_id is already a member of the channel
+        AccessError - occurs if auth_user_id does not refer to member of the valid channel
+        
+    Return Value:
+        N/A
+    '''
     store = data_store.get()
     valid_user1 = False
     valid_user2 = False
@@ -25,7 +44,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
             } 
     # auth_user_id is invalid         
     if valid_user1 == False:
-        raise AccessError("Authorised u_id does not refer to a valid user")
+        raise InputError("Authorised u_id does not refer to a valid user")
     # u_id is valid
     if valid_user2 == False:
         raise InputError("u_id does not refer to a valid user")
@@ -200,14 +219,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         raise InputError("Error: Start must be lower than total_messages")
 
     return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
-            }
-        ],
+        'messages': [ ],
         'start': start,
         'end': -1,
     }
