@@ -2,6 +2,25 @@ from src.data_store import data_store
 from src.error import AccessError, InputError
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
+    '''
+    Let an authorised user with ID auth_user_id to invite a user with ID u_id to j
+    oin a channel with ID channel_id. Once invited, the user is added to the channel immediately.
+    In both public and private channels, all members are able to invite users.
+    
+    Arguments:
+        auth_user_id (int)
+        channel_id (int)
+        u_id (int)
+        
+    Exceptions:
+        InputError - occurs if channel_id does not refer to existing channel
+        InputError - occurs if u_id does not refer to existing user
+        InputError - occurs if u_id is already a member of the channel
+        AccessError - occurs if auth_user_id does not refer to member of the valid channel
+        
+    Return Value:
+        N/A
+    '''
     store = data_store.get()
     valid_user1 = False
     valid_user2 = False
@@ -25,7 +44,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
             } 
     # auth_user_id is invalid         
     if valid_user1 == False:
-        raise InputError("Authorised u_id does not refer to a valid user")
+        raise AccessError("Authorised u_id does not refer to a valid user")
     # u_id is valid
     if valid_user2 == False:
         raise InputError("u_id does not refer to a valid user")
@@ -52,8 +71,44 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     # Add user to the channel after checking all conditions
     target_channel['all_members'].append(new_member)
     data_store.set(store)
-
+    return {
+    }
+    
 def channel_details_v1(auth_user_id, channel_id):
+    '''
+    A channel and authorised user is given. If the authorised user is a member
+    of the channel then details about the channel are provided. These details include the
+    channel's name, its members, owners and 'public-or-private' status.
+    
+    Arguments:
+        auth_user_id (int)
+        channel_id (int)
+        
+    Exceptions:
+        AccessError - occurs if auth_user_id does not refer to existing user
+        InputError - occurs if channel_id does not refer to existing channel
+        AccessError - occurs if auth_user_id does not refer to member of the valid channel
+        
+    Return Value:
+        Returns dictionary if auth_user_id and channel_id, together, are valid
+        Dictionary includes:
+            - name (string)
+            - is_public (boolean)
+            - owner_members (list of dictionaries)
+                Each dictionary contains:
+                    u_id (int)
+                    email (string)
+                    name_first (string)
+                    name_last (string)
+                    handle_str (string)
+            - all_members (list of dictionaries)
+                Each dictionary contains:
+                    u_id (int)
+                    email (string)
+                    name_first (string)
+                    name_last (string)
+                    handle_str (string)
+    '''
     # Fetch data
     store = data_store.get()
 
@@ -63,7 +118,7 @@ def channel_details_v1(auth_user_id, channel_id):
         if user['u_id'] == auth_user_id:
             valid_user = True
     if valid_user == False:
-        raise InputError("Error: Invalid auth_user_id")
+        raise AccessError("Error: Invalid user id")
     
     # Check if channel_id refers to valid channel
     # Find and save target channel if it exists
@@ -73,7 +128,7 @@ def channel_details_v1(auth_user_id, channel_id):
             target_channel = channel
             valid_channel = True
     if valid_channel == False:
-        raise InputError("Error: Invalid channel_id")
+        raise InputError("Error: Invalid channel id")
 
     # Check if authorised user is a member of the target channel
     # Search list of members in the target channel
@@ -84,12 +139,37 @@ def channel_details_v1(auth_user_id, channel_id):
     if is_member == False:
         raise AccessError("Error: Authorised user is not a member")
 
+    # Generate list of owner members and members 
+    # 'permission_id' and 'password' are excluded from member details
+    owner_members = []
+    all_members = []
+
+    for owner_member in target_channel['owner_members']:
+        owner_member_details = {
+                'u_id': owner_member['u_id'],
+                'email': owner_member['email'],
+                'name_first': owner_member['name_first'],
+                'name_last': owner_member['name_last'],
+                'handle_str': owner_member['handle_str'],
+        }
+        owner_members.append(owner_member_details)
+    
+    for member in target_channel['all_members']:
+        member_details = {
+                'u_id': member['u_id'],
+                'email': member['email'],
+                'name_first': member['name_first'],
+                'name_last': member['name_last'],
+                'handle_str': member['handle_str'],
+        }
+        all_members.append(member_details)
+
     # Return details
     return {
         'name': target_channel['name'],
         'is_public': target_channel['is_public'],
-        'owner_members': target_channel['owner_members'],
-        'all_members': target_channel['all_members']
+        'owner_members': owner_members,
+        'all_members': all_members
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
@@ -134,11 +214,16 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if is_member == False:
         raise AccessError("Error: Authorised user is not a member")
 
+    total_messages = 0
+    if start > total_messages:
+        raise InputError("Error: Start must be lower than total_messages")
+
     return {
-        'messages': [],
+        'messages': [ ],
         'start': start,
-        'end': 0,
+        'end': -1,
     }
+
 
 
 def channel_join_v1(auth_user_id, channel_id):
@@ -158,7 +243,7 @@ def channel_join_v1(auth_user_id, channel_id):
 
     # Fetch data
     store = data_store.get()
-    
+
     # Check if the auth_user_id is valid
     valid = False
     for user in store['users']:
@@ -169,27 +254,28 @@ def channel_join_v1(auth_user_id, channel_id):
                 'name_first': user['name_first'],
                 'name_last': user['name_last'],
                 'handle_str': user['handle_str'],
+                'permission_id': user['permission_id']
             } # Catch the new_member without password
             valid = True
-    if valid == False:
+    if not valid:
         raise AccessError("Invalid user ID!")
-    
+
     # Check if the channel_id is valid
     valid = False
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
             valid = True
             target_channel = channel # Catch the channel where the new_member is gonna join
-    if valid == False:
+    if not valid:
         raise InputError("Invalid channel ID!")
-    
+
     # A user can't join a channel where he is alreday a member.
     for old_member in target_channel['all_members']:
         if old_member['u_id'] == new_member['u_id']:
             raise AccessError("Sorry, you can't join the same channel agian.")
 
-    # A user can't join the private channel when the use is not a member nor a global owner.
-    if target_channel['is_public'] == False:
+    # If the channel is private and the useer is not a member nor a global owner.
+    if not target_channel['is_public'] and new_member['permission_id'] != 1:
         raise AccessError("Sorry, you can't join the private channel.")
 
     # Append the new member to the target channel

@@ -3,8 +3,7 @@ import pytest
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
 from src.channel import channel_join_v1, channel_details_v1, channel_invite_v1
-from src.error import InputError
-from src.error import AccessError
+from src.error import InputError, AccessError
 from src.other import clear_v1
 
 def test_invalid_user():
@@ -12,7 +11,7 @@ def test_invalid_user():
     u_id1 = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
     channel_id_1 = channels_create_v1(u_id1['auth_user_id'], 'passione', True)  
     invalid_auth_user_id = u_id1['auth_user_id'] + 1
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         channel_details_v1(invalid_auth_user_id, channel_id_1['channel_id'])  
 
 def test_invalid_channel_id():
@@ -33,7 +32,7 @@ def test_not_member():
     with pytest.raises(AccessError):
         channel_details_v1(u_id2['auth_user_id'], channel_id_1['channel_id'])   
 
-def test_one_member_channel_details():
+def test_one_member_details():
     clear_v1()
     u_id1 = auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
     channel_id = channels_create_v1(u_id1['auth_user_id'], 'TheRealMonsters', True)
@@ -55,7 +54,7 @@ def test_one_member_channel_details():
     assert details['all_members'][0]['name_last'] == "Schneider"
     assert details['all_members'][0]['handle_str'] == "isaacschneider" 
 
-def test_multiple_members_channel_details():
+def test_multiple_members_details():
     clear_v1()
     u_id1 = auth_register_v1("11037.666@gmail.com", "armStrongCann0n", "Isaac", "Schneider")
     u_id2 = auth_register_v1("StandUser@gmail.com", "StandPower", "Generic", "name")
@@ -89,7 +88,7 @@ def test_multiple_members_channel_details():
     assert details['all_members'][2]['handle_str'] == "wangliao"  
 
 
-def test_multiple_channel_details_test():
+def test_multiple_channels_details():
     clear_v1()
     u_id1 = auth_register_v1('liaowang@gmail.com', 'liaowang0207', 'wang', 'liao')
     u_id2 = auth_register_v1("StandUser@gmail.com", "StandPower", "Generic", "name")
@@ -139,6 +138,3 @@ def test_multiple_channel_details_test():
     assert details_2['all_members'][1]['name_first'] == "Isaac"
     assert details_2['all_members'][1]['name_last'] == "Schneider"
     assert details_2['all_members'][1]['handle_str'] == "isaacschneider"    
-
-
-    
