@@ -2,8 +2,6 @@ import re
 from src.data_store import data_store
 from src.error import InputError
 
-REGEX = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-
 def auth_login_v1(email, password):
     """
     checks if auth_user_id is a valid u_id and password matches the respective
@@ -57,8 +55,10 @@ def auth_register_v1(email, password, name_first, name_last):
         on the condition that the email, password first and last names are all valid
     '''
 
+    regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+
     # Check for input errors
-    if not re.fullmatch(REGEX, email):
+    if not re.fullmatch(regex, email):
         raise InputError("Error: Invalid email")
     if len(password) < 6:
         raise InputError("Error: Invalid password")
