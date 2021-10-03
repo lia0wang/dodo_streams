@@ -5,12 +5,6 @@ from src.channels import channels_create_v1
 from src.error import InputError, AccessError
 from src.other import clear_v1
 
-'''
-assumptions: for iteration 1 we have no messages and so total messsages
- is zero and we return an empty list for messages.
- End cannot return -1 in iteration 1 as there is no messages.
-
-'''
 def test_start_more_than_total_messages():
     '''
     When start is more than total messsages it returns input error
