@@ -41,10 +41,10 @@ def auth_register_v1(email, password, name_first, name_last):
     and appends account to list of users in database.
 
     Arguments:
-        email (string)
-        password (string)
-        name_first (string)
-        name_last (string)
+        email (string) - email of the registering user
+        password (string) - passsword of the registering user
+        name_first (string) - first name of the registering user
+        name_last (string) - last name of the registering user
 
     Exceptions:
         InputError - occurs when email entered is not a valid email
