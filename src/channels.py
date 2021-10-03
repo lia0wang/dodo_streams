@@ -28,7 +28,24 @@ def channels_list_v1(auth_user_id):
     return channels_list
 
 def channels_listall_v1(auth_user_id):
+    ''' 
+    Creates a dictionary containing a list of all the channels.
+    
+    Arguments:
+        auth_user_id (int)  - The ID of the valid user.
+
+    Exceptions:
+        None
+
+    Return Value:
+        Return a dictionary containing the channel id and channel name of every
+        channel.
+    '''
+
+    # Fetch data
     store = data_store.get()
+    
+    # Creating dictionary
     channels_list = dict()
     
     # Checking if the auth_user_id is correct
@@ -40,6 +57,7 @@ def channels_listall_v1(auth_user_id):
     if not valid:
         raise AccessError("Error: Invalid user id")
     
+    # Creating a list of channels
     channels_list['channels'] = []
 
     # Adding all channels to the dictionary
