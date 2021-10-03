@@ -28,6 +28,11 @@
 1. Users can not join the channel where he/she/sth is already a member.
 2. Users can join 0, 1 or more channels.
 
+### channel_invite_v1
+
+1. Users can join any channel that the user is being invited, regardless tha channel
+   is private or not.
+
 ## Data store
 
 1. There will be an entry for storing the information of users.
@@ -36,4 +41,6 @@
 
 ## Other
 
-1. clear_v1 will clean all the users, channels, and messages.
+### clear_v1
+
+1. This function will clean all the users, channels, and messages.
