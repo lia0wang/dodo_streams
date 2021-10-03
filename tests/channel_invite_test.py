@@ -56,7 +56,7 @@ def test_invalid_user():
     channel = channels_create_v1(auth_id, 'comp1531', True)
     channel_id = channel["channel_id"]
     
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channel_invite_v1(invalid_auth_id, channel_id, u_id)
 
     with pytest.raises(InputError):
