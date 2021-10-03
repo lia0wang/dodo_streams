@@ -82,8 +82,8 @@ def channel_details_v1(auth_user_id, channel_id):
     channel's name, its members, owners and 'public-or-private' status.
     
     Arguments:
-        auth_user_id (int)
-        channel_id (int)
+        auth_user_id (int) - ID of the authorised user
+        channel_id (int) - ID of the channel whose details will be provided
         
     Exceptions:
         AccessError - occurs if auth_user_id does not refer to existing user
@@ -114,21 +114,21 @@ def channel_details_v1(auth_user_id, channel_id):
     store = data_store.get()
 
     # Check if auth_user_id refers to existing user
-    valid_user = False
+    is_valid_user = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
-            valid_user = True
-    if valid_user == False:
+            is_valid_user = True
+    if is_valid_user == False:
         raise AccessError("Error: Invalid user id")
     
     # Check if channel_id refers to valid channel
     # Find and save target channel if it exists
-    valid_channel = False
+    is_valid_channel = False
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
             target_channel = channel
-            valid_channel = True
-    if valid_channel == False:
+            is_valid_channel = True
+    if is_valid_channel == False:
         raise InputError("Error: Invalid channel id")
 
     # Check if authorised user is a member of the target channel
