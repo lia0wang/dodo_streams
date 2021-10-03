@@ -41,6 +41,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
                 'name_first': user['name_first'],
                 'name_last': user['name_last'],
                 'handle_str': user['handle_str'],
+                'permission_id': user['permission_id']
             } 
     # auth_user_id is invalid         
     if valid_user1 == False:
