@@ -44,7 +44,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
             } 
     # auth_user_id is invalid         
     if valid_user1 == False:
-        raise AccessError("Authorised u_id does not refer to a valid user")
+        raise InputError("Authorised u_id does not refer to a valid user")
     # u_id is valid
     if valid_user2 == False:
         raise InputError("u_id does not refer to a valid user")
