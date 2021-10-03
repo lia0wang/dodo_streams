@@ -219,14 +219,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         raise InputError("Error: Start must be lower than total_messages")
 
     return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
-            }
-        ],
+        'messages': [ ],
         'start': start,
         'end': -1,
     }
