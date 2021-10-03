@@ -1,6 +1,10 @@
 # Assumptions
 ## Auth
 
+### auth_register_v1
+
+1. Multiple users can register with the same first names, last names and passwords.
+
 ## Channels
 
 ### channels_create_v1
