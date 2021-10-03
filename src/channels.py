@@ -9,7 +9,7 @@ def channels_list_v1(auth_user_id):
         auth_user_id (int)  - The ID of the valid user.
 
     Exceptions:
-        None
+        AccessError - Nonexistent auth_user_id entered
 
     Return Value:
         Return a dictionary containing the channel id and channel name of every
