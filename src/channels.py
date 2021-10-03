@@ -118,6 +118,7 @@ def channels_create_v1(auth_user_id, name, is_public):
                 'name_first': user['name_first'],
                 'name_last': user['name_last'],
                 'handle_str': user['handle_str'],
+                'permission_id': user['permission_id']
             }
     if valid == False:
         raise AccessError("Invalid user ID!")
