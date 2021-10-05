@@ -1,0 +1,279 @@
+============================= test session starts ==============================
+platform linux -- Python 3.7.3, pytest-6.2.5, py-1.10.0, pluggy-1.0.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+hypothesis profile 'default' -> database=DirectoryBasedExampleDatabase('/tmp_amd/kamen/export/kamen/3/cs1531/project-automarking/tempstore/.hypothesis/examples')
+rootdir: /tmp_amd/kamen/export/kamen/3/cs1531/project-automarking/tempstore, configfile: pytest.ini
+plugins: forked-1.3.0, xdist-2.2.1, hypothesis-6.1.1, timeout-1.4.2
+collecting ... collected 71 items
+
+tests/auth_tests/auth_login_test.py::test_successful_login PASSED        [  1%]
+tests/auth_tests/auth_login_test.py::test_unregistered_user PASSED       [  2%]
+tests/auth_tests/auth_login_test.py::test_registered_but_incorrect_password PASSED [  4%]
+tests/auth_tests/auth_register_test.py::test_invalid_email[@gmail.com] PASSED [  5%]
+tests/auth_tests/auth_register_test.py::test_invalid_email[bob] PASSED   [  7%]
+tests/auth_tests/auth_register_test.py::test_invalid_email[bob@bob@bob.com] PASSED [  8%]
+tests/auth_tests/auth_register_test.py::test_invalid_password[12345] PASSED [  9%]
+tests/auth_tests/auth_register_test.py::test_invalid_password[] PASSED   [ 11%]
+tests/auth_tests/auth_register_test.py::test_invalid_name_first[] PASSED [ 12%]
+tests/auth_tests/auth_register_test.py::test_invalid_name_first[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] PASSED [ 14%]
+tests/auth_tests/auth_register_test.py::test_invalid_name_last[] PASSED  [ 15%]
+tests/auth_tests/auth_register_test.py::test_invalid_name_last[bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb] PASSED [ 16%]
+tests/auth_tests/auth_register_test.py::test_duplicate_email PASSED      [ 18%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_normal PASSED [ 19%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_password_short PASSED [ 21%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_password_long PASSED [ 22%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_names_short PASSED [ 23%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_names_long PASSED [ 25%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_double_same_password PASSED [ 26%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_double_same_name PASSED [ 28%]
+tests/channel_tests/channel_details_test.py::test_channel_owner_can_get_details PASSED [ 29%]
+tests/channel_tests/channel_details_test.py::test_channel_member_can_get_details PASSED [ 30%]
+tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[abcdefghij-klmnopqrs-abcdefghijklmnopqrs-abcdefghij-klmnopqrs-abcdefghijklmnopqrs0] PASSED [ 32%]
+tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[abcdefghij-klmnopqrst-abcdefghijklmnopqrst-abcdefghij-klmnopqrst-abcdefghijklmnopqrst0] PASSED [ 33%]
+tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[@bcdefgh!j-klmn opqrst-bcdefghjklmnopqrst-bcdefghj-klmnopqrst-bcdefghjklmnopqrst0] PASSED [ 35%]
+tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[abc-def0-abcdef0-abc-def-abcdef1] PASSED [ 36%]
+tests/channel_tests/channel_details_test.py::test_non_channel_member_cant_get_details PASSED [ 38%]
+tests/channel_tests/channel_details_test.py::test_invalid_channel_id PASSED [ 39%]
+tests/channel_tests/channel_details_test.py::test_invalid_token PASSED   [ 40%]
+tests/channel_tests/channel_invite_test.py::test_error_when_already_member PASSED [ 42%]
+tests/channel_tests/channel_invite_test.py::test_inviting_global_owner PASSED [ 43%]
+tests/channel_tests/channel_invite_test.py::test_inviting_global_member PASSED [ 45%]
+tests/channel_tests/channel_invite_test.py::test_invitation_from_non_channel_member FAILED [ 46%]
+tests/channel_tests/channel_invite_test.py::test_channel_id_invalid PASSED [ 47%]
+tests/channel_tests/channel_invite_test.py::test_u_id_invalid PASSED     [ 49%]
+tests/channel_tests/channel_invite_test.py::test_invalid_token FAILED    [ 50%]
+tests/channel_tests/channel_join_test.py::test_global_owner_can_join_private_channel PASSED [ 52%]
+tests/channel_tests/channel_join_test.py::test_global_owner_can_join_public_channel PASSED [ 53%]
+tests/channel_tests/channel_join_test.py::test_global_member_can_join_public_channel PASSED [ 54%]
+tests/channel_tests/channel_join_test.py::test_global_member_cant_join_private_channel PASSED [ 56%]
+tests/channel_tests/channel_join_test.py::test_already_joined_channel FAILED [ 57%]
+tests/channel_tests/channel_join_test.py::test_join_invalid_channel_id PASSED [ 59%]
+tests/channel_tests/channel_join_test.py::test_invalid_token PASSED      [ 60%]
+tests/channel_tests/channel_messages_test.py::test_successful_no_messages PASSED [ 61%]
+tests/channel_tests/channel_messages_test.py::test_input_error_when_start_greater_than_message_num PASSED [ 63%]
+tests/channel_tests/channel_messages_test.py::test_access_error_when_user_is_non_member PASSED [ 64%]
+tests/channel_tests/channel_messages_test.py::test_input_error_when_channel_id_invalid PASSED [ 66%]
+tests/channel_tests/channel_messages_test.py::test_access_error_when_invalid_token_given PASSED [ 67%]
+tests/channels_tests/channels_create_test.py::test_create_channel_successful[True-andys room] PASSED [ 69%]
+tests/channels_tests/channels_create_test.py::test_create_channel_successful[False-andys room] PASSED [ 70%]
+tests/channels_tests/channels_create_test.py::test_channel_invalid_name_length[True-] PASSED [ 71%]
+tests/channels_tests/channels_create_test.py::test_channel_invalid_name_length[True-I AM NOT A TOY AND ALSO THIS NAME IS TOO LONG] PASSED [ 73%]
+tests/channels_tests/channels_create_test.py::test_channel_invalid_name_length[False-] PASSED [ 74%]
+tests/channels_tests/channels_create_test.py::test_channel_invalid_name_length[False-I AM NOT A TOY AND ALSO THIS NAME IS TOO LONG] PASSED [ 76%]
+tests/channels_tests/channels_create_test.py::test_invalid_token PASSED  [ 77%]
+tests/channels_tests/channels_list_test.py::test_when_member_is_in_no_channels PASSED [ 78%]
+tests/channels_tests/channels_list_test.py::test_channel_owner_in_channel[True-andy] PASSED [ 80%]
+tests/channels_tests/channels_list_test.py::test_channel_owner_in_channel[False-andy] PASSED [ 81%]
+tests/channels_tests/channels_list_test.py::test_channel_member_in_channel[True-andy] PASSED [ 83%]
+tests/channels_tests/channels_list_test.py::test_channel_member_in_channel[False-andy] PASSED [ 84%]
+tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[False-True-ZERG-andy] PASSED [ 85%]
+tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[False-False-ZERG-andy] PASSED [ 87%]
+tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[True-True-ZERG-andy] PASSED [ 88%]
+tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[True-False-ZERG-andy] PASSED [ 90%]
+tests/channels_tests/channels_list_test.py::test_invalid_token PASSED    [ 91%]
+tests/channels_tests/channels_listall_test.py::test_when_no_channels PASSED [ 92%]
+tests/channels_tests/channels_listall_test.py::test_when_one_channel_exists_private PASSED [ 94%]
+tests/channels_tests/channels_listall_test.py::test_when_one_channel_exists_public PASSED [ 95%]
+tests/channels_tests/channels_listall_test.py::test_when_multiple_channels_exist PASSED [ 97%]
+tests/channels_tests/channels_listall_test.py::test_invalid_token PASSED [ 98%]
+tests/other_tests/clear_test.py::test_cant_login_after_clear PASSED      [100%]
+
+====== Marks recorded: 33.43 ======
+
+
+=================================== FAILURES ===================================
+___________________ test_invitation_from_non_channel_member ____________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=2, token=2)
+zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id=1, owner_members=[3], all_members=[])
+
+    def test_invitation_from_non_channel_member(user_woody, user_buzz, zergs_private_lair):
+        with pytest.raises(err.AccessError):
+>           channel_invite_v1(user_woody, zergs_private_lair.channel_id, user_buzz.u_id)
+
+tests/channel_tests/channel_invite_test.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+channel_id = 1, u_id = 2
+
+    def channel_invite_v1(auth_user_id, channel_id, u_id):
+        '''
+        Let an authorised user with ID auth_user_id to invite a user with ID u_id to j
+        oin a channel with ID channel_id. Once invited, the user is added to the channel immediately.
+        In both public and private channels, all members are able to invite users.
+    
+        Arguments:
+            auth_user_id (int)
+            channel_id (int)
+            u_id (int)
+    
+        Exceptions:
+            InputError - occurs if channel_id does not refer to existing channel
+            InputError - occurs if u_id does not refer to existing user
+            InputError - occurs if u_id is already a member of the channel
+            AccessError - occurs if auth_user_id does not refer to member of the valid channel
+    
+        Return Value:
+            N/A
+        '''
+        store = data_store.get()
+        valid_user1 = False
+        valid_user2 = False
+        valid_channel = False
+        isMember = False
+        new_member = {}
+        # Check if auth_user_id is valid
+        for user in store['users']:
+            if user['u_id'] == auth_user_id:
+                valid_user1 = True
+        # Check if u_id is valid
+        for user in store['users']:
+            if user['u_id'] == u_id:
+                valid_user2 = True
+                new_member = {
+                    'u_id': u_id,
+                    'email': user['email'],
+                    'name_first': user['name_first'],
+                    'name_last': user['name_last'],
+                    'handle_str': user['handle_str'],
+                    'permission_id': user['permission_id']
+                }
+        # auth_user_id is invalid
+        if valid_user1 == False:
+>           raise InputError("Authorised u_id does not refer to a valid user")
+E           src.error.InputError: Authorised u_id does not refer to a valid user
+
+src/channel.py:48: InputError
+______________________________ test_invalid_token ______________________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=2, token=2)
+
+    def test_invalid_token(woodys_public_toybox, user_buzz):
+        with pytest.raises(err.AccessError):
+>           channel_invite_v1(-1, woodys_public_toybox.channel_id, user_buzz.u_id)
+
+tests/channel_tests/channel_invite_test.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = -1, channel_id = 1, u_id = 2
+
+    def channel_invite_v1(auth_user_id, channel_id, u_id):
+        '''
+        Let an authorised user with ID auth_user_id to invite a user with ID u_id to j
+        oin a channel with ID channel_id. Once invited, the user is added to the channel immediately.
+        In both public and private channels, all members are able to invite users.
+    
+        Arguments:
+            auth_user_id (int)
+            channel_id (int)
+            u_id (int)
+    
+        Exceptions:
+            InputError - occurs if channel_id does not refer to existing channel
+            InputError - occurs if u_id does not refer to existing user
+            InputError - occurs if u_id is already a member of the channel
+            AccessError - occurs if auth_user_id does not refer to member of the valid channel
+    
+        Return Value:
+            N/A
+        '''
+        store = data_store.get()
+        valid_user1 = False
+        valid_user2 = False
+        valid_channel = False
+        isMember = False
+        new_member = {}
+        # Check if auth_user_id is valid
+        for user in store['users']:
+            if user['u_id'] == auth_user_id:
+                valid_user1 = True
+        # Check if u_id is valid
+        for user in store['users']:
+            if user['u_id'] == u_id:
+                valid_user2 = True
+                new_member = {
+                    'u_id': u_id,
+                    'email': user['email'],
+                    'name_first': user['name_first'],
+                    'name_last': user['name_last'],
+                    'handle_str': user['handle_str'],
+                    'permission_id': user['permission_id']
+                }
+        # auth_user_id is invalid
+        if valid_user1 == False:
+>           raise InputError("Authorised u_id does not refer to a valid user")
+E           src.error.InputError: Authorised u_id does not refer to a valid user
+
+src/channel.py:48: InputError
+_________________________ test_already_joined_channel __________________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+
+    def test_already_joined_channel(woodys_public_toybox, user_woody):
+        with pytest.raises(err.InputError):
+>           channel_join_v1(user_woody.token, woodys_public_toybox.channel_id)
+
+tests/channel_tests/channel_join_test.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = 1, channel_id = 1
+
+    def channel_join_v1(auth_user_id, channel_id):
+        """
+        Add authorised users to the channel with given channel_id
+        Arguments:
+            auth_user_id (int) - The ID of the authorised valid user
+            channel_id (int)   - The ID of the channel where the user will join in
+        Exceptions:
+            InputError  - Channel_id is invalid
+            AccessError - Channel_id refers to a channel that is private
+                          and the authorised user is not already a channel member
+                          and is not a global owner
+        Return Value:
+            Return an empty dictionary
+        """
+    
+        # Fetch data
+        store = data_store.get()
+    
+        # Check if the auth_user_id is valid
+        valid = False
+        for user in store['users']:
+            if user['u_id'] == auth_user_id:
+                new_member = {
+                    'u_id': auth_user_id,
+                    'email': user['email'],
+                    'name_first': user['name_first'],
+                    'name_last': user['name_last'],
+                    'handle_str': user['handle_str'],
+                    'permission_id': user['permission_id']
+                } # Catch the new_member without password
+                valid = True
+        if not valid:
+            raise AccessError("Invalid user ID!")
+    
+        # Check if the channel_id is valid
+        valid = False
+        for channel in store['channels']:
+            if channel['channel_id'] == channel_id:
+                valid = True
+                target_channel = channel # Catch the channel where the new_member is gonna join
+        if not valid:
+            raise InputError("Invalid channel ID!")
+    
+        # A user can't join a channel where he is alreday a member.
+        for old_member in target_channel['all_members']:
+            if old_member['u_id'] == new_member['u_id']:
+>               raise AccessError("Sorry, you can't join the same channel agian.")
+E               src.error.AccessError: Sorry, you can't join the same channel agian.
+
+src/channel.py:276: AccessError
+=========================== short test summary info ============================
+FAILED tests/channel_tests/channel_invite_test.py::test_invitation_from_non_channel_member
+FAILED tests/channel_tests/channel_invite_test.py::test_invalid_token - src.e...
+FAILED tests/channel_tests/channel_join_test.py::test_already_joined_channel
+========================= 3 failed, 68 passed in 0.80s =========================
