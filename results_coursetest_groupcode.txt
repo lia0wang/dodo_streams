@@ -38,7 +38,7 @@ tests/channel_tests/channel_details_test.py::test_invalid_token PASSED   [ 40%]
 tests/channel_tests/channel_invite_test.py::test_error_when_already_member PASSED [ 42%]
 tests/channel_tests/channel_invite_test.py::test_inviting_global_owner PASSED [ 43%]
 tests/channel_tests/channel_invite_test.py::test_inviting_global_member PASSED [ 45%]
-tests/channel_tests/channel_invite_test.py::test_invitation_from_non_channel_member FAILED [ 46%]
+tests/channel_tests/channel_invite_test.py::test_invitation_from_non_channel_member PASSED [ 46%]
 tests/channel_tests/channel_invite_test.py::test_channel_id_invalid PASSED [ 47%]
 tests/channel_tests/channel_invite_test.py::test_u_id_invalid PASSED     [ 49%]
 tests/channel_tests/channel_invite_test.py::test_invalid_token FAILED    [ 50%]
@@ -78,74 +78,10 @@ tests/channels_tests/channels_listall_test.py::test_when_multiple_channels_exist
 tests/channels_tests/channels_listall_test.py::test_invalid_token PASSED [ 98%]
 tests/other_tests/clear_test.py::test_cant_login_after_clear PASSED      [100%]
 
-====== Marks recorded: 33.43 ======
+====== Marks recorded: 33.86 ======
 
 
 =================================== FAILURES ===================================
-___________________ test_invitation_from_non_channel_member ____________________
-
-user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
-user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=2, token=2)
-zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id=1, owner_members=[3], all_members=[])
-
-    def test_invitation_from_non_channel_member(user_woody, user_buzz, zergs_private_lair):
-        with pytest.raises(err.AccessError):
->           channel_invite_v1(user_woody, zergs_private_lair.channel_id, user_buzz.u_id)
-
-tests/channel_tests/channel_invite_test.py:47: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-auth_user_id = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
-channel_id = 1, u_id = 2
-
-    def channel_invite_v1(auth_user_id, channel_id, u_id):
-        '''
-        Let an authorised user with ID auth_user_id to invite a user with ID u_id to j
-        oin a channel with ID channel_id. Once invited, the user is added to the channel immediately.
-        In both public and private channels, all members are able to invite users.
-    
-        Arguments:
-            auth_user_id (int)
-            channel_id (int)
-            u_id (int)
-    
-        Exceptions:
-            InputError - occurs if channel_id does not refer to existing channel
-            InputError - occurs if u_id does not refer to existing user
-            InputError - occurs if u_id is already a member of the channel
-            AccessError - occurs if auth_user_id does not refer to member of the valid channel
-    
-        Return Value:
-            N/A
-        '''
-        store = data_store.get()
-        valid_user1 = False
-        valid_user2 = False
-        valid_channel = False
-        isMember = False
-        new_member = {}
-        # Check if auth_user_id is valid
-        for user in store['users']:
-            if user['u_id'] == auth_user_id:
-                valid_user1 = True
-        # Check if u_id is valid
-        for user in store['users']:
-            if user['u_id'] == u_id:
-                valid_user2 = True
-                new_member = {
-                    'u_id': u_id,
-                    'email': user['email'],
-                    'name_first': user['name_first'],
-                    'name_last': user['name_last'],
-                    'handle_str': user['handle_str'],
-                    'permission_id': user['permission_id']
-                }
-        # auth_user_id is invalid
-        if valid_user1 == False:
->           raise InputError("Authorised u_id does not refer to a valid user")
-E           src.error.InputError: Authorised u_id does not refer to a valid user
-
-src/channel.py:48: InputError
 ______________________________ test_invalid_token ______________________________
 
 woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
@@ -273,7 +209,6 @@ E               src.error.AccessError: Sorry, you can't join the same channel ag
 
 src/channel.py:276: AccessError
 =========================== short test summary info ============================
-FAILED tests/channel_tests/channel_invite_test.py::test_invitation_from_non_channel_member
 FAILED tests/channel_tests/channel_invite_test.py::test_invalid_token - src.e...
 FAILED tests/channel_tests/channel_join_test.py::test_already_joined_channel
-========================= 3 failed, 68 passed in 0.80s =========================
+========================= 2 failed, 69 passed in 0.73s =========================
