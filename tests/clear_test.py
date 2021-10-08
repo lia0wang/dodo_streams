@@ -16,7 +16,7 @@ def test_clear_user():
     Test if clear_v1 successfully clear the user
     """
     clear_v1()
-    user = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+    auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
     clear_v1()
 
     with pytest.raises(InputError):

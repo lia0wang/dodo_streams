@@ -25,7 +25,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     valid_user1 = False
     valid_user2 = False
     valid_channel = False
-    isMember = False
+    is_member = False
     new_member = {} 
     # Check if auth_user_id is valid
     for user in store['users']:
@@ -57,7 +57,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
             target_channel = chan
             for user in chan["all_members"]:
                 if user['u_id'] == auth_user_id:
-                    isMember = True # Check if authorised user is a member of the channel
+                    is_member = True # Check if authorised user is a member of the channel
                     break
             for user in chan["all_members"]:
                 if user['u_id'] == new_member['u_id']: # Duplicated user
@@ -66,7 +66,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     if valid_channel == False:
         raise InputError("channel_id does not refer to a valid channel")
    
-    if isMember == False:
+    if is_member == False:
         raise AccessError("Authorised user is not a member of the channel")
    
     # Add user to the channel after checking all conditions
