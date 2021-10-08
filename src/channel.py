@@ -215,11 +215,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if is_member == False:
         raise AccessError("Error: Authorised user is not a member")
 
-    messages = store['messages']
     total_messages = 0
-    for message in messages:
-        total_messages += 1
-
     if start > total_messages:
         raise InputError("Error: Start must be lower than total_messages")
 
