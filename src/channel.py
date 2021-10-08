@@ -215,14 +215,43 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if is_member == False:
         raise AccessError("Error: Authorised user is not a member")
 
+    messages = store['messages']
     total_messages = 0
+    for message in messages:
+        total_messages += 1
+
     if start > total_messages:
         raise InputError("Error: Start must be lower than total_messages")
 
+    # runs through the messages and createss a new list for list of messages 
+    # between start to start + 50 messages. (total is 50 messages)
+    # return -1 if error.
+    segment_messages = []
+    messages_list_len = len(messages)
+    # NOTE not tested
+    if not messages:
+        end = -1
+    else:
+        for index, message in enumerate(messages[start:], start):
+            if index < start + 50:
+                message_content = {
+                        'message_id': message['message_id'],
+                        'u_id': message['u_id'],
+                        'message': messages['message'],
+                        'time_created': messages['time_created'],
+                }
+                index += 1
+                segment_messages.append(message_content)
+                end = index
+            else:
+                end = index
+            if index == messages_list_len:
+                end = -1 
+    
     return {
-        'messages': [ ],
+        'messages': segment_messages,
         'start': start,
-        'end': -1,
+        'end': end,
     }
 
 

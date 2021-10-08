@@ -90,11 +90,11 @@ def test_unauthorised_user():
     user3 = auth_register_v1("AgentJohnson@hotmail.com", "abcd1234", "Agent", "Johnson")
     auth_id = user1['auth_user_id']
     u_id = user2['auth_user_id']
-    auth_id3 = user2['auth_user_id']
+    u_id2 = user3['auth_user_id']
     channel = channels_create_v1(auth_id, 'comp1531', True)
     channel_id = channel["channel_id"]
 
     with pytest.raises(AccessError):
-        channel_invite_v1(u_id, channel_id, auth_id3)
+        channel_invite_v1(u_id, channel_id, u_id2)
     
 
