@@ -28,7 +28,7 @@ def decode_jwt(encoded_jwt):
         - encoded_jwt: encoded token (string)
         - session_id: user's session_id (string)
     Returns:
-        - jwt encoded string
+        - dictionary containing 'handle_string' and 'session_id'
     '''
     return jwt.decode(encoded_jwt, SECRET, algorithms=['HS256'])
 
