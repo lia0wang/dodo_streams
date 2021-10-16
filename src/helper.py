@@ -123,3 +123,33 @@ def get_data():
         return{}
 
 
+def create_handle(name_first, name_last, data):
+
+    '''
+    Generate handle
+    Arguments:
+        name_first (string)
+        name_last (string)
+        data (dictionary) - database
+    Return:
+        handle_str (string)
+    '''
+    handle_str = name_first.lower() + name_last.lower()
+    handle_str = ''.join(char for char in handle_str if char.isalnum())
+    handle_rep_num = -1
+    if len(handle_str) > 20:
+        handle_str = handle_str[0:20]
+    if len(data['users']) != 0:
+        for user in data['users']:
+            if user['handle_str'][0:len(handle_str)] == handle_str:
+                handle_rep_num += 1
+        if handle_rep_num != -1:
+            handle_str = handle_str + str(handle_rep_num)
+    return handle_str
+
+def create_permission_id(data):
+    if len(data['users']) == 0:
+        permission_id = 1
+    else:
+        permission_id = 2
+    return permission_id
