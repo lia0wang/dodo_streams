@@ -7,6 +7,7 @@ BASE_URL = 'http://localhost:8080'
 
 
 def test_http_invalid_email():
+    open('database.json', 'w').close()
     register_param = {
         "email": "11037.666@gmail&.com",
         "password": "Hope11037",
@@ -20,6 +21,7 @@ def test_http_invalid_email():
          requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
 
 def test_http_duplicate_email():
+    open('database.json', 'w').close()
     register_param = {
         "email": "11037@gmail.com",
         "password": "Hope11037",
@@ -32,6 +34,7 @@ def test_http_duplicate_email():
 
 
 def test_http_password_short():
+    open('database.json', 'w').close()
     register_param = {
         "email": "11037@gmail.com",
         "password": "12345",
@@ -42,6 +45,7 @@ def test_http_password_short():
         requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
 
 def test_http_name_first_long():
+    open('database.json', 'w').close()
     register_param = {
         "email": "11037@gmail.com",
         "password": "Hope11037",
@@ -52,6 +56,7 @@ def test_http_name_first_long():
         requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
 
 def test_http_name_last_long():
+    open('database.json', 'w').close()
     register_param = {
         "email": "11037@gmail.com",
         "password": "Hope11037",
@@ -63,6 +68,7 @@ def test_http_name_last_long():
 
 
 def test_http_name_first_short():
+    open('database.json', 'w').close()
     register_param = {
         "email": "11037@gmail.com",
         "password": "Hope11037",
@@ -73,6 +79,7 @@ def test_http_name_first_short():
         requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
 
 def test_http_name_last_short():
+    open('database.json', 'w').close()
     register_param = {
         "email": "11037@gmail.com",
         "password": "Hope11037",
