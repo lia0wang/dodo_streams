@@ -1,4 +1,6 @@
 import re
+import os
+from src.helper import get_data
 from src.data_store import data_store
 from src.error import InputError
 
@@ -110,7 +112,19 @@ def auth_register_v1(email, password, name_first, name_last):
         permission_id = 2
 
     # Generate id
-    user_id = len(store['users']) + 1
+        # Check if database file exists.
+        # Check if database file is empty.
+        # If it exists and is not empty then, generate id according to...
+        # length of users list in data base.
+        # Otherwise generate id according to users in data_store.
+    if os.path.isfile("database.json"):
+        if os.path.getsize("database.json") != 0:
+            database_store = get_data()
+            user_id = len(database_store['users']) + 1
+        else:
+            user_id = len(store['users']) + 1
+    else:
+        user_id = len(store['users']) + 1
 
     # Create and store account
     user = {

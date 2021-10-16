@@ -1,5 +1,7 @@
+import os
 from src.data_store import data_store
 from src.error import AccessError, InputError
+from src.helper import get_data
 
 def channels_list_v1(auth_user_id):
     ''' 
@@ -128,7 +130,14 @@ def channels_create_v1(auth_user_id, name, is_public):
         raise InputError('The name length is not between 1 and 20 characters.')
 
     # Generate the channel_id
-    new_channel_id = len(store['channels']) + 1
+    if os.path.isfile("database.json"):
+        if os.path.getsize("database.json") != 0:
+            database_store = get_data()
+            new_channel_id = len(database_store['channels']) + 1
+        else:
+            new_channel_id = len(store['channels']) + 1
+    else:
+        new_channel_id = len(store['channels']) + 1
 
     # Creates a new channel with:
     channel = {
