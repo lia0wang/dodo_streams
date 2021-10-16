@@ -17,5 +17,7 @@ def clear_v1():
     store['messages'] = []
     data_store.set(store)
 
+    open('database.json', 'w').close()
+    
     return {
     }
