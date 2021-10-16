@@ -76,6 +76,15 @@ def auth_register_v1(email, password, name_first, name_last):
         # Put all emails in list
         # Append 'input email' to emails list
         # Check for duplicates in list of emails
+    if os.path.isfile("database.json"):
+        if os.path.getsize("database.json") != 0:
+            database_store = get_data()
+            emails = []
+            for user in database_store['users']:
+                emails.append(user['email'])
+            emails.append(email)
+            if len(emails) != len(set(emails)):
+                raise InputError("Error: email taken")
     if len(store['users']) != 0:
         emails = []
         for user in store['users']:
