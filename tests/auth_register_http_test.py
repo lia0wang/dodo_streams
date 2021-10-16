@@ -14,6 +14,7 @@ def test_http_register_basic():
         "name_last": "Boyyy"
     }
     get_response =  requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
+    open('database.json', 'w').close()
     assert get_response == 200
     
 
