@@ -19,7 +19,7 @@ def channels_list_v1(auth_user_id):
     '''
 
     # Fetching data
-    store = data_store.get()
+    store = get_data()
 
     # Creating dictionary
     channels_list = dict()
