@@ -62,7 +62,7 @@ def register():
     for index, user in enumerate(database_store['users']):
         if user['u_id'] == register_return['auth_user_id']:
             handle_string = user['handle_str']
-            # Append session_id to user's session_list
+            # Update user information with sessions_list and session_id 
             database_store['users'][index]['session_list'] = [session_id]
 
     # Update direct changes to database

@@ -2,6 +2,7 @@ import jwt
 import json
 import os
 from src.data_store import data_store
+from src.error import InputError, AccessError
 
 SECRET = "DODO"
 SESSION_ID = 0
@@ -51,47 +52,38 @@ def save_data_store_updates():
     Saves it to json file database
     '''
     store = data_store.get()
-    # Check if json database exists
-    if os.path.isfile("database.json"):
-        filesize = os.path.getsize("database.json")
-        # Store data_store data if json file is empty
-        if filesize == 0:
-            with open('database.json', 'w') as file:
-                json.dump(store, file)
-            file.close()
-        # Add new data from data_store if not empty
-        else:
-            with open("database.json") as file:
-                data = json.load(file)
-            file.close()
-            # Update 'already existing' users information 
-            for updated_user in store['users']:
-                for index, user in enumerate(data['users']):
-                    if user['u_id'] == updated_user['u_id'] and user != updated_user:
-                        data['users'][index] = updated_user
-            # Append new users
-            for user in store['users']:
-                if user not in data['users']:
-                    data['users'].append(user)
+    if is_database_exist() == True:
+        with open("database.json") as file:
+            data = json.load(file)
+        file.close()
+        # Update 'already existing' users information 
+        for updated_user in store['users']:
+            for index, user in enumerate(data['users']):
+                if user['u_id'] == updated_user['u_id'] and user != updated_user:
+                    data['users'][index] = updated_user
+        # Append new users
+        for user in store['users']:
+            if user not in data['users']:
+                data['users'].append(user)
 
-            # Update 'already existing' channels information
-            for updated_chann in store['channels']:
-                for index, chann in enumerate(data['channels']):
-                    if chann['channel_id'] == updated_chann['channel_id'] and chann != updated_chann:
-                        data['channels'][index] = updated_chann
-            # Append new channels
-            for channel in store['channels']:
-                if channel not in data['channels']:
-                    data['channels'].append(channel)
+        # Update 'already existing' channels information
+        for updated_chann in store['channels']:
+            for index, chann in enumerate(data['channels']):
+                if chann['channel_id'] == updated_chann['channel_id'] and chann != updated_chann:
+                    data['channels'][index] = updated_chann
+        # Append new channels
+        for channel in store['channels']:
+            if channel not in data['channels']:
+                data['channels'].append(channel)
 
-            with open('database.json', 'w') as file:
-                json.dump(data, file)
-            file.close()
-    # If json database does not exist create one
+        with open('database.json', 'w') as file:
+            json.dump(data, file)
+        file.close()
     else:
         with open('database.json', 'w') as file:
             json.dump(store, file)
         file.close()
+
 
 def save_database_updates(updated_database):
     '''
@@ -153,3 +145,43 @@ def create_permission_id(data):
     else:
         permission_id = 2
     return permission_id
+
+def seek_target_channel_and_errors(data, auth_user_id, channel_id):
+    # Check if auth_user_id refers to existing user
+    is_valid_user = False
+    for user in data['users']:
+        if user['u_id'] == auth_user_id:
+            is_valid_user = True
+    if is_valid_user == False:
+        raise AccessError("Error: Invalid user id")
+    
+    # Check if channel_id refers to valid channel
+    # Find and save target channel if it exists
+    is_valid_channel = False
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            target_channel = channel
+            is_valid_channel = True
+    if is_valid_channel == False:
+        raise InputError("Error: Invalid channel id")
+
+    # Check if authorised user is a member of the target channel
+    # Search list of members in the target channel
+    is_member = False
+    for member in target_channel['all_members']:
+        if member['u_id'] == auth_user_id:
+            is_member = True
+    if is_member == False:
+        raise AccessError("Error: Authorised user is not a member")
+
+    return target_channel
+
+def is_database_exist():
+    if os.path.isfile("database.json"):
+        if os.path.getsize("database.json") != 0:
+            return True
+        else:
+            return False
+    else:
+        return False
+
