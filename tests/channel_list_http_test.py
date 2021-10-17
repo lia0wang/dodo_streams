@@ -6,7 +6,7 @@ from src.other import clear_v1
 BASE_URL = 'http://localhost:8080'
 
 
-def test_http_nonexistent_email():
+def test_http_nonexistent_token():
     clear_v1()
     get_response = requests.get(f"{BASE_URL}/channels/list/v2", json = 389)
     assert get_response.status_code != 200
