@@ -1,4 +1,4 @@
-import os
+]import os
 from src.data_store import data_store
 from src.error import AccessError, InputError
 from src.helper import get_data, seek_target_channel_and_errors, is_database_exist
@@ -216,6 +216,7 @@ def channel_join_v1(auth_user_id, channel_id):
         channel_id (int)   - The ID of the channel where the user will join in
     Exceptions:
         InputError  - Channel_id is invalid
+                    - If the user is already a member of the channel
         AccessError - Channel_id refers to a channel that is private
                       and the authorised user is not already a channel member
                       and is not a global owner
@@ -254,7 +255,7 @@ def channel_join_v1(auth_user_id, channel_id):
     # A user can't join a channel where he is alreday a member.
     for old_member in target_channel['all_members']:
         if old_member['u_id'] == new_member['u_id']:
-            raise AccessError("Sorry, you can't join the same channel agian.")
+            raise InputError("Sorry, you can't join the same channel agian.")
 
     # If the channel is private and the useer is not a member nor a global owner.
     if not target_channel['is_public'] and new_member['permission_id'] != 1:
