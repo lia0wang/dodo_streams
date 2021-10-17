@@ -57,17 +57,17 @@ def register():
     # Fetch data from database
     database_store = get_data()
 
-    # Find handle string and create session_id to generate token
+    # Find u_id and create session_id to generate token
     session_id = create_session_id()
     for index, user in enumerate(database_store['users']):
         if user['u_id'] == register_return['auth_user_id']:
-            handle_string = user['handle_str']
+            u_id = user['u_id']
             # Update user information with sessions_list and session_id 
             database_store['users'][index]['session_list'] = [session_id]
 
     # Update direct changes to database
     save_database_updates(database_store)
-    register_return['token'] = create_jwt(handle_string, session_id)
+    register_return['token'] = create_jwt(u_id, session_id)
     return dumps(register_return)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
