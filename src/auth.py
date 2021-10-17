@@ -1,6 +1,6 @@
 import re
 import os
-from src.helper import get_data, create_handle, create_permission_id
+from src.helper import get_data, create_handle, create_permission_id, is_database_exist
 from src.data_store import data_store
 from src.error import InputError
 
@@ -72,20 +72,22 @@ def auth_register_v1(email, password, name_first, name_last):
     # Fetch data
     store = data_store.get()
 
+    if is_database_exist() == True:
+        database_store = get_data()
+
     # Check for repeated email
         # Put all emails in list
         # Append 'input email' to emails list
         # Check for duplicates in list of emails
-    if os.path.isfile("database.json"):
-        if os.path.getsize("database.json") != 0:
-            database_store = get_data()
-            emails = []
-            for user in database_store['users']:
-                emails.append(user['email'])
-            emails.append(email)
-            if len(emails) != len(set(emails)):
-                raise InputError("Error: email taken")
-    if len(store['users']) != 0:
+    
+    if is_database_exist() == True:
+        emails = []
+        for user in database_store['users']:
+            emails.append(user['email'])
+        emails.append(email)
+        if len(emails) != len(set(emails)):
+            raise InputError("Error: email taken")
+    elif len(store['users']) != 0:
         emails = []
         for user in store['users']:
             emails.append(user['email'])
@@ -95,24 +97,18 @@ def auth_register_v1(email, password, name_first, name_last):
             raise InputError("Error: email taken")
 
     # Generate handle
-    if os.path.isfile("database.json"):
-        if os.path.getsize("database.json") != 0:
-            database_store = get_data()
-            handle_str = create_handle(name_first, name_last, database_store)
-        else:
-            handle_str = create_handle(name_first, name_last, store)
+    if is_database_exist() == True:
+        handle_str = create_handle(name_first, name_last, database_store)
     else:
         handle_str = create_handle(name_first, name_last, store)
+  
 
     # Generate permission_id
-    if os.path.isfile("database.json"):
-        if os.path.getsize("database.json") != 0:
-            database_store = get_data()
-            permission_id = create_permission_id(database_store)
-        else:
-            permission_id = create_permission_id(store)
+    if is_database_exist() == True:
+        permission_id = create_permission_id(database_store)
     else:
-        permission_id = create_permission_id(store)    
+        permission_id = create_permission_id(store)
+ 
 
     # Generate id
         # Check if database file exists.
@@ -120,12 +116,8 @@ def auth_register_v1(email, password, name_first, name_last):
         # If it exists and is not empty then, generate id according to...
         # length of users list in data base.
         # Otherwise generate id according to users in data_store.
-    if os.path.isfile("database.json"):
-        if os.path.getsize("database.json") != 0:
-            database_store = get_data()
-            user_id = len(database_store['users']) + 1
-        else:
-            user_id = len(store['users']) + 1
+    if is_database_exist() == True:
+        user_id = len(database_store['users']) + 1
     else:
         user_id = len(store['users']) + 1
 

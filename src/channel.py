@@ -1,5 +1,7 @@
+import os
 from src.data_store import data_store
 from src.error import AccessError, InputError
+from src.helper import get_data, seek_target_channel_and_errors, is_database_exist
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
@@ -113,32 +115,11 @@ def channel_details_v1(auth_user_id, channel_id):
     # Fetch data
     store = data_store.get()
 
-    # Check if auth_user_id refers to existing user
-    is_valid_user = False
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            is_valid_user = True
-    if is_valid_user == False:
-        raise AccessError("Error: Invalid user id")
-    
-    # Check if channel_id refers to valid channel
-    # Find and save target channel if it exists
-    is_valid_channel = False
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            target_channel = channel
-            is_valid_channel = True
-    if is_valid_channel == False:
-        raise InputError("Error: Invalid channel id")
-
-    # Check if authorised user is a member of the target channel
-    # Search list of members in the target channel
-    is_member = False
-    for member in target_channel['all_members']:
-        if member['u_id'] == auth_user_id:
-            is_member = True
-    if is_member == False:
-        raise AccessError("Error: Authorised user is not a member")
+    if is_database_exist() == True:
+        db_store = get_data()
+        target_channel = seek_target_channel_and_errors(db_store, auth_user_id, channel_id)
+    else:
+        target_channel = seek_target_channel_and_errors(store, auth_user_id, channel_id)
 
     # Generate list of owner members and members 
     # 'permission_id' and 'password' are excluded from member details
