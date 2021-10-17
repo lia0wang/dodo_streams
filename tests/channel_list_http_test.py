@@ -14,10 +14,10 @@ def test_http_nonexistent_email():
 def test_http_valid_result():
     clear_v1()
     param0 = {
-        "email": "bob123@gmail.com",
-        "password": "qwerty",
-        "name_first": "Bob",
-        "name_last": "Marley"
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
     }
     user = requests.post(f"{BASE_URL}/auth/register/v2", json = param0)
     user0 = loads(user.json())
@@ -29,5 +29,5 @@ def test_http_valid_result():
     }
     requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param0)
 
-    get_response = requests.get(f"{BASE_URL}/channels/list/v2", json = user0['token'])
+    get_response = requests.post(f"{BASE_URL}/channels/list/v2", json = user0['token'])
     assert get_response.status_code == 200
