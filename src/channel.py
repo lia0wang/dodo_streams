@@ -1,4 +1,4 @@
-]import os
+import os
 from src.data_store import data_store
 from src.error import AccessError, InputError
 from src.helper import get_data, seek_target_channel_and_errors, is_database_exist
