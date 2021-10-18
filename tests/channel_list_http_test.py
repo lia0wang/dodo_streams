@@ -19,15 +19,15 @@ def test_http_valid_result():
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user = requests.post(f"{BASE_URL}/auth/register/v2", json = param0)
-    user0 = loads(user.json())
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = param0).json()
+    # user0 = loads(user)
 
     channel_param0 = {
-        "token": user0['token'],
+        "token": user['token'],
         "name": "test_channel1",
         "is_public": True
     }
     requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param0)
 
-    get_response = requests.post(f"{BASE_URL}/channels/list/v2", json = user0['token'])
+    get_response = requests.post(f"{BASE_URL}/channels/list/v2", json = user['token'])
     assert get_response.status_code == 200

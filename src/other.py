@@ -1,4 +1,6 @@
 from src.data_store import data_store
+import os
+# import database
 
 def clear_v1():
     '''
@@ -18,6 +20,8 @@ def clear_v1():
     data_store.set(store)
 
     open('database.json', 'w').close()
+    
+    # os.remove()
     
     return {
     }
