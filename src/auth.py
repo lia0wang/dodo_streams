@@ -23,6 +23,9 @@ def auth_login_v1(email, password):
         that has been registered and password is correct for that u_id.
 
     """
+
+
+    
     store = data_store.get()
     for user in store['users']:
         if user['email'] == email:
