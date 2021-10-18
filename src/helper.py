@@ -17,7 +17,7 @@ def create_jwt(u_id, session_id):
         - jwt encoded string
     '''
     payload = {
-        "handle_string": u_id,
+        "u_id": u_id,
         "session_id": session_id
     }
     return jwt.encode(payload, SECRET, algorithm = 'HS256')
@@ -30,7 +30,7 @@ def decode_jwt(encoded_jwt):
     Returns:
         - dictionary containing 'u_id' and 'session_id'
     '''
-    return jwt.decode(encoded_jwt, SECRET, algorithms=['HS256'])
+    return jwt.decode(encoded_jwt, SECRET, algorithms= ['HS256'])
 
 def create_session_id():
     """
