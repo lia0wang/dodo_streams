@@ -19,10 +19,10 @@ def test_http_valid_result():
         "name_last": "Boyyy"
     }
     user = requests.post(f"{BASE_URL}/auth/register/v2", json = param0).json()
-    user0 = loads(user)
+    # user0 = loads(user)
 
     channel_param0 = {
-        "token": user0['token'],
+        "token": user['token'],
         "name": "test_channel1",
         "is_public": True
     }
