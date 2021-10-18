@@ -29,5 +29,5 @@ def test_http_valid_result():
     }
     requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param0)
 
-    get_response = requests.post(f"{BASE_URL}/channels/list/v2", json = user['token'])
+    get_response = requests.get(f"{BASE_URL}/channels/list/v2", json = user['token'])
     assert get_response.status_code == 200
