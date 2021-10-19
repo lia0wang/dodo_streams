@@ -227,30 +227,58 @@ def channel_join_v1(auth_user_id, channel_id):
     # Fetch data
     store = data_store.get()
 
-    # Check if the auth_user_id is valid
-    valid = False
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            new_member = {
-                'u_id': auth_user_id,
-                'email': user['email'],
-                'name_first': user['name_first'],
-                'name_last': user['name_last'],
-                'handle_str': user['handle_str'],
-                'permission_id': user['permission_id']
-            } # Catch the new_member without password
-            valid = True
-    if not valid:
-        raise AccessError(description="Invalid user ID!")
+    if is_database_exist():
+        db_store = get_data()
+        # Check if the auth_user_id is valid
+        valid = False
+        for user in db_store['users']:
+            if user['u_id'] == auth_user_id:
+                new_member = {
+                    'u_id': auth_user_id,
+                    'email': user['email'],
+                    'name_first': user['name_first'],
+                    'name_last': user['name_last'],
+                    'handle_str': user['handle_str'],
+                    'permission_id': user['permission_id']
+                } # Catch the new_member without password
+                valid = True
+        if not valid:
+            raise AccessError(description="Invalid user ID!")
+    else:
+        valid = False
+        for user in store['users']:
+            if user['u_id'] == auth_user_id:
+                new_member = {
+                    'u_id': auth_user_id,
+                    'email': user['email'],
+                    'name_first': user['name_first'],
+                    'name_last': user['name_last'],
+                    'handle_str': user['handle_str'],
+                    'permission_id': user['permission_id']
+                } # Catch the new_member without password
+                valid = True
+        if not valid:
+            raise AccessError(description="Invalid user ID!")
 
-    # Check if the channel_id is valid
-    valid = False
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            valid = True
-            target_channel = channel # Catch the channel where the new_member is gonna join
-    if not valid:
-        raise InputError(description="Invalid channel ID!")
+    if is_database_exist():
+        db_store = get_data()
+        # Check if the channel_id is valid
+        valid = False
+        for channel in db_store['channels']:
+            if channel['channel_id'] == channel_id:
+                valid = True
+                target_channel = channel # Catch the channel where the new_member is gonna join
+        if not valid:
+            raise InputError(description="Invalid channel ID!")
+    else:
+        # Check if the channel_id is valid
+        valid = False
+        for channel in store['channels']:
+            if channel['channel_id'] == channel_id:
+                valid = True
+                target_channel = channel # Catch the channel where the new_member is gonna join
+        if not valid:
+            raise InputError(description="Invalid channel ID!")
 
     # A user can't join a channel where he is alreday a member.
     for old_member in target_channel['all_members']:

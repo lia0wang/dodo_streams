@@ -71,50 +71,6 @@ def test_http_invalid_channel_id():
     response = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
     assert response.status_code == 400
 
-def test_http_duplicated_joins():
-    '''
-    Test when join the same channel duplicated times,
-    create a public channel with user 1
-    let user 2 join multiple times
-    '''
-    requests.delete(f"{BASE_URL}/clear/v1", json = {})
-
-    register_param_1 = {
-        "email": "11037.666@gmail.com",
-        "password": "Hope11037",
-        "name_first": "Hopeful",
-        "name_last": "Boyyy"
-    }
-    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
-
-    channel_param = {
-        'token': user_1['token'],
-        'name': 'league',
-        'is_public': True
-    }
-    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json() 
-
-    register_param_2 = {
-        "email": "z5306312@gmail.com",
-        "password": "LeonLiao123",
-        "name_first": "Leon",
-        "name_last": "Liao"
-    }
-    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
-    
-    channel_join_param = {
-        'token': user_2['token'],
-        'channel_id': channel['channel_id']
-    }
-    response = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
-    assert response.status_code == 200
-
-    response = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
-    assert response.status_code == 400
-
-    response = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
-    assert response.status_code == 400
-
 def test_join_private_channel():
     '''
     Test when the channel is private and the user who wants to join that channel
