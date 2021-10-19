@@ -92,6 +92,7 @@ def login():
             save_database_updates(database_store)
     return dumps(auth_login)
 
+'''
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear():
     empty_db = {
@@ -104,7 +105,7 @@ def clear():
     #open('database.json', 'w').close()
     return dumps({})
 
-
+'''
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":

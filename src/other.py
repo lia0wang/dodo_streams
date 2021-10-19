@@ -18,7 +18,6 @@ def clear_v1():
     store['messages'] = []
     data_store.set(store)
 
-    #os.stat("database.json").st_size == 0
-    
+    open('database.json', 'w').close()    
     return {
     }
