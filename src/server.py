@@ -4,12 +4,12 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.channels import channels_create_v1
-from src.error import InputError
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
 from src.data_store import data_store
 from src.helper import check_valid_token, get_data, save_data_store_updates, save_database_updates, create_jwt, decode_jwt, create_session_id
 from src.other import clear_v1
+
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -104,7 +104,6 @@ def channels_create():
     # Retrieve Parameters
     request_data = request.get_json()
     token = request_data['token']
-    check_valid_token(token)
 
     decode_token = decode_jwt(token)
     name = request_data['name']
