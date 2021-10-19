@@ -32,7 +32,9 @@ def test_http_register_basic2():
     assert get_response.status_code == 200
 
 def test_http_invalid_email():
-    clear_v1()
+    #clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+
     register_param = {
         "email": "11037.666@gmail&.com",
         "password": "Hope11037",
@@ -61,7 +63,8 @@ def test_http_duplicate_email():
 
 
 def test_http_password_short():
-    clear_v1()
+    #clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param = {
         "email": "11037@gmail.com",
         "password": "12345",
@@ -72,7 +75,9 @@ def test_http_password_short():
     assert get_response.status_code == 400
 
 def test_http_name_first_long():
-    clear_v1()
+    #clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+
     register_param = {
         "email": "11037@gmail.com",
         "password": "Hope11037",
@@ -83,7 +88,9 @@ def test_http_name_first_long():
     assert get_response.status_code == 400
 
 def test_http_name_last_long():
-    clear_v1()
+    #clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+
     register_param = {
         "email": "11037@gmail.com",
         "password": "Hope11037",
@@ -94,7 +101,9 @@ def test_http_name_last_long():
     assert get_response.status_code == 400
 
 def test_http_name_first_short():
-    clear_v1()
+    #clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+
     register_param = {
         "email": "11037@gmail.com",
         "password": "Hope11037",
@@ -105,7 +114,9 @@ def test_http_name_first_short():
     assert get_response.status_code == 400
 
 def test_http_name_last_short():
-    clear_v1()
+    #clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+
     register_param = {
         "email": "11037@gmail.com",
         "password": "Hope11037",
