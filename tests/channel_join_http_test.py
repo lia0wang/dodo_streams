@@ -193,4 +193,4 @@ def test_http_global_owner():
     }
 
     response = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
-    assert response == 200
+    assert response.status_code == 200
