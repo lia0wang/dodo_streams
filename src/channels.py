@@ -141,11 +141,11 @@ def channels_create_v1(auth_user_id, name, is_public):
                     'permission_id': user['permission_id']
                 }
         if not valid:
-            raise AccessError("Invalid user ID!")
+            raise AccessError(description="Invalid user ID!")
 
     # Raise an InputError when the channel's name is less than 1 char or greater than 20 char
     if len(name) < 1 or len(name) > 20:
-        raise InputError('The name length is not between 1 and 20 characters.')
+        raise InputError(description='The name length is not between 1 and 20 characters.')
 
     # Generate the channel_id
     if is_database_exist():
