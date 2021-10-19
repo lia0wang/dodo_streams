@@ -6,8 +6,9 @@ from src.other import clear_v1
 
 BASE_URL = 'http://localhost:8080'
 
-def test_gttp_channels_create_basic():
-    clear_v1()
+def test_http_channels_create_basic():
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
     register_param = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
@@ -24,7 +25,7 @@ def test_gttp_channels_create_basic():
     }
     response = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
 
-    assert response == 200
+    assert response.status_code == 200
 
     requested_data = response.json()
     channel_id = requested_data['channel_id']
