@@ -130,6 +130,7 @@ def channel_join():
 
     # Pass parameters
     channel_join_v1(decode_token['u_id'], channel_id)
+    save_data_store_updates()
 
     return dumps({})
 
