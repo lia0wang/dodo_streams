@@ -8,6 +8,7 @@ from src import config
 from src.auth import auth_register_v1, auth_login_v1
 from src.data_store import data_store
 from src.helper import check_valid_token, get_data, save_data_store_updates, save_database_updates, create_jwt, decode_jwt, create_session_id
+from other.py import clear_v1
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -91,8 +92,21 @@ def login():
             save_database_updates(database_store)
     return dumps(auth_login)
 
+@APP.route("/clear/v1", methods=['DELETE'])
+def clear():
+    empty_db = {
+        'users': [],
+        'channels': [],
+        'messages': []
+    }
+    save_database_updates(empty_db) 
+    clear_v1()
+    #open('database.json', 'w').close()
+    return dumps({})
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    APP.run(port=config.port, debug=True) # Do not edit this port

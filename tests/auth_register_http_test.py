@@ -6,9 +6,10 @@ from src.other import clear_v1
 BASE_URL = 'http://localhost:8080'
 
 def test_http_register_basic():
-    clear_v1()
+    #clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param = {
-        "email": "11037.666@gmail.com",
+        "email": "1037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
@@ -16,6 +17,17 @@ def test_http_register_basic():
     get_response =  requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
     assert get_response.status_code == 200
 
+def test_http_register_basic2():
+    #clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    register_param = {
+        "email": "1037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
+    }
+    get_response =  requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
+    assert get_response.status_code == 200
 
 def test_http_invalid_email():
     clear_v1()
