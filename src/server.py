@@ -101,8 +101,20 @@ def clear():
 
 @APP.route("/auth/logout/v1", methods=['POST'])
 def logout():
+    request_data = request.get_json()
+    check_valid_token(request_data['token'])
+    decoded_token = decode_jwt(request_data['token'])
+        
+    # Fetch data from database
+    db_store = get_data()
+    # invalidates session id by removing it from session list 
+    for index, user in enumerate(db_store['users']):
+        if user['u_id'] == decoded_token['u_id']:
+            session_id = decoded_token['session_id']
+            db_store['users'][index]['session_list'].remove(session_id)
+            save_database_updates(db_store)
     return dumps({})
-    
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":

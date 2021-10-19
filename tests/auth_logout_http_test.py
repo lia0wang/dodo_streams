@@ -23,7 +23,7 @@ def test_register_login_logout():
     login = requests.post(f"{BASE_URL}/auth/login/v2", json = login_data)
     assert login.status_code == 200
 
-    logout = requests.post(f"{BASE_URL}/auth/logout/v1", json = login)
+    logout = requests.post(f"{BASE_URL}/auth/logout/v1", json = login['token'])
     assert logout.status_code == 200
     
 
@@ -38,5 +38,5 @@ def test_register_logout():
     reg = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
     assert reg.status_code == 200   
   
-    logout = requests.post(f"{BASE_URL}/auth/logout/v1", json = reg)
+    logout = requests.post(f"{BASE_URL}/auth/logout/v1", json = reg['token'])
     assert logout.status_code == 200
