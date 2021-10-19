@@ -1,6 +1,3 @@
-import re
-from flask.wrappers import Response
-import pytest
 import requests
 import pytest
 from src.other import clear_v1

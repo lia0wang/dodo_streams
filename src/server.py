@@ -1,8 +1,9 @@
 import sys
 import signal
-from json import dumps
+from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
+from src.channel import channel_join_v1
 from src.channels import channels_create_v1
 from src.error import InputError
 from src import config
@@ -102,19 +103,37 @@ def login():
 
 @APP.route("/channels/create/v2", methods=['POST'])
 def channels_create():
-    # Retrieve Parameters
+    # Retrieve token
     request_data = request.get_json()
 
     token = request_data['token']
     check_valid_token(token)
+    # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
     name = request_data['name']
     is_public = request_data['is_public']
 
+    # Pass parameters
     channel = channels_create_v1(decode_token['u_id'], name, is_public)
     save_data_store_updates()
 
     return dumps(channel)
+
+@APP.route("/channel/join/v2", methods=['POST'])
+def channel_join():
+    # Retrieve parameters
+    request_data = request.get_json()
+    token = request_data['token']
+    channel_id = request_data['channel_id']
+
+    # Decode token, retrieve parameters
+    decode_token = decode_jwt(token)
+
+    # Pass parameters
+    channel_join_v1(decode_token['u_id'], channel_id)
+    save_data_store_updates()
+
+    return dumps({})
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
