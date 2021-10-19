@@ -6,27 +6,36 @@ BASE_URL = 'http://localhost:8080'
 
 def test_http_channel_join_basic():
     '''
-    Test if channel/join/v2 working properly
+    Test if channel/join/v2 working properly,
+    create a public channel with user 1 and let user 2 join that channel
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
 
-    register_param = {
+    register_param_1 = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
 
     channel_param = {
-        'token': user['token'],
+        'token': user_1['token'],
         'name': 'league',
         'is_public': True
     }
     channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json() 
 
+    register_param_2 = {
+        "email": "z5306312@gmail.com",
+        "password": "LeonLiao123",
+        "name_first": "Leon",
+        "name_last": "Liao"
+    }
+    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    
     channel_join_param = {
-        'token': user['token'],
+        'token': user_2['token'],
         'channel_id': channel['channel_id']
     }
 
@@ -64,39 +73,52 @@ def test_http_invalid_channel_id():
 
 def test_http_duplicated_joins():
     '''
-    Test when join the same channel duplicated times
+    Test when join the same channel duplicated times,
+    create a public channel with user 1
+    let user 2 join multiple times
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
 
-    register_param = {
+    register_param_1 = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
 
     channel_param = {
-        'token': user['token'],
+        'token': user_1['token'],
         'name': 'league',
         'is_public': True
     }
     channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json() 
 
+    register_param_2 = {
+        "email": "z5306312@gmail.com",
+        "password": "LeonLiao123",
+        "name_first": "Leon",
+        "name_last": "Liao"
+    }
+    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    
     channel_join_param = {
-        'token': user['token'],
+        'token': user_2['token'],
         'channel_id': channel['channel_id']
     }
-
     response = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
     assert response.status_code == 200
 
     response = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
     assert response.status_code == 400
 
+    response = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
+    assert response.status_code == 400
+
 def test_join_private_channel():
     '''
-    Test when the channel is private and the user is not a channel member and a global owner.
+    Test when the channel is private and the user who wants to join that channel
+    is neither channel member nor global owner.
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
 
@@ -116,7 +138,7 @@ def test_join_private_channel():
     }
     channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json() 
 
-    # Let user 2 join the private channel, and it will get a bad response
+    # Let user 2 join the private channel, and it will get a forbidden response
     register_param_2 = {
         "email": "z5306312@gmail.com",
         "password": "LeonLiao123",
@@ -131,7 +153,7 @@ def test_join_private_channel():
     }
 
     response = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
-    assert response.status_code == 400
+    assert response.status_code == 403
 
 def test_http_none_existing_channel():
     '''
