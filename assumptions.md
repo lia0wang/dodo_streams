@@ -10,10 +10,6 @@
 ### channels_create_v1
 
 1. Every channel has its unique id.
-2. Channels can have the same name with different id
-4. The user who created a channel becomes the owner.
-5. The channel_id should be positve integers.
-6. The channel is public(is_public = True) by default.
 
 ### channel_messsages_v1
 
