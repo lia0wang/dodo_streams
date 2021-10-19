@@ -105,8 +105,9 @@ def login():
 def channels_create():
     # Retrieve token
     request_data = request.get_json()
-    token = request_data['token']
 
+    token = request_data['token']
+    check_valid_token(token)
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
     name = request_data['name']
