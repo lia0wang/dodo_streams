@@ -5,7 +5,7 @@ from src.other import clear_v1
 
 BASE_URL = 'http://localhost:8080'
 
-def test_http_valid_login():
+def test_http_valid_login1():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param1 = {
         "email": "11037.666@gmail.com",
@@ -16,15 +16,6 @@ def test_http_valid_login():
     reg1 =  requests.post(f"{BASE_URL}/auth/register/v2", json = register_param1)
     assert reg1.status_code == 200
 
-    register_param2 = {
-        "email": "JoJo@gmail.com", 
-        "password": "HermitPurple",
-        "name_first": "Joseph", 
-        "name_last": "Joestar"
-    }
-    reg2 =  requests.post(f"{BASE_URL}/auth/register/v2", json = register_param2)
-    assert reg2.status_code == 200
-
     #login 
     login_data1 = {
         "email": "11037.666@gmail.com",
@@ -34,6 +25,16 @@ def test_http_valid_login():
     assert login_1.status_code == 200
 
 
+def test_http_valid_login2():
+    register_param2 = {
+        "email": "JoJo@gmail.com", 
+        "password": "HermitPurple",
+        "name_first": "Joseph", 
+        "name_last": "Joestar"
+    }
+    reg2 =  requests.post(f"{BASE_URL}/auth/register/v2", json = register_param2)
+    assert reg2.status_code == 200
+
     login_data2 = {
         "email": "JoJo@gmail.com", 
         "password": "HermitPurple"
@@ -41,6 +42,7 @@ def test_http_valid_login():
     login_2 =  requests.post(f"{BASE_URL}/auth/login/v2", json = login_data2)
     assert login_2.status_code == 200
     
+
 def test_invalid_email1():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param1 = {
