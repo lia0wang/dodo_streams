@@ -1,8 +1,10 @@
 import jwt
 import json
 import os
+
 from src.data_store import data_store
 from src.error import InputError, AccessError
+
 
 SECRET = "DODO"
 SESSION_ID = 0
@@ -55,14 +57,20 @@ def save_data_store_updates():
         with open("database.json") as file:
             data = json.load(file)
         file.close()
-        # Update 'already existing' users information 
-        for updated_user in store['users']:
-            for index, user in enumerate(data['users']):
-                if user['u_id'] == updated_user['u_id'] and user != updated_user:
-                    data['users'][index] = updated_user
         # Append new users
+        
+        id_list = []
+        id_list2 = []
+        target_id = []
         for user in store['users']:
-            if user not in data['users']:
+            id_list.append(user['u_id'])
+        for data_user in data['users']:
+            id_list2.append(data_user['u_id'])
+        for id in id_list:
+            if id not in id_list2:
+                target_id.append(id)
+        for user in store['users']:
+            if user['u_id'] in target_id:
                 data['users'].append(user)
 
         # Update 'already existing' channels information
@@ -71,10 +79,20 @@ def save_data_store_updates():
                 if chann['channel_id'] == updated_chann['channel_id'] and chann != updated_chann:
                     data['channels'][index] = updated_chann
         # Append new channels
-        for channel in store['channels']:
-            if channel not in data['channels']:
-                data['channels'].append(channel)
-
+        id_list = []
+        id_list2 = []
+        target_id = []
+        for chann in store['channels']:
+            id_list.append(chann['channel_id'])
+        for data_chann in data['channels']:
+            id_list2.append(data_chann['channel_id'])
+        for id in id_list:
+            if id not in id_list2:
+                target_id.append(id)
+        for chann in store['channels']:
+            if chann['channel_id'] in target_id:
+                data['channels'].append(chann)
+                
         with open('database.json', 'w') as file:
             json.dump(data, file)
         file.close()
@@ -201,3 +219,6 @@ def check_valid_token(token):
     if is_token_valid == False:
         raise AccessError(description="Invalid Token")
 
+if __name__ == "__main__":
+    db_store = get_data()
+    print(db_store)
