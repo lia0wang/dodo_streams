@@ -26,10 +26,10 @@ def test_http_invalid_email():
         "name_last": "Boyyy"
     }
     get_response = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
-    assert get_response.status_code != 200
+    assert get_response.status_code == 400
     register_param['email'] = "@xample.com"
     get_response = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
-    assert get_response.status_code != 200
+    assert get_response.status_code == 400
 
 def test_http_duplicate_email():
     clear_v1()
@@ -41,7 +41,7 @@ def test_http_duplicate_email():
     }
     requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
     get_response = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
-    assert get_response.status_code != 200
+    assert get_response.status_code == 400
 
 
 def test_http_password_short():
@@ -53,7 +53,7 @@ def test_http_password_short():
         "name_last": "Boyyy"
     }
     get_response = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
-    assert get_response.status_code != 200
+    assert get_response.status_code == 400
 
 def test_http_name_first_long():
     clear_v1()
@@ -64,7 +64,7 @@ def test_http_name_first_long():
         "name_last": "Boyyy"
     }
     get_response = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
-    assert get_response.status_code != 200
+    assert get_response.status_code == 400
 
 def test_http_name_last_long():
     clear_v1()
@@ -75,7 +75,7 @@ def test_http_name_last_long():
         "name_last": "MynameisYoshikageKiraIm33yearsoldMyhouseisinthenort"
     }
     get_response = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
-    assert get_response.status_code != 200
+    assert get_response.status_code == 400
 
 def test_http_name_first_short():
     clear_v1()
@@ -86,7 +86,7 @@ def test_http_name_first_short():
         "name_last": "Boyyy"
     }
     get_response = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
-    assert get_response.status_code != 200
+    assert get_response.status_code == 400
 
 def test_http_name_last_short():
     clear_v1()
@@ -97,5 +97,4 @@ def test_http_name_last_short():
         "name_last": ""
     }
     get_response = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
-    assert get_response.status_code != 200
-
+    assert get_response.status_code == 400

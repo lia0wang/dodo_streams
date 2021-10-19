@@ -7,17 +7,17 @@ from src.error import InputError, AccessError
 SECRET = "DODO"
 SESSION_ID = 0
 
-def create_jwt(handle_string, session_id):
+def create_jwt(u_id, session_id):
     '''
     Creates token given a handle string and session_id
     Arguments: 
-        - handle_string: user's handle string (string)
-        - session_id: user's session_id (string)
+        - u_id: user's u_id (int)
+        - session_id: user's session_id (int)
     Returns:
         - jwt encoded string
     '''
     payload = {
-        "handle_string": handle_string,
+        "handle_string": u_id,
         "session_id": session_id
     }
     return jwt.encode(payload, SECRET, algorithm = 'HS256')
@@ -27,9 +27,8 @@ def decode_jwt(encoded_jwt):
     Decode token given encoded token.
     Arguments: 
         - encoded_jwt: encoded token (string)
-        - session_id: user's session_id (string)
     Returns:
-        - dictionary containing 'handle_string' and 'session_id'
+        - dictionary containing 'u_id' and 'session_id'
     '''
     return jwt.decode(encoded_jwt, SECRET, algorithms=['HS256'])
 
@@ -184,4 +183,21 @@ def is_database_exist():
             return False
     else:
         return False
+
+def check_valid_token(token):
+    db_store = get_data()
+    decoded_jwt = decode_jwt(token)
+
+    u_id = decoded_jwt['u_id']
+    session_id = decoded_jwt['session_id']
+    
+    is_token_valid = False
+    for user in db_store['users']:
+        if user['u_id'] == u_id:
+            if session_id not in user['session_list']:
+                raise AccessError(description="Invalid Token")
+            else:
+                is_token_valid = True
+    if is_token_valid == False:
+        raise AccessError(description="Invalid Token")
 
