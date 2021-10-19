@@ -16,10 +16,9 @@ def test_http_channels_create_basic():
         "name_last": "Boyyy"
     }
     user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
-    token = user['token']
 
     channel_param = {
-        'token': token,
+        'token': user['token'],
         'name': 'league',
         'is_public': True
     }
@@ -27,6 +26,6 @@ def test_http_channels_create_basic():
 
     assert response.status_code == 200
 
-    requested_data = response.json()
-    channel_id = requested_data['channel_id']
+    channel = response.json()
+    channel_id = channel['channel_id']
     assert channel_id == 1

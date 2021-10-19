@@ -33,6 +33,12 @@ APP.register_error_handler(Exception, defaultHandler)
 
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
+@APP.route("/clear/v1", methods=['DELETE'])
+def clear():
+    clear_v1()
+    #open('database.json', 'w').close()
+    return dumps({})
+
 # Example
 @APP.route("/echo", methods=['GET'])
 def echo():
@@ -72,20 +78,6 @@ def register():
     register_return['token'] = create_jwt(u_id, session_id)
     return dumps(register_return)
 
-@APP.route("/channels/create/v2", methods=['POST'])
-def channels_create():
-    # Retrieve Parameters
-    request_data = request.get_json()
-    token = request_data['token']
-    auth_user_id = decode_jwt(token)
-    name = request_data['name']
-    is_public = request_data['is_public']
-
-    channel = channels_create_v1(auth_user_id, name, is_public)
-    channel_id = channel['channel_id']
-    
-    return dumps(channel_id)
-
 @APP.route("/auth/login/v2", methods=['POST'])
 def login():
     request_data = request.get_json()
@@ -107,12 +99,21 @@ def login():
             save_database_updates(database_store)
     return dumps(auth_login)
 
+@APP.route("/channels/create/v2", methods=['POST'])
+def channels_create():
+    # Retrieve Parameters
+    request_data = request.get_json()
+    token = request_data['token']
+    check_valid_token(token)
 
-@APP.route("/clear/v1", methods=['DELETE'])
-def clear():
-    clear_v1()
-    #open('database.json', 'w').close()
-    return dumps({})
+    decode_token = decode_jwt(token)
+    name = request_data['name']
+    is_public = request_data['is_public']
+
+    channel = channels_create_v1(decode_token['u_id'], name, is_public)
+    save_data_store_updates()
+
+    return dumps(channel)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
