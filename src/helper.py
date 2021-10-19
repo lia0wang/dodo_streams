@@ -75,9 +75,9 @@ def save_data_store_updates():
 
         # Update 'already existing' channels information
         for updated_chann in store['channels']:
-                    for index, chann in enumerate(data['channels']):
-                        if chann['channel_id'] == updated_chann['channel_id']:
-                            data['channels'][index] = updated_chann
+            for index, chann in enumerate(data['channels']):
+                if chann['channel_id'] == updated_chann['channel_id']:
+                    data['channels'][index] = updated_chann
 
         # Append new channels
         id_list = []
