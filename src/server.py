@@ -99,7 +99,10 @@ def clear():
     #open('database.json', 'w').close()
     return dumps({})
 
-
+@APP.route("/auth/logout/v1", methods=['POST'])
+def logout():
+    return dumps({})
+    
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
