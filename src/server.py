@@ -3,6 +3,7 @@ import signal
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
+from src.channels import channels_create_v1
 from src.error import InputError
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
@@ -69,6 +70,20 @@ def register():
     save_database_updates(database_store)
     register_return['token'] = create_jwt(u_id, session_id)
     return dumps(register_return)
+
+@APP.route("/channels/create/v2", methods=['POST'])
+def channels_create():
+    # Retrieve Parameters
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = decode_jwt(token)
+    name = request_data['name']
+    is_public = request_data['is_public']
+
+    channel = channels_create_v1(auth_user_id, name, is_public)
+    channel_id = channel['channel_id']
+    
+    return dumps(channel_id)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
