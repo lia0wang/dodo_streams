@@ -7,7 +7,8 @@ from src.error import InputError
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
 from src.data_store import data_store
-from src.helper import get_data, save_data_store_updates, save_database_updates, create_jwt, decode_jwt, create_session_id
+from src.helper import check_valid_token, get_data, save_data_store_updates, save_database_updates, create_jwt, decode_jwt, create_session_id
+from src.other import clear_v1
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -69,6 +70,35 @@ def register():
     save_database_updates(database_store)
     register_return['token'] = create_jwt(u_id, session_id)
     return dumps(register_return)
+
+@APP.route("/auth/login/v2", methods=['POST'])
+def login():
+    request_data = request.get_json()
+    email = request_data['email']
+    password = request_data['password']
+    
+    auth_login = auth_login_v1(email,password)
+    session_id = create_session_id()
+    auth_login['token'] = create_jwt(auth_login['auth_user_id'], session_id)
+    
+    # Fetch data from database
+    database_store = get_data()
+
+    # Find u_id and create session_id to generate token
+    for index, user in enumerate(database_store['users']):
+        if user['u_id'] == auth_login['auth_user_id']:
+            # Update user information with sessions_list and session_id 
+            database_store['users'][index]['session_list'].append(session_id)
+            save_database_updates(database_store)
+    return dumps(auth_login)
+
+
+@APP.route("/clear/v1", methods=['DELETE'])
+def clear():
+    clear_v1()
+    #open('database.json', 'w').close()
+    return dumps({})
+
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

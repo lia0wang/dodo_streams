@@ -23,16 +23,28 @@ def auth_login_v1(email, password):
         that has been registered and password is correct for that u_id.
 
     """
-    store = data_store.get()
-    for user in store['users']:
-        if user['email'] == email:
-            if user['password'] == password:
-                return {
-                    'auth_user_id' : user['u_id']
-                }
-            else:
-                raise InputError('Error: Invalid password')
-    raise InputError('Error: Invalid email')
+    if is_database_exist() == True:
+        database_store = get_data()
+        for user in database_store['users']:
+            if user['email'] == email:
+                if user['password'] == password:
+                    return {
+                        'auth_user_id' : user['u_id']
+                    }
+                else:
+                    raise InputError(description = 'Error: Invalid password')
+        raise InputError('Error: Invalid email') 
+    else:
+        store = data_store.get()
+        for user in store['users']:
+            if user['email'] == email:
+                if user['password'] == password:
+                    return {
+                        'auth_user_id' : user['u_id']
+                    }
+                else:
+                    raise InputError(description = 'Error: Invalid password')
+        raise InputError(description = 'Error: Invalid email')
 
 def auth_register_v1(email, password, name_first, name_last):
     '''
