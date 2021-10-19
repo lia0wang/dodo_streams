@@ -129,15 +129,14 @@ def channel_join():
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
     channel_id = request_data['channel_id']
-
     # Pass parameters
     channel_join_v1(decode_token['u_id'], channel_id)
     save_data_store_updates()
-
+    
     return dumps({})
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    APP.run(port=config.port, debug = True) # Do not edit this port

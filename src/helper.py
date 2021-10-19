@@ -74,10 +74,22 @@ def save_data_store_updates():
                 data['users'].append(user)
 
         # Update 'already existing' channels information
-        for updated_chann in store['channels']:
-            for index, chann in enumerate(data['channels']):
-                if chann['channel_id'] == updated_chann['channel_id'] and chann != updated_chann:
-                    data['channels'][index] = updated_chann
+        for index, updated_chann in enumerate(store['channels']):
+            for index1, chann in enumerate(data['channels']):
+                if chann['channel_id'] == updated_chann['channel_id']:
+                    id_list = []
+                    id_list2 = []
+                    target_id = []
+                    for mem in store['channels'][index]['all_members']:
+                        id_list.append(mem['u_id'])
+                    for data_mem in data['channels'][index1]['all_members']:
+                        id_list2.append(data_mem['u_id'])
+                    for id in id_list:
+                        if id not in id_list2:
+                            target_id.append(id)
+                    for mem in store['channels'][index]['all_members']:
+                        if mem['u_id'] in target_id:
+                            data['channels'][index1]['all_members'].append(mem)
         # Append new channels
         id_list = []
         id_list2 = []
