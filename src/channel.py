@@ -1,7 +1,7 @@
 import os
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import get_data, seek_target_channel_and_errors, is_database_exist
+from src.helper import get_data, save_database_updates, seek_target_channel_and_errors, is_database_exist
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
@@ -291,7 +291,10 @@ def channel_join_v1(auth_user_id, channel_id):
 
     # Append the new member to the target channel
     target_channel['all_members'].append(new_member)
-    data_store.set(store)
+    if is_database_exist():
+        save_database_updates(db_store)
+    else:
+        data_store.set(store)
 
     return {
     }
