@@ -104,7 +104,7 @@ def login():
 def channels_create():
     # Retrieve Parameters
     request_data = request.get_json()
-    
+
     token = request_data['token']
     check_valid_token(token)
     decode_token = decode_jwt(token)
@@ -120,4 +120,4 @@ def channels_create():
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=9999, debug = True) # Do not edit this port
+    APP.run(port=config.port) # Do not edit this port
