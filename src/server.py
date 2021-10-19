@@ -121,13 +121,14 @@ def channels_create():
 
 @APP.route("/channel/join/v2", methods=['POST'])
 def channel_join():
-    # Retrieve parameters
+    # Retrieve token
     request_data = request.get_json()
     token = request_data['token']
-    channel_id = request_data['channel_id']
+    check_valid_token(token)
 
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
+    channel_id = request_data['channel_id']
 
     # Pass parameters
     channel_join_v1(decode_token['u_id'], channel_id)
