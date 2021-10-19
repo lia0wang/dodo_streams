@@ -76,8 +76,9 @@ def save_data_store_updates():
         # Update 'already existing' channels information
         for updated_chann in store['channels']:
             for index, chann in enumerate(data['channels']):
-                if chann['channel_id'] == updated_chann['channel_id'] and chann != updated_chann:
+                if chann['channel_id'] == updated_chann['channel_id']:
                     data['channels'][index] = updated_chann
+
         # Append new channels
         id_list = []
         id_list2 = []
@@ -218,7 +219,3 @@ def check_valid_token(token):
                 is_token_valid = True
     if is_token_valid == False:
         raise AccessError(description="Invalid Token")
-
-if __name__ == "__main__":
-    db_store = get_data()
-    print(db_store)

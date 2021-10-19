@@ -146,11 +146,10 @@ def channel_join():
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
     channel_id = request_data['channel_id']
-
     # Pass parameters
     channel_join_v1(decode_token['u_id'], channel_id)
     save_data_store_updates()
-
+    
     return dumps({})
 
 #### NO NEED TO MODIFY BELOW THIS POINT

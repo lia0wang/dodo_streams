@@ -1,7 +1,7 @@
 import os
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import get_data, seek_target_channel_and_errors, is_database_exist
+from src.helper import get_data, seek_target_channel_and_errors, is_database_exist, save_database_updates
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
@@ -290,8 +290,9 @@ def channel_join_v1(auth_user_id, channel_id):
         raise AccessError(description="Sorry, you can't join the private channel.")
 
     # Append the new member to the target channel
-    target_channel['all_members'].append(new_member)
+    for index, channel in enumerate(store['channels']):
+        if channel['channel_id'] == channel_id:
+            store['channels'][index]['all_members'].append(new_member)
     data_store.set(store)
-
     return {
     }
