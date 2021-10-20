@@ -3,14 +3,15 @@ import signal
 from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.channel import channel_join_v1
+from src.channel import channel_join_v1, channel_details_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1
 from src.error import InputError
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
 from src.data_store import data_store
-from src.helper import check_valid_token, get_data, save_data_store_updates, save_database_updates, create_jwt, decode_jwt, create_session_id
+from src.helper import check_valid_token, get_data, save_data_store_updates, create_session_id
+from src.helper import is_database_exist, save_database_updates, create_jwt, decode_jwt
 from src.other import clear_v1
 
 def quit_gracefully(*args):
@@ -153,6 +154,18 @@ def channel_join():
     
     return dumps({})
 
+@APP.route("/channel/details/v2", methods=['GET'])
+def details():
+    request_data = request.get_json()
+    check_valid_token(request_data['token'])
+    db_store = get_data()
+    decoded_jwt = decode_jwt(request_data['token'])
+    for user in db_store['users']:
+        if user['u_id'] == decoded_jwt['u_id']:
+            target_user = user
+    details = channel_details_v1(target_user['u_id'], request_data['channel_id'])
+    return dumps(details)
+    
 @APP.route("/dm/create/v1", methods=['POST'])
 def dm_create():
     # Retrieve token
@@ -169,6 +182,38 @@ def dm_create():
     save_database_updates(dm)
 
     return dumps(dm)
+
+@APP.route("/user/profile/v1", methods=['GET'])
+def profile():
+    request_data = request.get_json()
+    # Check if u_id refers from request data refers to existing user
+    is_valid_user = False
+    db_store = get_data()
+    if not is_database_exist():
+        raise InputError(description="u_id does not refer to existing user")
+
+    for user in db_store['users']:
+        if user['u_id'] == request_data['u_id']:
+            is_valid_user = True
+    if is_valid_user == False:
+        raise InputError(description="u_id does not refer to existing user")
+
+    check_valid_token(request_data['token'])
+    # find user in database
+    decoded_jwt = decode_jwt(request_data['token'])
+    for user in db_store['users']:
+        if user['u_id'] == decoded_jwt['u_id']:
+            target_user = user
+
+    # create dictionary to be returned
+    user_return = {
+        'u_id': target_user['u_id'],
+        'email': target_user['email'],
+        'name_first': target_user['name_first'],
+        'name_last': target_user['name_last'],
+        'handle_str': target_user['handle_str']
+    }
+    return dumps(user_return)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
