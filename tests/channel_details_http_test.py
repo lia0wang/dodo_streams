@@ -37,7 +37,7 @@ def test_http_details_multiple_members():
     ch_create_param = {
         'token': register_return1['token'],
         'name': 'TheRealMonsters',
-        'is_public': 'True'
+        'is_public': True
     }
     create_return = requests.post(f"{BASE_URL}/channels/create/v2", json = ch_create_param)
     create_return = create_return.json()
@@ -95,7 +95,7 @@ def test_http_details_one_member():
     ch_create_param = {
         'token': register_return1['token'],
         'name': 'TheRealMonsters',
-        'is_public': 'True'
+        'is_public': True
     }
     create_return = requests.post(f"{BASE_URL}/channels/create/v2", json = ch_create_param)
     create_return = create_return.json()
@@ -136,7 +136,7 @@ def test_http_invalid_channel_id():
     ch_create_param = {
         'token': register_return1['token'],
         'name': 'TheRealMonsters',
-        'is_public': 'True'
+        'is_public': True
     }
     create_return = requests.post(f"{BASE_URL}/channels/create/v2", json = ch_create_param)
     create_return = create_return.json()
@@ -170,15 +170,15 @@ def test_http_not_member():
     ch_create_param1 = {
         'token': register_return1['token'],
         'name': 'TheRealMonsters',
-        'is_public': 'True'
+        'is_public': True
     }
     ch_create_param2 = {
         'token': register_return2['token'],
         'name': 'TheFakeMonsters',
-        'is_public': 'True'
+        'is_public': True
     }
-    create_return1 = requests.post(f"{BASE_URL}/channels/create/v2", json = ch_create_param1)
-    create_return2 = requests.post(f"{BASE_URL}/channels/create/v2", json = ch_create_param2)
+    create_return1 = requests.post(f"{BASE_URL}/channels/create/v2", json = ch_create_param1).json()
+    create_return2 = requests.post(f"{BASE_URL}/channels/create/v2", json = ch_create_param2).json()
 
     ch_details_param = {
         "token": register_return1['token'], 
