@@ -166,7 +166,6 @@ def dm_create():
 
     # Pass parameters
     dm = dm_create_v1(decode_token['u_id'], u_ids)
-    save_data_store_updates()
 
     return dumps(dm)
 

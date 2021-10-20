@@ -1,5 +1,5 @@
 from src.error import AccessError, InputError
-from src.helper import get_data, is_database_exist
+from src.helper import get_data, save_database_updates
 from src.data_store import data_store
 
 def dm_create_v1(auth_user_id, u_ids):
@@ -21,7 +21,7 @@ def dm_create_v1(auth_user_id, u_ids):
     '''
 
     # Fetch data
-    store = data_store.get()
+    store = get_data()
 
     # Check if the auth_user_id is valid
     valid = False
@@ -39,7 +39,7 @@ def dm_create_v1(auth_user_id, u_ids):
                 valid = True
         if not valid:
             raise InputError(description="Invalid user ID!")
-    
+
     # The creator of the dm cant be in the users list
     for u_id in u_ids:
         if u_id == auth_user_id:
@@ -69,7 +69,7 @@ def dm_create_v1(auth_user_id, u_ids):
 
     # Append the created channel to channels database
     store['dms'].append(dm)
-    data_store.set(store)
+    save_database_updates(store)
 
     return {
         'dm_id': dm_id,
