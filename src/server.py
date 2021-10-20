@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.channel import channel_join_v1
 from src.channels import channels_create_v1
+from src.dm import dm_create_v1
 from src.error import InputError
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
@@ -151,6 +152,23 @@ def channel_join():
     save_data_store_updates()
     
     return dumps({})
+
+@APP.route("/dm/create/v1", methods=['POST'])
+def dm_create():
+    # Retrieve token
+    request_data = request.get_json()
+    token = request_data['token']
+    check_valid_token(token)
+
+    # Decode token, retrieve parameters
+    decode_token = decode_jwt(token)
+    u_ids = request_data['u_ids']
+
+    # Pass parameters
+    dm = dm_create_v1(decode_token['u_id'], u_ids)
+    save_data_store_updates()
+
+    return dumps(dm)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
