@@ -25,3 +25,4 @@ def test_invalid_user_id():
         dm_create_v1(auth_user_id, [-1])
     with pytest.raises(InputError):
         dm_create_v1(auth_user_id, [invalid_user_id, valid_user_id])
+
