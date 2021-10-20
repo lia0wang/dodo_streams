@@ -64,6 +64,7 @@ def test_http_multiple_profile():
     assert profile_return3['name_first'] == "MOther"
     assert profile_return3['name_last'] == "ReGgie"
     assert profile_return3['handle_str'] == "motherreggie0"
+    
 # test only existing profile
 def test_http_only_profile():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -86,6 +87,7 @@ def test_http_only_profile():
     assert profile_return1['name_first'] == "Hopeful"
     assert profile_return1['name_last'] == "Boy"
     assert profile_return1['handle_str'] == "hopefulboy"
+
 # testing 'u_id does not refer to existing user' error
 def test_http_profile_u_id_invlaid():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
