@@ -114,6 +114,7 @@ def test_http_setname_twice():
     assert request_data["all_members"][0]["name_last"] == "newerName"
 
 def test_http_setname_different_users():
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param_1 = {
         "email": "11037@gmail.com",
         "password": "Hope11037",
