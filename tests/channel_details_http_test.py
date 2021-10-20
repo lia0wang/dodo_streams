@@ -58,13 +58,13 @@ def test_http_details_multiple_members():
     assert request_data['is_public'] == True
 
     assert request_data['owner_members'][0]['u_id'] == register_return1['auth_user_id']
-    assert request_data['owner_members'][0]['email'] == "'11037@gmail.com'"
+    assert request_data['owner_members'][0]['email'] == "11037@gmail.com"
     assert request_data['owner_members'][0]['name_first'] == "Hopeful"
     assert request_data['owner_members'][0]['name_last'] == "Boy"
     assert request_data['owner_members'][0]['handle_str'] == "hopefulboy"    
 
     assert request_data['all_members'][0]['u_id'] == register_return1['auth_user_id']
-    assert request_data['all_members'][0]['email'] == "'11037@gmail.com'"
+    assert request_data['all_members'][0]['email'] == "11037@gmail.com"
     assert request_data['all_members'][0]['name_first'] == "Hopeful"
     assert request_data['all_members'][0]['name_last'] == "Boy"
     assert request_data['all_members'][0]['handle_str'] == "hopefulboy"    
@@ -110,13 +110,13 @@ def test_http_details_one_member():
     assert request_data['is_public'] == True
 
     assert request_data['owner_members'][0]['u_id'] == register_return1['auth_user_id']
-    assert request_data['owner_members'][0]['email'] == "'11037@gmail.com'"
+    assert request_data['owner_members'][0]['email'] == "11037@gmail.com"
     assert request_data['owner_members'][0]['name_first'] == "Hopeful"
     assert request_data['owner_members'][0]['name_last'] == "Boy"
     assert request_data['owner_members'][0]['handle_str'] == "hopefulboy"    
 
     assert request_data['all_members'][0]['u_id'] == register_return1['auth_user_id']
-    assert request_data['all_members'][0]['email'] == "'11037@gmail.com'"
+    assert request_data['all_members'][0]['email'] == "11037@gmail.com"
     assert request_data['all_members'][0]['name_first'] == "Hopeful"
     assert request_data['all_members'][0]['name_last'] == "Boy"
     assert request_data['all_members'][0]['handle_str'] == "hopefulboy"   
