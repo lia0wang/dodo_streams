@@ -3,7 +3,7 @@ import signal
 from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.channel import channel_join_v1
+from src.channel import channel_join_v1, channel_details_v1
 from src.channels import channels_create_v1
 from src.error import InputError
 from src import config
@@ -151,6 +151,18 @@ def channel_join():
     save_data_store_updates()
     
     return dumps({})
+
+@APP.route("/channel/details/v2", methods=['GET'])
+def details():
+    request_data = request.get_json()
+    check_valid_token(request_data['token'])
+    db_store = get_data()
+    decoded_jwt = decode_jwt(request_data['token'])
+    for user in db_store['users']:
+        if user['u_id'] == decoded_jwt['u_id']:
+            target_user = user
+    details = channel_details_v1(target_user['u_id'], request_data['channel_id'])
+    return dumps(details)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
