@@ -125,7 +125,7 @@ def channels_create_v1(auth_user_id, name, is_public):
                     'permission_id': user['permission_id']
                 }
         if not valid:
-            raise AccessError("Invalid user ID!")
+            raise AccessError(description="Invalid user ID!")
     else:
         # Check if the auth_user_id is valid
         valid = False
