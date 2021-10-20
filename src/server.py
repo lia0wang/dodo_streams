@@ -206,7 +206,7 @@ def profile():
 
     # create dictionary to be returned
     user_return = {
-        'user_id': target_user['u_id'],
+        'u_id': target_user['u_id'],
         'email': target_user['email'],
         'name_first': target_user['name_first'],
         'name_last': target_user['name_last'],

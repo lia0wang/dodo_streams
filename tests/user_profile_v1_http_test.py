@@ -101,5 +101,5 @@ def test_http_profile_u_id_invlaid():
         "u_id": register_return1["auth_user_id"] + 1,
         "token": register_return1["token"]
     }
-    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param1).json()
+    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param1)
     assert profile_return.status_code == 400
