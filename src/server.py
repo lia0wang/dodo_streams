@@ -241,8 +241,8 @@ def setname():
                 db_store['channels'][index]['owner_members'][index2]['name_last'] = name_last
         for index3, mem in enumerate(chann['all_members']):
             if mem['u_id'] == decoded_jwt['u_id']:
-                db_store['channels'][index]['owner_members'][index3]['name_first'] = name_first
-                db_store['channels'][index]['owner_members'][index3]['name_last'] = name_last
+                db_store['channels'][index]['all_members'][index3]['name_first'] = name_first
+                db_store['channels'][index]['all_members'][index3]['name_last'] = name_last
 
     save_database_updates(db_store)
     return dumps({})
