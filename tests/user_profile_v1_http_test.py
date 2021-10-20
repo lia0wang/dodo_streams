@@ -21,8 +21,8 @@ def test_http_multiple_profile():
     register_param_3 = {
         "email": "groundpound@gmail.com",
         "password": "UltraPowerful",
-        "name_first": "Mother",
-        "name_last": "Reggie"
+        "name_first": "MOther",
+        "name_last": "ReGgie"
     }
 
     register_return1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1)
