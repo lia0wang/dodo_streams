@@ -232,17 +232,17 @@ def setname():
     for index, user in enumerate(db_store['users']):
         if user['u_id'] == decoded_jwt['u_id']:
             db_store['users'][index]['name_first'] = name_first
-            db_store['users'][index]['name_first'] = name_first
+            db_store['users'][index]['name_last'] = name_last
 
     for index, chann in enumerate(db_store['channels']):
         for index2, owner_mem in enumerate(chann['owner_members']):
             if owner_mem['u_id'] == decoded_jwt['u_id']:
                 db_store['channels'][index]['owner_members'][index2]['name_first'] = name_first
-                db_store['channels'][index]['owner_members'][index2]['name_first'] = name_last
+                db_store['channels'][index]['owner_members'][index2]['name_last'] = name_last
         for index3, mem in enumerate(chann['all_members']):
             if mem['u_id'] == decoded_jwt['u_id']:
                 db_store['channels'][index]['owner_members'][index3]['name_first'] = name_first
-                db_store['channels'][index]['owner_members'][index3]['name_first'] = name_last
+                db_store['channels'][index]['owner_members'][index3]['name_last'] = name_last
 
     save_database_updates(db_store)
     return dumps({})

@@ -282,7 +282,7 @@ def test_http_invalid_setname_first():
     request_data = requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
     assert request_data.status_code == 200
 
-def test_http_invalid_setname_first():
+def test_http_invalid_setname_last():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param_1 = {
         "email": "11037@gmail.com",
