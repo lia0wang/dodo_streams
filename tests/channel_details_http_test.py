@@ -209,7 +209,7 @@ def test_http_details_multiple_channels():
     register_return3 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_3)
     register_return3 = register_return3.json()
 
-    ch_create_param = {
+    ch_create_param1 = {
         "token": register_return1["token"],
         "name": "TheRealMonsters",
         "is_public": True
@@ -219,7 +219,7 @@ def test_http_details_multiple_channels():
         "name": "SuperBeautyCuties",
         "is_public": True
     }
-    create_return1 = requests.post(f"{BASE_URL}/channels/create/v2", json = ch_create_param)
+    create_return1 = requests.post(f"{BASE_URL}/channels/create/v2", json = ch_create_param1)
     create_return1 = create_return1.json()
     create_return2 = requests.post(f"{BASE_URL}/channels/create/v2", json = ch_create_param2)
     create_return2 = create_return2.json()
@@ -231,7 +231,7 @@ def test_http_details_multiple_channels():
         "token": register_return3["token"], 
         "channel_id": create_return2["channel_id"]
     }
-    requests.post(f"{BASE_URL}/channel/join/v2", json = ch_param1)
+    requests.post(f"{BASE_URL}/channel/join/v2", json = ch_param2)
     get_request1 = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_param1)
     request_data1 = get_request1.json()
     get_request2 = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_param2)
