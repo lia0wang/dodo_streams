@@ -29,7 +29,7 @@ def dm_create_v1(auth_user_id, u_ids):
         if user['u_id'] == auth_user_id:
             valid = True
     if not valid:
-        raise InputError(description="Invalid creator ID!")
+        raise InputError(description="Invalid authorized user ID!")
 
     # Check if the u_ids are valid
     for u_id in u_ids:
@@ -43,7 +43,7 @@ def dm_create_v1(auth_user_id, u_ids):
     # The creator of the dm cant be in the users list
     for u_id in u_ids:
         if u_id == auth_user_id:
-            raise AccessError(description="The auth_user cannot be in the invited users list!")
+            raise AccessError(description="The authorized user cannot be in the invited users list!")
 
     # Generate dm_id
     dm_id = len(store['dms']) + 1
