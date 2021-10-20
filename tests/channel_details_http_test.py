@@ -69,13 +69,13 @@ def test_http_details_multiple_members():
     assert request_data['all_members'][0]['name_last'] == "Boy"
     assert request_data['all_members'][0]['handle_str'] == "hopefulboy"    
 
-    assert request_data['all_members'][1]['u_id'] == register_return1['auth_user_id']
+    assert request_data['all_members'][1]['u_id'] == register_return2['auth_user_id']
     assert request_data['all_members'][1]['email'] == "MotherReggie@gmail.com"
     assert request_data['all_members'][1]['name_first'] == "Mother"
     assert request_data['all_members'][1]['name_last'] == "Reggie"
     assert request_data['all_members'][1]['handle_str'] == "motherreggie"  
 
-    assert request_data['all_members'][2]['u_id'] == register_return1['auth_user_id']
+    assert request_data['all_members'][2]['u_id'] == register_return3['auth_user_id']
     assert request_data['all_members'][2]['email'] == "groundpound@gmail.com"
     assert request_data['all_members'][2]['name_first'] == "Mario"
     assert request_data['all_members'][2]['name_last'] == "Pratt"
