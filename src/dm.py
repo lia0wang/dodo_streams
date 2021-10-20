@@ -1,5 +1,5 @@
 from src.error import AccessError, InputError
-from src.helper import get_data, save_database_updates
+from src.helper import get_data, save_database_updates, is_database_exist
 from src.data_store import data_store
 
 def dm_create_v1(auth_user_id, u_ids):
@@ -21,7 +21,10 @@ def dm_create_v1(auth_user_id, u_ids):
     '''
 
     # Fetch data
-    store = get_data()
+    store = data_store.get()
+
+    if is_database_exist():
+        store = get_data()
 
     # Check if the auth_user_id is valid
     valid = False
@@ -69,8 +72,8 @@ def dm_create_v1(auth_user_id, u_ids):
 
     # Append the created channel to channels database
     store['dms'].append(dm)
-    save_database_updates(store)
-
+    data_store.set(store)
+    
     return {
         'dm_id': dm_id,
         'dm_name': dm_name

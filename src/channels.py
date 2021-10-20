@@ -108,51 +108,32 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     # Fetch data
     store = data_store.get()
-
+    
     if is_database_exist():
-        db_store = get_data()
-         # Check if the auth_user_id is valid
-        valid = False
-        for user in db_store['users']:
-            if user['u_id'] == auth_user_id:
-                valid = True
-                user_info = {
-                    'u_id': auth_user_id,
-                    'email': user['email'],
-                    'name_first': user['name_first'],
-                    'name_last': user['name_last'],
-                    'handle_str': user['handle_str'],
-                    'permission_id': user['permission_id']
-                }
-        if not valid:
-            raise AccessError(description="Invalid user ID!")
-    else:
-        # Check if the auth_user_id is valid
-        valid = False
-        for user in store['users']:
-            if user['u_id'] == auth_user_id:
-                valid = True
-                user_info = {
-                    'u_id': auth_user_id,
-                    'email': user['email'],
-                    'name_first': user['name_first'],
-                    'name_last': user['name_last'],
-                    'handle_str': user['handle_str'],
-                    'permission_id': user['permission_id']
-                }
-        if not valid:
-            raise AccessError(description="Invalid user ID!")
+        store = get_data()
+
+    # Check if the auth_user_id is valid
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            valid = True
+            user_info = {
+                'u_id': auth_user_id,
+                'email': user['email'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last'],
+                'handle_str': user['handle_str'],
+                'permission_id': user['permission_id']
+            }
+    if not valid:
+        raise AccessError(description="Invalid user ID!")
 
     # Raise an InputError when the channel's name is less than 1 char or greater than 20 char
     if len(name) < 1 or len(name) > 20:
         raise InputError(description='The name length is not between 1 and 20 characters.')
 
     # Generate the channel_id
-    if is_database_exist():
-        database_store = get_data()
-        new_channel_id = len(database_store['channels']) + 1
-    else:
-        new_channel_id = len(store['channels']) + 1
+    new_channel_id = len(store['channels']) + 1
 
     # Creates a new channel with:
     channel = {
