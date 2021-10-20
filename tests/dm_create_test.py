@@ -13,12 +13,15 @@ def test_invalid_user_id():
     auth_user = auth_register_v1('shifan@gmail.com', 'chenshifan0207', 'shifan', 'chen')
     auth_user_id = auth_user['auth_user_id']
 
-    user = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
-    invalid_user_id = user['auth_user_id'] + 1
+    user_1 = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+    invalid_user_id = user_1['auth_user_id'] + 10
+
+    user_2 = auth_register_v1('haha@gmail.com', 'haha0207', 'ha', 'ha')
+    valid_user_id = user_2['auth_user_id']
 
     with pytest.raises(InputError):
-        dm_create_v1(auth_user_id, invalid_user_id)
+        dm_create_v1(auth_user_id, [invalid_user_id])
     with pytest.raises(InputError):
-        dm_create_v1(auth_user_id, -1)
+        dm_create_v1(auth_user_id, [-1])
     with pytest.raises(InputError):
-        dm_create_v1(auth_user_id, 0)
+        dm_create_v1(auth_user_id, [invalid_user_id, valid_user_id])
