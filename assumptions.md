@@ -5,6 +5,12 @@
 
 1. Multiple users can register with the same first names, last names and passwords.
 
+## DMs
+
+### dm_create_v1
+
+1. The creator of the dm cant be in the users list.
+
 ## Channels
 
 ### channels_create_v1
