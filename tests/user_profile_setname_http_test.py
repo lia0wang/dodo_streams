@@ -27,7 +27,7 @@ def test_http_setname_once():
         "name_first": "new",
         "name_last": "name"
     }
-    requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param)
+    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param)
     profile_param = {
         "u_id": register_return1["auth_user_id"],
         "token": register_return1["token"]
@@ -38,7 +38,7 @@ def test_http_setname_once():
         "token": register_return1["token"], 
         "channel_id": create_return["channel_id"]
     }
-    request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json
+    request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json()
 
     assert profile_return['name_first'] == "new"
     assert profile_return['name_last'] == "name"
@@ -72,7 +72,7 @@ def test_http_setname_twice():
         "name_first": "new",
         "name_last": "name"
     }
-    requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param)
+    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param)
     profile_param = {
         "u_id": register_return1["auth_user_id"],
         "token": register_return1["token"]
@@ -83,7 +83,7 @@ def test_http_setname_twice():
         "token": register_return1["token"], 
         "channel_id": create_return["channel_id"]
     }
-    request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json
+    request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json()
 
     assert profile_return['name_first'] == "new"
     assert profile_return['name_last'] == "name"
@@ -99,7 +99,7 @@ def test_http_setname_twice():
         "name_first": "even",
         "name_last": "newerName"
     }
-    requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param)
+    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param)
 
     request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json
     profile_return = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param).json()
@@ -153,9 +153,9 @@ def test_http_setname_different_users():
         "name_first": "evolved",
         "name_last": "newerName"
     }
-    requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
-    requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param2)
-    requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param3)
+    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
+    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param2)
+    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param3)
     profile_param1 = {
         "u_id": register_return1["auth_user_id"],
         "token": register_return1["token"]
@@ -231,7 +231,7 @@ def test_http_channel_member_setname():
         "name_first": "new",
         "name_last": "Name"
     }
-    requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
+    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
 
     get_request = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_join_param)
     request_data = get_request.json()
@@ -256,14 +256,14 @@ def test_http_invalid_setname_first():
         "name_first": "",
         "name_last": "Name"
     }
-    request_data = requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
+    request_data = requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
     assert request_data.status_code == 400
     setname_param1 = {
         "token": register_return1["token"],
         "name_first": "1",
         "name_last": "Name"
     }
-    request_data = requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
+    request_data = requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
     assert request_data.status_code == 200
     # test name_first of 51 characters
     setname_param1 = {
@@ -271,7 +271,7 @@ def test_http_invalid_setname_first():
         "name_first": "MynameisYoshikageKiraIm33yearsoldMyhouseisinthenort",
         "name_last": "Name"
     }
-    request_data = requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
+    request_data = requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
     assert request_data.status_code == 400
     # test name_first of 50 characters
     setname_param1 = {
@@ -279,7 +279,7 @@ def test_http_invalid_setname_first():
         "name_first": "MynameisYoshikageKiraIm33yearsoldMyhouseisinthenor",
         "name_last": "Name"
     }
-    request_data = requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
+    request_data = requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
     assert request_data.status_code == 200
 
 def test_http_invalid_setname_last():
@@ -299,14 +299,14 @@ def test_http_invalid_setname_last():
         "name_last": "",
         "name_first": "Name"
     }
-    request_data = requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
+    request_data = requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
     assert request_data.status_code == 400
     setname_param1 = {
         "token": register_return1["token"],
         "name_last": "1",
         "name_first": "Name"
     }
-    request_data = requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
+    request_data = requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
     assert request_data.status_code == 200
     # test name_last of 51 characters
     setname_param1 = {
@@ -314,7 +314,7 @@ def test_http_invalid_setname_last():
         "name_last": "MynameisYoshikageKiraIm33yearsoldMyhouseisinthenort",
         "name_first": "Name"
     }
-    request_data = requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
+    request_data = requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
     assert request_data.status_code == 400
     # test name_last of 50 characters
     setname_param1 = {
@@ -322,5 +322,5 @@ def test_http_invalid_setname_last():
         "name_last": "MynameisYoshikageKiraIm33yearsoldMyhouseisinthenor",
         "name_first": "Name"
     }
-    request_data = requests.post(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
+    request_data = requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
     assert request_data.status_code == 200
