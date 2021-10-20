@@ -215,6 +215,38 @@ def profile():
     }
     return dumps(user_return)
 
+@APP.route("/user/profile/setname/v1", methods=['PUT'])
+def setname():
+    request_data = request.get_json()
+    db_store = get_data()
+    name_first = request_data['name_first']
+    name_last = request_data['name_last']
+    if len(name_first) < 1 or len(name_first) > 50:
+        raise InputError("Error: Invalid first name")
+    if len(name_last) < 1 or len(name_last) > 50:
+        raise InputError("Error: Invalid last name")
+    
+    check_valid_token(request_data['token'])
+
+    decoded_jwt = decode_jwt(request_data['token'])
+    for index, user in enumerate(db_store['users']):
+        if user['u_id'] == decoded_jwt['u_id']:
+            db_store['users'][index]['name_first'] = name_first
+            db_store['users'][index]['name_last'] = name_last
+
+    for index, chann in enumerate(db_store['channels']):
+        for index2, owner_mem in enumerate(chann['owner_members']):
+            if owner_mem['u_id'] == decoded_jwt['u_id']:
+                db_store['channels'][index]['owner_members'][index2]['name_first'] = name_first
+                db_store['channels'][index]['owner_members'][index2]['name_last'] = name_last
+        for index3, mem in enumerate(chann['all_members']):
+            if mem['u_id'] == decoded_jwt['u_id']:
+                db_store['channels'][index]['all_members'][index3]['name_first'] = name_first
+                db_store['channels'][index]['all_members'][index3]['name_last'] = name_last
+
+    save_database_updates(db_store)
+    return dumps({})
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
