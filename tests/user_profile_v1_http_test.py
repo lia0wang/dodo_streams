@@ -1,8 +1,8 @@
 import requests
 import pytest
 
-
 BASE_URL = 'http://localhost:8080'
+
 # test multiple profiles
 def test_http_multiple_profile():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
