@@ -101,7 +101,7 @@ def test_http_setname_twice():
     }
     requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param)
 
-    request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json
+    request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json()
     profile_return = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param).json()
 
     assert profile_return['name_first'] == "even"
@@ -237,7 +237,7 @@ def test_http_channel_member_setname():
     request_data = get_request.json()
 
     assert request_data["all_members"][1]["name_first"] == "new"
-    assert request_data["all_members"][1]["name_last"] == "name"
+    assert request_data["all_members"][1]["name_last"] == "Name"
 
 def test_http_invalid_setname_first():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
