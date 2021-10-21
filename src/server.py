@@ -1,6 +1,6 @@
+from re import T
 import sys
 import signal
-import re
 from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
@@ -184,6 +184,18 @@ def dm_create():
 
     return dumps(dm)
 
+@APP.route("/dm/details/v1", methods=['POST'])
+def dm_details():
+    # retrieve token
+    request_data = request.get_json()
+    check_valid_token(request_data['token'])
+
+    decoded_jwt = decode_jwt(request_data['token'])
+    auth_user_id = decoded_jwt['u_id']
+
+    details = channel_details_v1(auth_user_id, request_data['dm_id'])
+    return dumps(details)
+
 
 @APP.route("/user/profile/v1", methods=['GET'])
 def profile():
@@ -191,6 +203,8 @@ def profile():
     # Check if u_id refers from request data refers to existing user
     is_valid_user = False
     db_store = get_data()
+    if not is_database_exist():
+        raise InputError(description="u_id does not refer to existing user")
 
     for user in db_store['users']:
         if user['u_id'] == request_data['u_id']:
@@ -222,10 +236,10 @@ def setname():
     name_first = request_data['name_first']
     name_last = request_data['name_last']
     if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError(description="Error: Invalid first name")
+        raise InputError("Error: Invalid first name")
     if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError(description="Error: Invalid last name")
-
+        raise InputError("Error: Invalid last name")
+    
     check_valid_token(request_data['token'])
 
     decoded_jwt = decode_jwt(request_data['token'])
@@ -247,42 +261,8 @@ def setname():
     save_database_updates(db_store)
     return dumps({})
 
-@APP.route("/user/profile/setemail/v1", methods=['PUT'])
-def set_email():
-    request_data = request.get_json()
-    
-    email = request_data['email']
-    regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-
-    # Check for input errors
-    if not re.fullmatch(regex, email):
-        raise InputError(description="Error: Invalid email")
-
-    db_store = get_data()
-    for user in db_store['users']:
-        if user['email'] == email:
-            raise InputError(description="Error: email taken")
-
-    check_valid_token(request_data['token'])
-
-    decoded_jwt = decode_jwt(request_data['token'])
-    for index, user in enumerate(db_store['users']):
-        if user['u_id'] == decoded_jwt['u_id']:
-            db_store['users'][index]['email'] = email
-
-    for index, chann in enumerate(db_store['channels']):
-        for index2, owner_mem in enumerate(chann['owner_members']):
-            if owner_mem['u_id'] == decoded_jwt['u_id']:
-                db_store['channels'][index]['owner_members'][index2]['email'] = email
-        for index3, mem in enumerate(chann['all_members']):
-            if mem['u_id'] == decoded_jwt['u_id']:
-                db_store['channels'][index]['all_members'][index3]['email'] = email
-                
-    save_database_updates(db_store)
-    return dumps({})
-
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    APP.run(port=9999, debug=True) # Do not edit this port

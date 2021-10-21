@@ -79,3 +79,58 @@ def dm_create_v1(auth_user_id, u_ids):
         'dm_name': dm_name
     }
 
+
+def dm_details_v1(auth_user_id, dm_id):
+    # Fetch data
+    store = data_store.get()
+
+    if is_database_exist():
+        store = get_data()
+
+    # Check if auth_user_id refers to existing user
+    is_valid_user = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            is_valid_user = True
+    if is_valid_user == False:
+        raise AccessError(description="Error: Invalid user id")
+    
+    # Check if dm_id refers to valid dm
+    # Find and save target dm if it exists
+    is_valid_dm = False
+    for dm in store['dms']:
+        if dm['dm_id'] == dm_id:
+            target_dm = dm
+            is_valid_dm = True
+    if is_valid_dm == False:
+        raise InputError(description="Error: Invalid channel id")
+
+    # Check if authorised user is a member of the target dm
+    # Search list of members in the target dm
+    is_member = False
+    for u_id in target_dm['u_ids']:
+        if u_id == auth_user_id:
+            is_member = True
+    if is_member == False:
+        raise AccessError(description="Error: Authorised user is not a member")
+    
+    # Generate list of members 
+    members = []
+
+    for member in target_dm['u_ids']:
+        for user in store['users']:
+            if user['u_id'] == member:
+                member_details = {
+                        'u_id': user['u_id'],
+                        'email': user['email'],
+                        'name_first': user['name_first'],
+                        'name_last': user['name_last'],
+                        'handle_str': user['handle_str'],
+                }
+                members.append(member_details)
+
+    # Return details
+    return {
+        'name': target_dm['dm_name'],
+        'members': members
+    }

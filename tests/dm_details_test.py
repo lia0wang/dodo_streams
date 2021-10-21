@@ -1,4 +1,3 @@
-import pytest
 
 from src.auth import auth_register_v1
 from src.dm import dm_create_v1, dm_details_v1
