@@ -18,7 +18,7 @@ def invalid_length():
     invalid_msg_2 = ''
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
     auth_id = user1['auth_user_id']
-    token = create_jwt(auth_id, session_id):
+    token = create_jwt(auth_id, session_id)
     
     channel = channels_create_v1(auth_id, 'comp1531', True)
     channel_id = channel["channel_id"]
@@ -41,7 +41,7 @@ def invalid_length_dm():
     user3 = auth_register_v1("AgentJohnson@hotmail.com", "abcd1234", "Agent", "Johnson")
     
     auth_id = user1['auth_user_id']
-    token = create_jwt(auth_id, session_id):
+    token = create_jwt(auth_id, session_id)
         
     u_id1 = user2['auth_user_id']
     u_id2 = user3['auth_user_id']
@@ -66,7 +66,7 @@ def invalid_auth_id():
     channel_id = channel["channel_id"]
 
     u_id = user2['auth_user_id']
-    invalid_token = create_jwt(u_id, session_id):
+    invalid_token = create_jwt(u_id, session_id)
     
     msg = "Something"
     
