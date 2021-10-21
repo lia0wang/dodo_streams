@@ -74,7 +74,7 @@ def test_duplicated_joins():
     channel = channels_create_v1(user['auth_user_id'], 'league', True)
     
     # Now the user where the member in the created channel, try joining the channel again.
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channel_join_v1(user['auth_user_id'], channel['channel_id'])
 
 def test_invalid_channel_id():

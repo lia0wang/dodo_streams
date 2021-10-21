@@ -1,7 +1,7 @@
 import os
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import get_data
+from src.helper import get_data, is_database_exist
 
 def channels_list_v1(auth_user_id):
     ''' 
@@ -20,6 +20,9 @@ def channels_list_v1(auth_user_id):
 
     # Fetching data
     store = data_store.get()
+    
+    if is_database_exist():
+        store = get_data()
 
     # Creating dictionary
     channels_list = dict()
@@ -65,6 +68,10 @@ def channels_listall_v1(auth_user_id):
     # Fetch data
     store = data_store.get()
     
+    if is_database_exist():
+        store = get_data()
+
+    
     # Creating dictionary
     channels_list = dict()
     
@@ -108,6 +115,9 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     # Fetch data
     store = data_store.get()
+    
+    if is_database_exist():
+        store = get_data()
 
     # Check if the auth_user_id is valid
     valid = False
@@ -123,21 +133,14 @@ def channels_create_v1(auth_user_id, name, is_public):
                 'permission_id': user['permission_id']
             }
     if not valid:
-        raise AccessError("Invalid user ID!")
+        raise AccessError(description="Invalid user ID!")
 
     # Raise an InputError when the channel's name is less than 1 char or greater than 20 char
     if len(name) < 1 or len(name) > 20:
-        raise InputError('The name length is not between 1 and 20 characters.')
+        raise InputError(description='The name length is not between 1 and 20 characters.')
 
     # Generate the channel_id
-    if os.path.isfile("database.json"):
-        if os.path.getsize("database.json") != 0:
-            database_store = get_data()
-            new_channel_id = len(database_store['channels']) + 1
-        else:
-            new_channel_id = len(store['channels']) + 1
-    else:
-        new_channel_id = len(store['channels']) + 1
+    new_channel_id = len(store['channels']) + 1
 
     # Creates a new channel with:
     channel = {

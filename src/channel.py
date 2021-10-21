@@ -1,7 +1,7 @@
 import os
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import get_data, seek_target_channel_and_errors, is_database_exist
+from src.helper import get_data, seek_target_channel_and_errors, is_database_exist, save_database_updates
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
@@ -215,11 +215,11 @@ def channel_join_v1(auth_user_id, channel_id):
         auth_user_id (int) - The ID of the authorised valid user
         channel_id (int)   - The ID of the channel where the user will join in
     Exceptions:
-        InputError  - Channel_id is invalid
-                    - If the user is already a member of the channel
-        AccessError - Channel_id refers to a channel that is private
-                      and the authorised user is not already a channel member
-                      and is not a global owner
+        InputError         - Channel_id is invalid
+                           - If the user is already a member of the channel
+        AccessError        - Channel_id refers to a channel that is private
+                             and the authorised user is not already a channel member
+                             and is not a global owner
     Return Value:
         Return an empty dictionary
     """
@@ -227,7 +227,9 @@ def channel_join_v1(auth_user_id, channel_id):
     # Fetch data
     store = data_store.get()
 
-    # Check if the auth_user_id is valid
+    if is_database_exist():
+        store = get_data()
+
     valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
@@ -241,7 +243,7 @@ def channel_join_v1(auth_user_id, channel_id):
             } # Catch the new_member without password
             valid = True
     if not valid:
-        raise AccessError("Invalid user ID!")
+        raise AccessError(description="Invalid user ID!")
 
     # Check if the channel_id is valid
     valid = False
@@ -250,20 +252,104 @@ def channel_join_v1(auth_user_id, channel_id):
             valid = True
             target_channel = channel # Catch the channel where the new_member is gonna join
     if not valid:
-        raise InputError("Invalid channel ID!")
+        raise InputError(description="Invalid channel ID!")
 
     # A user can't join a channel where he is alreday a member.
     for old_member in target_channel['all_members']:
         if old_member['u_id'] == new_member['u_id']:
-            raise InputError("Sorry, you can't join the same channel agian.")
+            raise InputError(description="Sorry, you can't join the same channel agian.")
 
     # If the channel is private and the useer is not a member nor a global owner.
     if not target_channel['is_public'] and new_member['permission_id'] != 1:
-        raise AccessError("Sorry, you can't join the private channel.")
+        raise AccessError(description="Sorry, you can't join the private channel.")
 
     # Append the new member to the target channel
-    target_channel['all_members'].append(new_member)
+    for index, channel in enumerate(store['channels']):
+        if channel['channel_id'] == channel_id:
+            store['channels'][index]['all_members'].append(new_member)
     data_store.set(store)
-
     return {
     }
+
+def channel_addowner_v1(auth_user_id, channel_id, u_id):
+    """ 
+    Make user with user id u_id an owner of the channel.
+    Arguments:
+        auth_user_id (int) - The ID of the authorised valid user
+        channel_id (int)   - The ID of the channel where the user will join in
+        u_id (int):        - The ID of the users
+    Exceptions:
+        InputError         - channel_id does not refer to a valid channel
+                           - u_id does not refer to a valid user
+                           - u_id refers to a user who is not a member of the channel
+                           - u_id refers to a user who is already an owner of the channel
+        AccessError        - channel_id is valid and the authorised user 
+                             does not have owner permissions in the channel
+    Return Value:
+        Returns {} (dict) on success
+    """    
+    
+    # Fetch data
+    store = data_store.get()
+
+    if is_database_exist():
+        store = get_data()
+
+    # Check if the channel_id is valid
+    valid = False
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            target_channel = channel
+            valid = True
+    if not valid:
+        raise InputError(description="Invalid channel ID!")
+
+    # Check if the u_id are valid
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            valid = True
+            user_info = {
+                'u_id': user['u_id'],
+                'email': user['email'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last'],
+                'handle_str': user['handle_str'],
+                'permission_id': user['permission_id']
+            }
+    if not valid:
+        raise InputError(description="Invalid user ID!")
+
+    # Check if the user is not a member of the channel
+    valid = False
+    for member in target_channel['all_members']:
+        if member['u_id'] == u_id:
+            valid = True
+    if not valid:
+        raise InputError(description="This user is not a member of the channel!")
+        
+    # Check if the user is already a owner of the channel
+    for owner in target_channel['owner_members']:
+        if owner['u_id'] == u_id:
+            raise InputError(description="This user is already a owner of the channel!")
+    
+    # Check when the authorised user does not have owner permissions in the channel
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            auth_user = user
+
+    if auth_user['permission_id'] != 1:
+        has_permission = False
+        for owner in target_channel['owner_members']:
+            if owner['u_id'] == auth_user_id:
+                has_permission = True
+        if not has_permission:
+            raise AccessError(description="The authorised user does not have owner permissions in the valid channel!")
+    
+    # Append the new member to the target channel
+    for index, channel in enumerate(store['channels']):
+        if channel['channel_id'] == channel_id:
+            store['channels'][index]['owner_members'].append(user_info)
+    data_store.set(store)
+
+    return {}

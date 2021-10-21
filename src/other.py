@@ -1,4 +1,5 @@
 from src.data_store import data_store
+import os 
 
 def clear_v1():
     '''
@@ -15,9 +16,10 @@ def clear_v1():
     store['users'] = []
     store['channels'] = []
     store['messages'] = []
+    store['dms'] = []
+    store['message_index'] = 0
     data_store.set(store)
 
-    open('database.json', 'w').close()
-    
+    open('database.json', 'w').close()    
     return {
     }

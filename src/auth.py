@@ -1,6 +1,6 @@
 import re
 import os
-from src.helper import get_data, create_handle, create_permission_id, is_database_exist
+from src.helper import get_data, create_handle, create_permission_id, is_database_exist, hash_encrypt
 from src.data_store import data_store
 from src.error import InputError
 
@@ -23,16 +23,32 @@ def auth_login_v1(email, password):
         that has been registered and password is correct for that u_id.
 
     """
-    store = data_store.get()
-    for user in store['users']:
-        if user['email'] == email:
-            if user['password'] == password:
-                return {
-                    'auth_user_id' : user['u_id']
-                }
-            else:
-                raise InputError('Error: Invalid password')
-    raise InputError('Error: Invalid email')
+    if is_database_exist() == True:
+        database_store = get_data()
+        for user in database_store['users']:
+            if user['email'] == email:
+                # check if encrypted password in database matches 
+                # input password after encryption
+                if user['password'] == hash_encrypt(password):
+                    return {
+                        'auth_user_id' : user['u_id']
+                    }
+                else:
+                    raise InputError(description = 'Error: Invalid password')
+        raise InputError('Error: Invalid email') 
+    else:
+        store = data_store.get()
+        for user in store['users']:
+            if user['email'] == email:
+                # check if encrypted password in database matches 
+                # input password after encryption
+                if user['password'] == hash_encrypt(password):
+                    return {
+                        'auth_user_id' : user['u_id']
+                    }
+                else:
+                    raise InputError(description = 'Error: Invalid password')
+        raise InputError(description = 'Error: Invalid email')
 
 def auth_register_v1(email, password, name_first, name_last):
     '''
@@ -125,7 +141,8 @@ def auth_register_v1(email, password, name_first, name_last):
     user = {
         'u_id': user_id,
         'email': email,
-        'password': password,
+        # encrypt password
+        'password': hash_encrypt(password),
         'name_first': name_first,
         'name_last': name_last,
         'handle_str': handle_str,
