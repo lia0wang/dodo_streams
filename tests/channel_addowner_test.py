@@ -39,21 +39,6 @@ def test_invalid_user_id():
     with pytest.raises(InputError):
         channel_addowner_v1(owner['auth_user_id'], channel['channel_id'], -1)
 
-def test_invalid_auth_user_id():
-    '''
-    Test when the auth user id is invalid
-    '''
-    clear_v1()
-    owner = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
-    channel = channels_create_v1(owner['auth_user_id'], 'league', True)
-
-    user = auth_register_v1('chenshifan@gmail.com', 'chenshifan0207', 'shifan', 'chen')
-
-    with pytest.raises(AccessError):
-        channel_addowner_v1(owner['auth_user_id'] + 999, channel['channel_id'], user['auth_user_id'])
-    with pytest.raises(AccessError):
-        channel_addowner_v1(-1, channel['channel_id'], user['auth_user_id'])
-
 def test_non_exist_user():
     '''
     Test when the user is not a member of the channel
