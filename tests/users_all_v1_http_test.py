@@ -50,7 +50,7 @@ def test_single_user():
     assert response.status_code == 200
     
     user_list = response.json()
-    assert user_list == [{"u_id": 1,"email": "11037@gmail.com", "name_first": "Hopeful", 
+    assert user_list == [{"u_id": 1,"email": "11037.666@gmail.com", "name_first": "Hopeful", 
                           "name_last": "Boyyy", "handle_str": "hopefulboyyy", "permission_id": 1}]
     
     
@@ -86,7 +86,7 @@ def test_multiple_users():
     assert response.status_code == 200
     
     user_list = response.json()
-    assert user_list == [{"u_id": 1,"email": "11037@gmail.com", "name_first": "Hopeful", 
+    assert user_list == [{"u_id": 1,"email": "11037.666@gmail.com", "name_first": "Hopeful", 
                           "name_last": "Boyyy", "handle_str": "hopefulboyyy", "permission_id": 1},
                          {"u_id": 2,"email": "bob123@gmail.com", "name_first": "Bob", 
                           "name_last": "Marley", "handle_str": "bobmarley", "permission_id": 2}]
