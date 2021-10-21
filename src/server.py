@@ -6,7 +6,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.channel import channel_join_v1, channel_details_v1
 from src.channels import channels_create_v1
-from src.dm import dm_create_v1
+from src.dm import dm_create_v1, dm_details_v1
 from src.message import message_send_v1, message_senddm_v1
 from src.error import InputError
 from src import config
@@ -208,9 +208,18 @@ def dm_create():
 
     # Pass parameters
     dm = dm_create_v1(decode_token['u_id'], u_ids)
-    save_database_updates(dm)
 
     return dumps(dm)
+
+@APP.route("/dm/details/v1", methods=['GET'])
+def dm_details():
+    # retrieve token
+    request_data = request.get_json()
+    check_valid_token(request_data['token'])
+    decoded_jwt = decode_jwt(request_data['token'])
+    auth_user_id = decoded_jwt['u_id']
+    details = dm_details_v1(auth_user_id, request_data['dm_id'])
+    return dumps(details)
 
 @APP.route("/message/send/v1", methods=['POST'])
 def message_send():
