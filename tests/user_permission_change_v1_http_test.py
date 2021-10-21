@@ -36,7 +36,6 @@ def test_invalid_token():
     
     assert response.status_code != 200
 
-    
 def test_invalid_uid():
     '''
     Checking if the function idenitifies invalid u_ids

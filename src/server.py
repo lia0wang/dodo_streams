@@ -441,6 +441,50 @@ def list_users():
 
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def change_permission():
+    # Retrieve token
+    data = request.get_json()
+    token = data['token']
+    
+    # Check if token is valid
+    check_valid_token(token)
+    
+    # Get data
+    u_id = data['u_id']
+    permission_id = data['permission_id']
+    decoded_token = decode_jwt(token)
+    auth_user_id = decoded_token['u_id']
+    store = get_data()
+    
+    valid_u_id = False
+    valid_auth = False
+    multiple_global_owners = False
+    
+    if permission_id == 1 or permission_id == 2:
+        for user in store['users']:
+            if user['u_id'] == u_id:
+                valid_u_id = True
+            
+            if user['u_id'] == auth_user_id and user['permission_id'] == 1:
+                valid_auth = True
+            elif user['permission_id'] == 1:
+                multiple_global_owners = True
+    else:
+        raise InputError(description="permission_id is invalid")
+    
+    if not valid_u_id:
+        raise InputError(description="u_id does not refer to a valid user")
+
+    if not valid_auth:
+        raise AccessError(description="Authorised user is not a global owner")
+    
+    if permission_id == 2 and auth_user_id == u_id and not multiple_global_owners:
+        raise InputError(description="There must be at least one global owner")
+    
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            user['permission_id'] = permission_id
+    
+    
     return dumps({})
 
 #### NO NEED TO MODIFY BELOW THIS POINT
