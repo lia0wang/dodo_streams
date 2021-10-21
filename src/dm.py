@@ -78,7 +78,6 @@ def dm_create_v1(auth_user_id, u_ids):
     
     return {
         'dm_id': dm_id,
-        'dm_name': dm_name
     }
 
 def dm_details_v1(auth_user_id, dm_id):
