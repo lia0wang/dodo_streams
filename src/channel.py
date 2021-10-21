@@ -1,7 +1,7 @@
 import os
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import get_data, seek_target_channel_and_errors, is_database_exist
+from src.helper import get_data, seek_target_channel_and_errors, is_database_exist, save_database_updates
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
@@ -227,7 +227,9 @@ def channel_join_v1(auth_user_id, channel_id):
     # Fetch data
     store = data_store.get()
 
-    # Check if the auth_user_id is valid
+    if is_database_exist():
+        store = get_data()
+
     valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
@@ -241,7 +243,7 @@ def channel_join_v1(auth_user_id, channel_id):
             } # Catch the new_member without password
             valid = True
     if not valid:
-        raise AccessError("Invalid user ID!")
+        raise AccessError(description="Invalid user ID!")
 
     # Check if the channel_id is valid
     valid = False
@@ -250,20 +252,21 @@ def channel_join_v1(auth_user_id, channel_id):
             valid = True
             target_channel = channel # Catch the channel where the new_member is gonna join
     if not valid:
-        raise InputError("Invalid channel ID!")
+        raise InputError(description="Invalid channel ID!")
 
     # A user can't join a channel where he is alreday a member.
     for old_member in target_channel['all_members']:
         if old_member['u_id'] == new_member['u_id']:
-            raise InputError("Sorry, you can't join the same channel agian.")
+            raise InputError(description="Sorry, you can't join the same channel agian.")
 
     # If the channel is private and the useer is not a member nor a global owner.
     if not target_channel['is_public'] and new_member['permission_id'] != 1:
-        raise AccessError("Sorry, you can't join the private channel.")
+        raise AccessError(description="Sorry, you can't join the private channel.")
 
     # Append the new member to the target channel
-    target_channel['all_members'].append(new_member)
+    for index, channel in enumerate(store['channels']):
+        if channel['channel_id'] == channel_id:
+            store['channels'][index]['all_members'].append(new_member)
     data_store.set(store)
-
     return {
     }
