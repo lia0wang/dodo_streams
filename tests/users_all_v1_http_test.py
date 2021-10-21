@@ -75,7 +75,7 @@ def test_multiple_users():
         "name_first": "Bob",
         "name_last": "Marley"
     }
-    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
     token = {
         'token': user_1['token']
