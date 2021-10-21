@@ -65,6 +65,10 @@ def channels_listall_v1(auth_user_id):
     # Fetch data
     store = data_store.get()
     
+    if is_database_exist():
+        store = get_data()
+
+    
     # Creating dictionary
     channels_list = dict()
     

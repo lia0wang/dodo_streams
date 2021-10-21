@@ -125,12 +125,19 @@ def channels_create():
 
 @APP.route("/channels/listall/v2", methods=['GET'])
 def channel_listall():
-    # Retrieve and decode token
+    # Retrieve token
     data = request.get_json()
     token = data['token']
-    auth_user_id = decode_jwt(token)
+    
+    # Check if token is valid and decode it
+    check_valid_token(token)
+    decoded_token = decode_jwt(token)
+    auth_user_id = decoded_token['u_id']
+    
+    # Pass parameters
     channels = channels_listall_v1(auth_user_id)
     return dumps(channels)
+
 
 @APP.route("/auth/logout/v1", methods=['POST'])
 def logout():
