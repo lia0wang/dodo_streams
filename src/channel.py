@@ -304,15 +304,6 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     if not valid:
         raise InputError(description="Invalid channel ID!")
 
-    # Check if the auth_user_id is valid
-    valid = False
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            valid = True
-            auth_user = user
-    if not valid:
-        raise AccessError(description="Invalid authorized user ID!")
-
     # Check if the u_id are valid
     valid = False
     for user in store['users']:
@@ -343,6 +334,10 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
             raise InputError(description="This user is already a owner of the channel!")
     
     # Check when the authorised user does not have owner permissions in the channel
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            auth_user = user
+
     if auth_user['permission_id'] != 1:
         has_permission = False
         for owner in target_channel['owner_members']:
