@@ -25,7 +25,7 @@ def invalid_length_too_long():
 
     message_send_program = {
         'token': auth_user['token'],
-        'channel_id': channel['channel_id']
+        'channel_id': channel['channel_id'],
         'message': invalid_msg
     }
    response = requests.post(f"{BASE_URL}/message/send/v1", json = message_send_program)
@@ -55,7 +55,7 @@ def invalid_length_too_short():
 
     message_send_program = {
         'token': auth_user['token'],
-        'channel_id': channel['channel_id']
+        'channel_id': channel['channel_id'],
         'message': invalid_msg
     }
    response = requests.post(f"{BASE_URL}/message/send/v1", json = message_send_program)
@@ -105,7 +105,7 @@ def invalid_length_too_short():
 
     dm_send_program = {
         'token': auth_user['token'],
-        'dm_id': dm['dm_id']
+        'dm_id': dm['dm_id'],
         'message': invalid_msg
     }
    response = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_send_program)
