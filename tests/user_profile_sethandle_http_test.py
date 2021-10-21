@@ -251,6 +251,29 @@ def test_http_invalid_sethandle_char_length():
     request_data = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = sethandle_param1)
     assert request_data.status_code == 200
 
+def test_http_invalid_sethandle_alphanum():
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    register_param_1 = {
+        "email": "11037@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boy"
+    }
+
+    register_return1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1)
+    register_return1 = register_return1.json()
+    sethandle_param1 = {
+        "token": register_return1["token"],
+        "handle_str": "newh@ndle#"
+    }
+    request_data = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = sethandle_param1)
+    assert request_data.status_code == 400
+    sethandle_param1 = {
+        "token": register_return1["token"],
+        "handle_str": "newh^andle__^"
+    }
+    request_data = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = sethandle_param1)
+    assert request_data.status_code == 400
 
 
 def test_http_invalid_sethandle_duplicate():
