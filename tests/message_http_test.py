@@ -29,8 +29,8 @@ def invalid_length_too_long():
         'message': invalid_msg
     }
 
-    #response = requests.post(f"{BASE_URL}/message/send/v1",json=message_send_program)
-    #assert response.status_code == 400
+    response = requests.post(f"{BASE_URL}/message/send/v1",json=message_send_program)
+    assert response.status_code == 400
 
 def invalid_length_too_short():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -60,7 +60,7 @@ def invalid_length_too_short():
    response = requests.post(f"{BASE_URL}/message/send/v1", json = message_send_program)
    assert response.status_code == 400
 
-   def invalid_length_dm_too_short():
+def invalid_length_dm_too_short():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     register_param_1 = {
