@@ -270,7 +270,7 @@ def test_http_invalid_setemail_duplicate():
 
     setemail_param1 = {
         "token": register_return2["token"],
-        "email": "11037.666@gmail.com"
+        "email": "11037@gmail.com"
     }
     request_data = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = setemail_param1)
     assert request_data.status_code == 400
