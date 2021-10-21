@@ -10,6 +10,7 @@ from src.dm import dm_create_v1
 from src.error import InputError
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
+from src.channels import channels_list_v1, channels_listall_v1
 from src.data_store import data_store
 from src.helper import check_valid_token, get_data, save_data_store_updates, create_session_id
 from src.helper import is_database_exist, save_database_updates, create_jwt, decode_jwt
@@ -121,6 +122,21 @@ def channels_create():
     save_data_store_updates()
 
     return dumps(channel)
+
+@APP.route("/channels/list/v2", methods=['GET'])
+def channel_list():
+    # Retrieve token
+    data = request.get_json()
+    token = data['token']
+    
+    # Check if token is valid and decode it
+    check_valid_token(token)
+    decoded_token = decode_jwt(token)
+    auth_user_id = decoded_token['u_id']
+    
+    # Pass parameters
+    channels = channels_list_v1(auth_user_id)
+    return dumps(channels)
 
 @APP.route("/auth/logout/v1", methods=['POST'])
 def logout():
