@@ -1,10 +1,8 @@
 import requests
 
 from src.dm import dm_create_v1
-from src import config
 
-BASE_URL = config.url
-
+BASE_URL = 'http://localhost:8080'
 
 def test_http_dm_create_basic():
     '''

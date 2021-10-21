@@ -1,9 +1,7 @@
 import requests
 import pytest
-from src import config
 
-BASE_URL = config.url
-
+BASE_URL = 'http://localhost:8080'
 
 # test multiple profiles
 def test_http_multiple_profile():
