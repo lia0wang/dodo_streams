@@ -86,7 +86,7 @@ def test_basic():
     response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
     dm_list = response.json()
     
-    #assert response.status_code == 200
+    assert response.status_code == 200
     assert dm_list == [{'dm_id': dm['dm_id'], 'dm_name': "shifanchen, hopefulboyyy"}]
 
 def test_multiple_dms():
@@ -137,6 +137,6 @@ def test_multiple_dms():
     response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
     dm_list = response.json()
     
-    #assert response.status_code == 200
+    assert response.status_code == 200
     assert dm_list == [{'dm_id': dm_1['dm_id'], 'dm_name': "shifanchen, hopefulboyyy"}, 
                        {'dm_id': dm_2['dm_id'], 'dm_name': "shifachen, leonliao"}]
