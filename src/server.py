@@ -7,7 +7,7 @@ from flask_cors import CORS
 from src.channel import channel_join_v1, channel_details_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1
-from src.message import send_v1, senddm_v1
+from src.message import message_send_v1, message_senddm_v1
 from src.error import InputError
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
@@ -197,7 +197,7 @@ def message_send():
     # Retrieve message
     message = request_data['message']
     # Pass parameters
-    new_message = send_v1(token,channel_id,message)
+    new_message = message_send_v1(token,channel_id,message)
     save_database_updates(new_message)
     return dumps(new_message)
 
@@ -213,7 +213,7 @@ def message_senddm():
     # Retrieve message
     message = request_data['message']
     # Pass parameters
-    new_dm = send_v1(token,dm_id,message)
+    new_dm = message_senddm_v1(token,dm_id,message)
     save_database_updates(new_dm)
     return dumps(new_dm)
 

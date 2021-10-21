@@ -74,6 +74,8 @@ def invalid_auth_id():
         message_send_v1(invalid_token, channel_id, msg)
 
 def invalid_auth_id_dm():
+    clear_v1()
+    session_id = create_session_id()
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
     user2 = auth_register_v1("JohnSmith@hotmail.com", "abcd1234", "John", "Smith")
     user3 = auth_register_v1("AgentJohnson@hotmail.com", "abcd1234", "Agent", "Johnson")
