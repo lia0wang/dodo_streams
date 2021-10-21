@@ -159,12 +159,8 @@ def channel_join():
 def details():
     request_data = request.get_json()
     check_valid_token(request_data['token'])
-    db_store = get_data()
     decoded_jwt = decode_jwt(request_data['token'])
-    for user in db_store['users']:
-        if user['u_id'] == decoded_jwt['u_id']:
-            target_user = user
-    details = channel_details_v1(target_user['u_id'], request_data['channel_id'])
+    details = channel_details_v1(decoded_jwt['u_id'], request_data['channel_id'])
     return dumps(details)
     
 @APP.route("/dm/create/v1", methods=['POST'])
