@@ -439,6 +439,10 @@ def list_users():
     
     return dumps(users)
 
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+def change_permission():
+    return dumps({})
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
