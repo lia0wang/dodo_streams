@@ -21,10 +21,9 @@ def dm_create_v1(auth_user_id, u_ids):
     '''
 
     # Fetch data
+    store = data_store.get()
     if is_database_exist():
         store = get_data()
-    else:
-        store = data_store.get()
 
     # Check if the auth_user_id is valid
     valid = False
@@ -79,7 +78,6 @@ def dm_create_v1(auth_user_id, u_ids):
     
     return {
         'dm_id': dm_id,
-        'dm_name': dm_name
     }
 
 def dm_details_v1(auth_user_id, dm_id):

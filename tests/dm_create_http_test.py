@@ -44,7 +44,7 @@ def test_http_dm_create_basic():
     dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param)
 
     assert dm.status_code == 200
-    assert dm.json() == {'dm_id': 1, 'dm_name': 'hopefulboyyy, leonliao, shifanchen'} 
+    assert dm.json() == {'dm_id': 1} 
 
 def test_http_invalid_user_id():
     '''
