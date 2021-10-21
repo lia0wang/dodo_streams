@@ -17,6 +17,7 @@ def clear_v1():
     store['channels'] = []
     store['messages'] = []
     store['dms'] = []
+    store['message_index'] = 0
     data_store.set(store)
 
     open('database.json', 'w').close()    

@@ -1,7 +1,9 @@
 import requests
 import pytest
 
-BASE_URL = 'http://localhost:8080'
+from src import config
+
+BASE_URL = config.url
 
 
 def test_http_setemail_once():
