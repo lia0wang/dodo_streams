@@ -14,7 +14,7 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.channels import channels_list_v1, channels_listall_v1
 from src.data_store import data_store
 from src.helper import check_valid_token, get_data, save_data_store_updates, create_session_id
-from src.helper import is_database_exist, save_database_updates, create_jwt, decode_jwt
+from src.helper import is_database_exist, save_database_updates, create_jwt, decode_jwt, hash_encrypt
 from src.other import clear_v1
 
 def quit_gracefully(*args):
@@ -91,7 +91,7 @@ def login():
     email = request_data['email']
     password = request_data['password']
     
-    auth_login = auth_login_v1(email,password)
+    auth_login = auth_login_v1(email, password)
     session_id = create_session_id()
     auth_login['token'] = create_jwt(auth_login['auth_user_id'], session_id)
     

@@ -1,7 +1,7 @@
 import jwt
 import json
 import os
-
+import hashlib
 from src.data_store import data_store
 from src.error import InputError, AccessError
 
@@ -219,3 +219,15 @@ def check_valid_token(token):
                 is_token_valid = True
     if is_token_valid == False:
         raise AccessError(description="Invalid Token")
+
+def hash_encrypt(password_str):
+    """encrypts password string 
+
+    Args:
+        password_str (string)
+
+    Returns:
+        The hexidigest value of the encoded string
+    """
+    return hashlib.sha256(password_str.encode()).hexdigest()
+
