@@ -29,7 +29,7 @@ initial_object = {
     'users': [],
     'channels':[],
     'messages': [],
-    'dms': []
+    'dms': [],
     'message_index':0
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
