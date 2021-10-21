@@ -2,7 +2,7 @@ import pytest
 from src.other import clear_v1
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
-from src.message import send_v1,senddm_v1
+from src.message import message_send_v1,message_senddm_v1
 from src.dm import dm_create_v1
 from src.helper import create_jwt, create_session_id
 from src.error import InputError, AccessError

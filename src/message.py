@@ -5,7 +5,7 @@ from src.helper import get_data,is_database_exist, check_valid_token, decode_jwt
 from src.data_store import data_store
 from src.error import InputError, AccessError
 
-def send_v1(token, channel_id, message):
+def message_send_v1(token, channel_id, message):
     # Fetch data
     if(len(message)<1 or len(message)>1000):
         raise InputError("Error: message too long or too short")
@@ -50,7 +50,7 @@ def send_v1(token, channel_id, message):
     }
             
     
-def senddm_v1(token, dm_id, message):
+def message_senddm_v1(token, dm_id, message):
     # Fetch data
     if(len(message)<1 or len(message)>1000):
         raise InputError("Error: message too long or too short")
