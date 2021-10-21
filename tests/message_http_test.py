@@ -7,7 +7,7 @@ from src import config
 
 BASE_URL = config.url
 
-def invalid_length_too_long():
+def test_invalid_length_too_long():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     register_param = {
@@ -35,7 +35,7 @@ def invalid_length_too_long():
     response = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program)
     assert response.status_code == 400
 
-def invalid_length_too_short():
+def test_invalid_length_too_short():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     register_param = {
@@ -51,8 +51,7 @@ def invalid_length_too_short():
         'name': 'league',
         'is_public': True
     }
-    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
-    
+    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json()
     invalid_msg = ''
 
     message_send_program = {
@@ -60,10 +59,11 @@ def invalid_length_too_short():
         'channel_id': channel['channel_id'],
         'message': invalid_msg
     }
-    response = requests.post(f"{BASE_URL}/message/send/v1", json = message_send_program)
+
+    response = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program)
     assert response.status_code == 400
 
-def invalid_length_dm_too_short():
+def test_invalid_length_dm_too_short():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     register_param_1 = {
@@ -98,7 +98,7 @@ def invalid_length_dm_too_short():
         'token': auth_user['token'],
         'u_ids': u_ids
     }
-    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param)
+    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param).json()
     
     invalid_msg = ''
 
@@ -111,7 +111,7 @@ def invalid_length_dm_too_short():
     assert response.status_code == 400
 
 
-def invalid_length_dm_too_long():
+def test_invalid_length_dm_too_long():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     register_param_1 = {
@@ -146,9 +146,9 @@ def invalid_length_dm_too_long():
         'token': auth_user['token'],
         'u_ids': u_ids
     }
-    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param)
+    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param).json()
     
-    invalid_msg = ',' * 1000
+    invalid_msg = ',' * 1001
 
     dm_send_program = {
         'token': auth_user['token'],
@@ -157,3 +157,4 @@ def invalid_length_dm_too_long():
     }
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_send_program)
     assert response.status_code == 400
+
