@@ -20,7 +20,7 @@ def invalid_length_too_long():
         'name': 'league',
         'is_public': True
     }
-    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
+    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json()
     invalid_msg = ',' * 1001
 
     message_send_program = {
