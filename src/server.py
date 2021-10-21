@@ -8,7 +8,7 @@ from src.channel import channel_addowner_v1, channel_join_v1, channel_details_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1
 from src.message import message_send_v1, message_senddm_v1
-from src.error import InputError
+from src.error import InputError, AccessError
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
 from src.channels import channels_list_v1, channels_listall_v1
@@ -486,8 +486,9 @@ def change_permission():
     for user in store['users']:
         if user['u_id'] == u_id:
             user['permission_id'] = permission_id
-    data_store.set(store)
-    save_data_store_updates()
+    # data_store.set(store)
+    if is_database_exists:
+        save_database_updates(store)
     
     return dumps({})
 
