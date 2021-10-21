@@ -91,11 +91,9 @@ def invalid_length_dm_too_short():
     u_id2 = user2['auth_user_id']
     u_ids = [u_id1,u_id2]
 
-    
-    
     dm_param = {
-        'token': auth_user['token']
-        'u_ids': u_ids,
+        'token': auth_user['token'],
+        'u_ids': u_ids
     }
     dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param)
     
