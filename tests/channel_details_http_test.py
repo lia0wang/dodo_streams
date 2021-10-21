@@ -6,7 +6,6 @@ from src import config
 
 BASE_URL = config.url
 
- 
 def test_http_details_multiple_members():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param_1 = {
