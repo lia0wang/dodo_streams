@@ -69,7 +69,7 @@ def test_http_invalid_token():
 
 def test_http_list_multiple():
     '''
-    Test when create multiple channels
+    Test with multiple channels
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
