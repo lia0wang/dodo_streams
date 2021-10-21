@@ -30,6 +30,7 @@ initial_object = {
     'channels':[],
     'messages': [],
     'dms': []
+    'message_index':0
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
