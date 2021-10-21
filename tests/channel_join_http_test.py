@@ -1,10 +1,8 @@
 import requests
 import pytest
 from src.other import clear_v1
-from src import config
 
-BASE_URL = config.url
-
+BASE_URL = 'http://localhost:8080'
 
 def test_http_channel_join_basic():
     '''
