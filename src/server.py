@@ -483,7 +483,7 @@ def change_permission():
     for user in store['users']:
         if user['u_id'] == u_id:
             user['permission_id'] = permission_id
-    
+    save_data_store_updates()
     
     return dumps({})
 
