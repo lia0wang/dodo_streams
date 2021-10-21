@@ -1,5 +1,6 @@
 import sys
 import signal
+import re
 from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
@@ -174,12 +175,8 @@ def channel_join():
 def details():
     request_data = request.get_json()
     check_valid_token(request_data['token'])
-    db_store = get_data()
     decoded_jwt = decode_jwt(request_data['token'])
-    for user in db_store['users']:
-        if user['u_id'] == decoded_jwt['u_id']:
-            target_user = user
-    details = channel_details_v1(target_user['u_id'], request_data['channel_id'])
+    details = channel_details_v1(decoded_jwt['u_id'], request_data['channel_id'])
     return dumps(details)
     
 @APP.route("/dm/create/v1", methods=['POST'])
@@ -205,8 +202,6 @@ def profile():
     # Check if u_id refers from request data refers to existing user
     is_valid_user = False
     db_store = get_data()
-    if not is_database_exist():
-        raise InputError(description="u_id does not refer to existing user")
 
     for user in db_store['users']:
         if user['u_id'] == request_data['u_id']:
@@ -238,10 +233,10 @@ def setname():
     name_first = request_data['name_first']
     name_last = request_data['name_last']
     if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError("Error: Invalid first name")
+        raise InputError(description="Error: Invalid first name")
     if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError("Error: Invalid last name")
-    
+        raise InputError(description="Error: Invalid last name")
+
     check_valid_token(request_data['token'])
 
     decoded_jwt = decode_jwt(request_data['token'])
@@ -260,6 +255,71 @@ def setname():
                 db_store['channels'][index]['all_members'][index3]['name_first'] = name_first
                 db_store['channels'][index]['all_members'][index3]['name_last'] = name_last
 
+    save_database_updates(db_store)
+    return dumps({})
+
+@APP.route("/user/profile/setemail/v1", methods=['PUT'])
+def set_email():
+    request_data = request.get_json()
+    
+    email = request_data['email']
+    regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+
+    # Check for input errors
+    if not re.fullmatch(regex, email):
+        raise InputError(description="Error: Invalid email")
+
+    db_store = get_data()
+    for user in db_store['users']:
+        if user['email'] == email:
+            raise InputError(description="Error: email taken")
+
+    check_valid_token(request_data['token'])
+
+    decoded_jwt = decode_jwt(request_data['token'])
+    for index, user in enumerate(db_store['users']):
+        if user['u_id'] == decoded_jwt['u_id']:
+            db_store['users'][index]['email'] = email
+
+    for index, chann in enumerate(db_store['channels']):
+        for index2, owner_mem in enumerate(chann['owner_members']):
+            if owner_mem['u_id'] == decoded_jwt['u_id']:
+                db_store['channels'][index]['owner_members'][index2]['email'] = email
+        for index3, mem in enumerate(chann['all_members']):
+            if mem['u_id'] == decoded_jwt['u_id']:
+                db_store['channels'][index]['all_members'][index3]['email'] = email
+                
+    save_database_updates(db_store)
+    return dumps({})
+
+@APP.route("/user/profile/sethandle/v1", methods=['PUT'])
+def set_handle():
+    request_data = request.get_json()
+    handle_str = request_data['handle_str']
+    if len(handle_str) < 3 or len(handle_str) > 20:
+        raise InputError(description="Invalid handle")
+    if not handle_str.isalnum():
+        raise InputError(description="Invalid handle")
+    db_store = get_data()
+    for user in db_store['users']:
+        if user['handle_str'] == handle_str:
+            raise InputError(description="Invalid handle")
+
+    check_valid_token(request_data['token'])
+
+    decoded_jwt = decode_jwt(request_data['token'])
+    for index, user in enumerate(db_store['users']):
+        if user['u_id'] == decoded_jwt['u_id']:
+            db_store['users'][index]['handle_str'] = handle_str
+
+    for index, chann in enumerate(db_store['channels']):
+        for index2, owner_mem in enumerate(chann['owner_members']):
+            if owner_mem['u_id'] == decoded_jwt['u_id']:
+                db_store['channels'][index]['owner_members'][index2]['handle_str'] = handle_str
+        for index3, mem in enumerate(chann['all_members']):
+            if mem['u_id'] == decoded_jwt['u_id']:
+                db_store['channels'][index]['all_members'][index3]['handle_str'] = handle_str
+    
     save_database_updates(db_store)
     return dumps({})
 
