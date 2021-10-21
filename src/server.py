@@ -183,6 +183,7 @@ def dm_create():
 
     return dumps(dm)
 
+
 @APP.route("/user/profile/v1", methods=['GET'])
 def profile():
     request_data = request.get_json()
