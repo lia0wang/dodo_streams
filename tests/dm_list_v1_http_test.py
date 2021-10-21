@@ -87,7 +87,7 @@ def test_basic():
     dm_list = response.json()
     
     assert response.status_code == 200
-    assert dm_list == [{'dm_id': dm['dm_id'], 'dm_name': "shifanchen, hopefulboyyy"}]
+    assert dm_list == [{'dm_id': dm['dm_id'], 'dm_name': "hopefulboyyy, shifanchen"}]
 
 def test_multiple_dms():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -138,5 +138,5 @@ def test_multiple_dms():
     dm_list = response.json()
     
     assert response.status_code == 200
-    assert dm_list == [{'dm_id': dm_1['dm_id'], 'dm_name': "shifanchen, hopefulboyyy"}, 
-                       {'dm_id': dm_2['dm_id'], 'dm_name': "shifachen, leonliao"}]
+    assert dm_list == [{'dm_id': dm_1['dm_id'], 'dm_name': "hopefulboyyy, shifanchen"}, 
+                       {'dm_id': dm_2['dm_id'], 'dm_name': "leonliao, shifachen"}]
