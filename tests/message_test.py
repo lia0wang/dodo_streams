@@ -24,9 +24,9 @@ def invalid_length():
     channel_id = channel["channel_id"]
     
     with pytest.raises(InputError):
-        send_v1(token, channel_id, invalid_msg_1)
+        message_send_v1(token, channel_id, invalid_msg_1)
     with pytest.raises(InputError):
-        send_v1(token, channel_id, invalid_msg_2)
+        message_send_v1(token, channel_id, invalid_msg_2)
 
 def invalid_length_dm():
     '''tests for invalid message length'''
@@ -49,9 +49,9 @@ def invalid_length_dm():
     dm_id = dm_create_v1(auth_id,u_ids)
     
     with pytest.raises(InputError):
-        send_v1(token, dm_id, invalid_msg_1)
+        message_senddm_v1(token, dm_id, invalid_msg_1)
     with pytest.raises(InputError):
-        send_v1(token, dm_id, invalid_msg_2)
+        message_senddm_v1(token, dm_id, invalid_msg_2)
 
 
 ### Access Error
@@ -71,7 +71,7 @@ def invalid_auth_id():
     msg = "Something"
     
     with pytest.raises(AccessError):
-        send_v1(invalid_token, channel_id, msg)
+        message_send_v1(invalid_token, channel_id, msg)
 
 def invalid_auth_id_dm():
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
@@ -84,11 +84,11 @@ def invalid_auth_id_dm():
     u_id2 = user3['auth_user_id']
     u_id3 = user4['auth_user_id']
 
+    invalid_token = create_jwt(auth_id, session_id)
     u_ids = [u_id1,u_id2]
     dm_id = dm_create_v1(u_id3,u_ids)
     
-    
     msg = "Something"
     with pytest.raises(AccessError):
-        send_v1(auth_id, dm_id, msg)
+        message_senddm_v1(invalid_token, dm_id, msg)
     
