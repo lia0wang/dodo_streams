@@ -4,9 +4,9 @@ import re
 from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.channel import channel_join_v1, channel_details_v1
+from src.channel import channel_addowner_v1, channel_join_v1, channel_details_v1
 from src.channels import channels_create_v1
-from src.dm import dm_create_v1
+from src.dm import dm_create_v1, dm_details_v1
 from src.message import message_send_v1, message_senddm_v1
 from src.error import InputError
 from src import config
@@ -181,10 +181,28 @@ def channel_join():
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
     channel_id = request_data['channel_id']
+
     # Pass parameters
     channel_join_v1(decode_token['u_id'], channel_id)
     save_data_store_updates()
     
+    return dumps({})
+
+@APP.route("/channel/addowner/v1", methods=['POST'])
+def channel_addowner():
+    # Retrieve token
+    request_data = request.get_json()
+    token = request_data['token']
+    check_valid_token(token)
+    
+    # Decode token, retrieve parameters
+    decode_token = decode_jwt(token)
+    channel_id = request_data['channel_id']
+    u_id = request_data['u_id']
+
+    # Pass parameters
+    channel_addowner_v1(decode_token['u_id'], channel_id, u_id)
+    save_data_store_updates()
     return dumps({})
 
 @APP.route("/channel/details/v2", methods=['GET'])
@@ -208,7 +226,6 @@ def dm_create():
 
     # Pass parameters
     dm = dm_create_v1(decode_token['u_id'], u_ids)
-    save_database_updates(dm)
 
     return dumps(dm)
 
@@ -230,6 +247,16 @@ def dm_list():
         dms.append(new_dm)
     
     return dumps(dms)
+
+@APP.route("/dm/details/v1", methods=['GET'])
+def dm_details():
+    # retrieve token
+    request_data = request.get_json()
+    check_valid_token(request_data['token'])
+    decoded_jwt = decode_jwt(request_data['token'])
+    auth_user_id = decoded_jwt['u_id']
+    details = dm_details_v1(auth_user_id, request_data['dm_id'])
+    return dumps(details)
 
 @APP.route("/message/send/v1", methods=['POST'])
 def message_send():
@@ -389,6 +416,28 @@ def set_handle():
     
     save_database_updates(db_store)
     return dumps({})
+
+@APP.route("/users/all/v1", methods=['GET'])
+def list_users():
+    # Retrieve token
+    data = request.get_json()
+    token = data['token']
+    
+    # Check if token is valid
+    check_valid_token(token)
+    
+    # Get data
+    data_store = get_data()
+    
+    # Create list and add users to the list
+    users = []
+    for user in data_store['users']:
+        new_user = user
+        del new_user['password']
+        del new_user['session_list']
+        users.append(new_user)
+    
+    return dumps(users)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
