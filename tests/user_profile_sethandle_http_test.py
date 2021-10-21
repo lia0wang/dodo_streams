@@ -240,13 +240,13 @@ def test_http_invalid_sethandle_char_length():
     assert request_data.status_code == 200
     sethandle_param1 = {
         "token": register_return1["token"],
-        "handle_str": "012345678901234567890"
+        "handle_str": "01234567890123456789"
     }
     request_data = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = sethandle_param1)
     assert request_data.status_code == 200
     sethandle_param1 = {
         "token": register_return1["token"],
-        "handle_str": "012345678901234567891"
+        "handle_str": "012345678901234567890"
     }
     request_data = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = sethandle_param1)
     assert request_data.status_code == 400
