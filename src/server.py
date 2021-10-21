@@ -373,7 +373,25 @@ def set_handle():
 
 @APP.route("/users/all/v1", methods=['GET'])
 def list_users():
-    return []
+    # Retrieve token
+    data = request.get_json()
+    token = data['token']
+    
+    # Check if token is valid
+    check_valid_token(token)
+    
+    # Get data
+    data_store = get_data()
+    
+    # Create list and add users to the list
+    users = []
+    for user in data_store['users']:
+        new_user = user
+        del new_user['password']
+        del new_user['session_list']
+        users.append(new_user)
+    
+    return dumps(users)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
