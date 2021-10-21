@@ -2,8 +2,9 @@ import pytest
 import requests
 import pytest
 import json
+from src import config
 
-BASE_URL = "http://localhost:8080"
+BASE_URL = config.url
 
  
 def test_http_details_multiple_members():
