@@ -39,7 +39,7 @@ def test_invalid_token():
         "u_ids": [user_1["auth_user_id"], user_2["auth_user_id"]]
     }
 
-    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param).json()
+    requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param).json()
     
     token = {
         "token": auth_user["token"] + "1" # Invalid token
@@ -139,4 +139,4 @@ def test_multiple_dms():
     
     assert response.status_code == 200
     assert dm_list == [{'dm_id': dm_1['dm_id'], 'dm_name': "hopefulboyyy, shifanchen"}, 
-                       {'dm_id': dm_2['dm_id'], 'dm_name': "leonliao, shifachen"}]
+                       {'dm_id': dm_2['dm_id'], 'dm_name': "leonliao, shifanchen"}]
