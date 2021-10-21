@@ -3,8 +3,10 @@ import requests
 import pytest
 import json
 from src.other import clear_v1
+from src import config
 
-BASE_URL = 'http://localhost:8080'
+BASE_URL = config.url
+
 
 def test_register_logout():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
