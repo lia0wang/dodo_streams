@@ -2,7 +2,9 @@ import requests
 
 from src.message import message_send_v1, message_senddm_v1
 
-BASE_URL = 'http://localhost:8080'
+from src import config
+
+BASE_URL = config.url
 
 def invalid_length_too_long():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
