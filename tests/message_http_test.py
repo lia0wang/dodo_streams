@@ -28,6 +28,7 @@ def invalid_length_too_long():
         'channel_id': channel['channel_id'],
         'message': invalid_msg
     }
+    
    response = requests.post(f"{BASE_URL}/message/send/v1", json = message_send_program)   
 
    assert response.status_code == 400
