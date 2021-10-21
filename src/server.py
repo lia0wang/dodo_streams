@@ -453,7 +453,10 @@ def change_permission():
     permission_id = data['permission_id']
     decoded_token = decode_jwt(token)
     auth_user_id = decoded_token['u_id']
-    store = get_data()
+    store = data_store.get()
+    
+    if is_database_exist():
+        store = get_data()
     
     valid_u_id = False
     valid_auth = False
@@ -483,6 +486,7 @@ def change_permission():
     for user in store['users']:
         if user['u_id'] == u_id:
             user['permission_id'] = permission_id
+    data_store.set(store)
     save_data_store_updates()
     
     return dumps({})
