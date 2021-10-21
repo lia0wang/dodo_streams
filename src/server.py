@@ -122,7 +122,7 @@ def channels_create():
 
     return dumps(channel)
 
-@APP.route("/channels/list/v2", methods=['POST'])
+@APP.route("/channels/list/v2", methods=['GET'])
 def channel_list():
     # Retrieve token
     data = request.get_json()
