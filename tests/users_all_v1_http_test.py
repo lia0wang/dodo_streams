@@ -54,7 +54,7 @@ def test_single_user():
                           "name_last": "Boy", "handle_str": "hopefulboy", "permission_id": 1}]
     
     
-def test_multiple users():
+def test_multiple_users():
     '''
     Checking output with multiple users
     '''
