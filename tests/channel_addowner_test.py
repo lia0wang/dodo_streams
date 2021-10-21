@@ -17,6 +17,7 @@ def test_invalid_channel_id():
     invalid_channel_id_2 = -1
 
     user = auth_register_v1('chenshifan@gmail.com', 'chenshifan0207', 'shifan', 'chen')
+    channel_join_v1(user['auth_user_id'], channel['channel_id'])
 
     with pytest.raises(InputError):
         channel_addowner_v1(owner['auth_user_id'], invalid_channel_id_1, user['auth_user_id'])
