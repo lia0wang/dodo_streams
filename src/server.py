@@ -371,6 +371,10 @@ def set_handle():
     save_database_updates(db_store)
     return dumps({})
 
+@APP.route("/users/all/v1", methods=['GET'])
+def list_users():
+    return []
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
