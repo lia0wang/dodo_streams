@@ -69,26 +69,35 @@ def test_http_invalid_token():
 
 def test_http_list_multiple():
     '''
-    Test when create multiple channels
+    Test with multiple channels
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param = {
+    register_param_1 = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
 
+
+    register_param_2 = {
+        "email": "bob123@gmail.com",
+        "password": "qwerty",
+        "name_first": "Bob",
+        "name_last": "Marley"
+    }
+    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    
     channel_param_1 = {
-        'token': user['token'], # token invalid
+        'token': user_1['token'],
         'name': 'league1',
         'is_public': True
     }
 
     channel_param_2 = {
-        'token': user['token'], # token invalid
+        'token': user_2['token'],
         'name': 'league2',
         'is_public': False
     }
@@ -97,7 +106,7 @@ def test_http_list_multiple():
     channel_2 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param_2).json()
     
     token = {
-        'token': user['token']
+        'token': user_1['token']
     }
     
     response = requests.get(f"{BASE_URL}/channels/listall/v2", json = token)
