@@ -280,6 +280,37 @@ def set_email():
     save_database_updates(db_store)
     return dumps({})
 
+@APP.route("/user/profile/sethandle/v1", methods=['PUT'])
+def set_handle():
+    request_data = request.get_json()
+    handle_str = request_data['handle_str']
+    if len(handle_str) < 3 or len(handle_str) > 20:
+        raise InputError(description="Invalid handle")
+    if not handle_str.isalnum():
+        raise InputError(description="Invalid handle")
+    db_store = get_data()
+    for user in db_store['users']:
+        if user['handle_str'] == handle_str:
+            raise InputError(description="Invalid handle")
+
+    check_valid_token(request_data['token'])
+
+    decoded_jwt = decode_jwt(request_data['token'])
+    for index, user in enumerate(db_store['users']):
+        if user['u_id'] == decoded_jwt['u_id']:
+            db_store['users'][index]['handle_str'] = handle_str
+
+    for index, chann in enumerate(db_store['channels']):
+        for index2, owner_mem in enumerate(chann['owner_members']):
+            if owner_mem['u_id'] == decoded_jwt['u_id']:
+                db_store['channels'][index]['owner_members'][index2]['handle_str'] = handle_str
+        for index3, mem in enumerate(chann['all_members']):
+            if mem['u_id'] == decoded_jwt['u_id']:
+                db_store['channels'][index]['all_members'][index3]['handle_str'] = handle_str
+    
+    save_database_updates(db_store)
+    return dumps({})
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
