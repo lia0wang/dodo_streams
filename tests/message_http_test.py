@@ -44,7 +44,7 @@ def invalid_length_too_short():
     auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
     
     channel_param = {
-        'token': user['token'],
+        'token': auth_user['token'],
         'name': 'league',
         'is_public': True
     }
@@ -69,7 +69,7 @@ def invalid_length_dm_too_short():
         "name_first": "John",
         "name_last": "Smith"
     }
-    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param1).json()
 
     register_param_2 = {
         "email": "test2@gmail.com",
@@ -77,7 +77,7 @@ def invalid_length_dm_too_short():
         "name_first": "Agent",
         "name_last": "Smith"
     }
-    user1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    user1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param2).json()
     
     register_param_3 = {
         "email": "test3@gmail.com",
@@ -85,20 +85,19 @@ def invalid_length_dm_too_short():
         "name_first": "Agent",
         "name_last": "Johnson"
     }
-    user2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    user2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param3).json()
 
-    u_id1 = user2['auth_user_id']
-    u_id2 = user3['auth_user_id']
+    u_id1 = user1['auth_user_id']
+    u_id2 = user2['auth_user_id']
     u_ids = [u_id1,u_id2]
+
+    
     
     dm_param = {
-        'dm_id': dm_id,
-        'dm_name': dm_name,
-        'auth_user_id': auth_user_id,
+        'token': auth_user['token']
         'u_ids': u_ids,
-        'messages': []
     }
-    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = channel_param)
+    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param)
     
     invalid_msg = ''
 
