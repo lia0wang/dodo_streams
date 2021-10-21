@@ -212,6 +212,10 @@ def dm_create():
 
     return dumps(dm)
 
+@APP.route("/dm/list/v1", methods=['GET'])
+def dm_list():
+    return []
+
 @APP.route("/message/send/v1", methods=['POST'])
 def message_send():
     request_data = request.get_json()
