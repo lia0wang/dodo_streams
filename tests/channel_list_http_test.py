@@ -82,13 +82,13 @@ def test_http_list_multiple():
     user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
 
     channel_param_1 = {
-        'token': user['token'], # token invalid
+        'token': user['token'],
         'name': 'league1',
         'is_public': True
     }
 
     channel_param_2 = {
-        'token': user['token'], # token invalid
+        'token': user['token'],
         'name': 'league2',
         'is_public': False
     }
