@@ -62,7 +62,7 @@ def test_dm_create_basic():
 
     u_ids = [user_id_1, user_id_2, user_id_3]
 
-    assert dm_create_v1(auth_user_id, u_ids) == {'dm_id': 1, 'dm_name': 'shifanchen, wangliao, wangliao0, wangliao1'}
+    assert dm_create_v1(auth_user_id, u_ids) == {'dm_id': 1}
 
 def test_dm_create_only_creator():
     '''
