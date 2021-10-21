@@ -187,7 +187,7 @@ def test_basic():
     user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
     permission_info = {
-        'token': auth_user['token']
+        'token': auth_user['token'],
         'u_id': user_1['auth_user_id'],
         'permission_id': 1
     }
