@@ -69,7 +69,7 @@ def invalid_length_dm_too_short():
         "name_first": "John",
         "name_last": "Smith"
     }
-    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param1).json()
+    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
 
     register_param_2 = {
         "email": "test2@gmail.com",
@@ -77,7 +77,7 @@ def invalid_length_dm_too_short():
         "name_first": "Agent",
         "name_last": "Smith"
     }
-    user1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param2).json()
+    user1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
     register_param_3 = {
         "email": "test3@gmail.com",
@@ -85,7 +85,7 @@ def invalid_length_dm_too_short():
         "name_first": "Agent",
         "name_last": "Johnson"
     }
-    user2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param3).json()
+    user2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_3).json()
 
     u_id1 = user1['auth_user_id']
     u_id2 = user2['auth_user_id']
