@@ -459,6 +459,7 @@ def change_permission():
     valid_auth = False
     multiple_global_owners = False
     
+    # Checking for errors
     if permission_id == 1 or permission_id == 2:
         for user in store['users']:
             if user['u_id'] == u_id:
@@ -471,6 +472,7 @@ def change_permission():
     else:
         raise InputError(description="permission_id is invalid")
     
+    # Returning error messages in case of errors
     if not valid_u_id:
         raise InputError(description="u_id does not refer to a valid user")
 
@@ -480,9 +482,20 @@ def change_permission():
     if permission_id == 2 and auth_user_id == u_id and not multiple_global_owners:
         raise InputError(description="There must be at least one global owner")
     
+    # Changing user's permissions in users list
     for user in store['users']:
         if user['u_id'] == u_id:
             user['permission_id'] = permission_id
+    
+    # Changing user's permissions in channel members list
+    for channel in store['channels']:
+        for member in channel['owner_members']:
+            if member['u_id'] == u_id:
+                member['permission_id'] = permission_id
+        
+        for member in channel['all_members']:
+            if member['u_id'] == u_id:
+                member['permission_id'] = permission_id
 
     save_database_updates(store)
     
