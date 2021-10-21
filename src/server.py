@@ -159,12 +159,8 @@ def channel_join():
 def details():
     request_data = request.get_json()
     check_valid_token(request_data['token'])
-    db_store = get_data()
     decoded_jwt = decode_jwt(request_data['token'])
-    for user in db_store['users']:
-        if user['u_id'] == decoded_jwt['u_id']:
-            target_user = user
-    details = channel_details_v1(target_user['u_id'], request_data['channel_id'])
+    details = channel_details_v1(decoded_jwt['u_id'], request_data['channel_id'])
     return dumps(details)
     
 @APP.route("/dm/create/v1", methods=['POST'])
@@ -277,6 +273,37 @@ def set_email():
             if mem['u_id'] == decoded_jwt['u_id']:
                 db_store['channels'][index]['all_members'][index3]['email'] = email
                 
+    save_database_updates(db_store)
+    return dumps({})
+
+@APP.route("/user/profile/sethandle/v1", methods=['PUT'])
+def set_handle():
+    request_data = request.get_json()
+    handle_str = request_data['handle_str']
+    if len(handle_str) < 3 or len(handle_str) > 20:
+        raise InputError(description="Invalid handle")
+    if not handle_str.isalnum():
+        raise InputError(description="Invalid handle")
+    db_store = get_data()
+    for user in db_store['users']:
+        if user['handle_str'] == handle_str:
+            raise InputError(description="Invalid handle")
+
+    check_valid_token(request_data['token'])
+
+    decoded_jwt = decode_jwt(request_data['token'])
+    for index, user in enumerate(db_store['users']):
+        if user['u_id'] == decoded_jwt['u_id']:
+            db_store['users'][index]['handle_str'] = handle_str
+
+    for index, chann in enumerate(db_store['channels']):
+        for index2, owner_mem in enumerate(chann['owner_members']):
+            if owner_mem['u_id'] == decoded_jwt['u_id']:
+                db_store['channels'][index]['owner_members'][index2]['handle_str'] = handle_str
+        for index3, mem in enumerate(chann['all_members']):
+            if mem['u_id'] == decoded_jwt['u_id']:
+                db_store['channels'][index]['all_members'][index3]['handle_str'] = handle_str
+    
     save_database_updates(db_store)
     return dumps({})
 
