@@ -505,15 +505,92 @@ def list_users():
     # Create list and add users to the list
     users = []
     for user in data_store['users']:
-        new_user = user
-        del new_user['password']
-        del new_user['session_list']
-        users.append(new_user)
-    
+        if user['password'] != "":
+            new_user = user
+            del new_user['password']
+            del new_user['session_list']
+            users.append(new_user)
     return dumps(users)
 
 @APP.route("/admin/user/remove/v1", methods=["DELETE"])
 def remove_user():
+    #Retrieve token
+    data = request.get_json()
+    token = data['token']
+    
+    # Check if token is valid
+    check_valid_token(token)
+    
+    # Get data
+    u_id = data['u_id']
+    decoded_token = decode_jwt(token)
+    auth_user_id = decoded_token['u_id']
+    store = get_data()
+    
+    valid_u_id = False
+    valid_auth = False
+    multiple_global_owners = False
+    
+    # Checking for errors
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            valid_u_id = True
+            
+        if user['u_id'] == auth_user_id and user['permission_id'] == 1:
+            valid_auth = True
+        elif user['permission_id'] == 1:
+            multiple_global_owners = True
+    
+    # Returning error messages in case of errors
+    if not valid_u_id:
+        raise InputError(description="u_id does not refer to a valid user")
+
+    if not valid_auth:
+        raise AccessError(description="Authorised user is not a global owner")
+    
+    if auth_user_id == u_id and not multiple_global_owners:
+        raise InputError(description="There must be at least one global owner")
+
+    # Remove user from user list
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            user['name_first'] = "Removed"
+            user['name_last'] = "user"
+            user['email'] = ""
+            user['password'] = ""
+            user['handle_str'] = ""
+            user['permission_id'] = 2
+    
+    # Remove user from channels and change messages' content to "Removed user"
+    for channel in store['channels']:
+        user_in_channel = False
+        for member in channel['owner_members']:
+            if member['u_id'] == u_id:
+                channel['owner_members'].remove(member)
+        
+        for member in channel['all_members']:
+            if member['u_id'] == u_id:
+                channel['all_members'].remove(member)
+                user_in_channel = True
+        if user_in_channel:
+            for message in channel['messages']:
+                if message['u_id'] == u_id:
+                    message['message'] = "Removed user"
+    
+    # Remove user from dms and change messages' content to "Removed user"
+    for dm in store['dms']:
+        user_in_dm = False
+        if dm['auth_user_id'] == u_id:
+            dm['auth_user_id'] = ""
+        
+        for member in dm['u_ids']:
+            if member == u_id:
+                dm['u_ids'].remove(member)
+                user_in_dm = True
+        if user_in_dm:
+            for message in dm['messages']:
+                if message['u_id'] == u_id:
+                    message['message'] = "Removed user"
     return dumps({})
 
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])

@@ -220,6 +220,15 @@ def test_basic():
     assert dm_details['members'] == [{{'u_id': 1, 'email': register_param_1['email'], 'name_first': register_param_1['name_first'], 
                                        'name_last': register_param_1['name_last'], 'handle_string': "shifanchen"}}]
     
+    # Retrieve profile
+    user_profile_param = {
+        'token': user_0['token'],
+        'u_id': user_1['auth_user_id']
+    }
+    user_profile = requests.get(f"{BASE_URL}/user/profile/v1", json = user_profile_param).json()
+    assert user_profile['name_first'] == "Removed"
+    assert user_profile['name_last'] == "user"
+    
     # Message content replaced by 'Removed user' in channels
     channel_message_details_param = {
         'token': user_0['token'],
@@ -237,12 +246,3 @@ def test_basic():
     }
     dm_message_details = requests.get(f"{BASE_URL}/channel/messages/v2", json = channel_message_details_param).json()
     assert dm_message_details['messages'][0]['message'] == "Removed user"
-    
-    # Retrieve profile
-    user_profile_param = {
-        'token': user_0['token'],
-        'u_id': user_1['auth_user_id']
-    }
-    user_profile = requests.get(f"{BASE_URL}/user/profile/v1", json = user_profile_param).json()
-    assert user_profile['name_first'] == "Removed"
-    assert user_profile['name_last'] == "user"
