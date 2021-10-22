@@ -97,7 +97,7 @@ def test_no_dms():
         "u_ids": [user_1["auth_user_id"]]
     }
     
-    dm_1 = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param_1).json()
+    requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param_1).json()
     
     token = {
         "token": user_2["token"]

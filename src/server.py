@@ -307,12 +307,13 @@ def dm_list():
     
     dms = []
     for dm in store['dms']:
-        if u_id in dm['u_ids']:
-            new_dm = dm
-            del new_dm['auth_user_id']
-            del new_dm['u_ids']
-            del new_dm['messages']
-            dms.append(new_dm)
+        for user in dm['u_id']:
+            if u_id == user:
+                new_dm = dm
+                del new_dm['auth_user_id']
+                del new_dm['u_ids']
+                del new_dm['messages']
+                dms.append(new_dm)
     return dumps(dms)
 
 @APP.route("/dm/details/v1", methods=['GET'])
