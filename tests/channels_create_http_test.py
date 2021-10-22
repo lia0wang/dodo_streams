@@ -62,8 +62,8 @@ def test_http_invalid_channel_name():
     response_1 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param_1)
     response_2 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param_2)
 
-    assert response_1.status_code != 200
-    assert response_2.status_code != 200
+    assert response_1.status_code == 400
+    assert response_2.status_code == 400
 
 def test_http_invalid_token():
     '''
@@ -86,7 +86,7 @@ def test_http_invalid_token():
     }
     response = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
 
-    assert response.status_code != 200
+    assert response.status_code == 500
 
 def test_http_create_multiples():
     '''
