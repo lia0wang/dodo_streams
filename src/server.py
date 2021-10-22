@@ -231,6 +231,7 @@ def dm_create():
 
 @APP.route("/dm/leave/v1", methods=['POST'])
 def dm_leave():
+
     # Retrieve token
     request_data = request.get_json()
     token = request_data['token']
@@ -273,6 +274,20 @@ def dm_leave():
     
     save_database_updates(store)
     return dumps({}) 
+@APP.route("/dm/list/v1", methods=['GET'])
+def dm_list():
+    
+    # Getting dm list
+    store = get_data()
+    dms = []
+    for dm in store['dms']:
+        new_dm = dm
+        del new_dm['auth_user_id']
+        del new_dm['u_ids']
+        del new_dm['messages']
+        dms.append(new_dm)
+    
+    return dumps(dms)
 
 @APP.route("/dm/details/v1", methods=['GET'])
 def dm_details():

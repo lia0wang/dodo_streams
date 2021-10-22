@@ -9,7 +9,7 @@ from src.error import InputError, AccessError
 
 ### Input Error
 
-def invalid_length():
+def test_invalid_input_length():
     '''tests for invalid message length'''
     clear_v1()
     session_id = create_session_id()
@@ -28,7 +28,7 @@ def invalid_length():
     with pytest.raises(InputError):
         message_send_v1(token, channel_id, invalid_msg_2)
 
-def invalid_length_dm():
+def test_invalid_input_length_dm():
     '''tests for invalid message length'''
     clear_v1()
     session_id = create_session_id()
@@ -55,7 +55,7 @@ def invalid_length_dm():
 
 
 ### Access Error
-def invalid_auth_id():
+def test_invalid_msg_auth_id():
     clear_v1()
     session_id = create_session_id()
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
@@ -73,7 +73,7 @@ def invalid_auth_id():
     with pytest.raises(AccessError):
         message_send_v1(invalid_token, channel_id, msg)
 
-def invalid_auth_id_dm():
+def test_invalid_msg_auth_id_dm():
     clear_v1()
     session_id = create_session_id()
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
@@ -92,5 +92,5 @@ def invalid_auth_id_dm():
     
     msg = "Something"
     with pytest.raises(AccessError):
-        message_senddm_v1(invalid_token, dm_id, msg)
+        message_senddm_v1(invalid_token, dm_id['dm_id'], msg)
     
