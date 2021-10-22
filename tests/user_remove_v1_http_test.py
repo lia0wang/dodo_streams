@@ -177,7 +177,8 @@ def test_basic():
         'token': user_0['token'],
         'u_ids': [user_1['auth_user_id']]
     }
-    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param).json()
+    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param)
+    assert dm.status_code = OK
     
     dm_message_param = {
         'token': user_1['token'],
