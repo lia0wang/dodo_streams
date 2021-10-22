@@ -3,7 +3,7 @@ import pytest
 from src import config
 
 BASE_URL = config.url
-PERFECT = 200
+OK = 200
 ACCESS_ERROR = 403
 
 def test_invalid_token():
@@ -106,7 +106,7 @@ def test_no_dms():
     response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
     dm_list = response.json()
     
-    assert response.status_code == PERFECT
+    assert response.status_code == OK
     assert dm_list == []
 
 def test_basic():
@@ -145,7 +145,7 @@ def test_basic():
     response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
     dm_list = response.json()
     
-    assert response.status_code == PERFECT
+    assert response.status_code == OK
     assert dm_list == [{'dm_id': dm['dm_id'], 'dm_name': "hopefulboyyy, shifanchen"}]
 
 def test_multiple_dms():
@@ -199,6 +199,6 @@ def test_multiple_dms():
     response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
     dm_list = response.json()
     
-    assert response.status_code == PERFECT
+    assert response.status_code == OK
     assert dm_list == [{'dm_id': dm_1['dm_id'], 'dm_name': "hopefulboyyy, shifanchen"}, 
                        {'dm_id': dm_2['dm_id'], 'dm_name': "leonliao, shifanchen"}]
