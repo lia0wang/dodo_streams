@@ -78,7 +78,7 @@ def test_owner_leave():
 
 def test_user_leave():
     '''
-    Test when the owner leave, the owner should not be in the all_member list
+    Test when the user leave, the user should not be in the all_member list
     '''
     clear_v1()
     owner = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
