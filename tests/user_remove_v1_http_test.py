@@ -164,14 +164,16 @@ def test_basic():
         'token': user['token'],
         'channel_id': channel['channel_id']
     }
-    requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
+    join = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
+    assert join.status_code == OK
     
     channel_message_param = {
         'token': user['token'],
         'channel_id': channel['channel_id'],
         'message': "Hello"
     }
-    requests.post(f"{BASE_URL}/message/send/v1", json = channel_message_param).json()
+    send = requests.post(f"{BASE_URL}/message/send/v1", json = channel_message_param)
+    assert send.status_code == OK
     
     channel_message_details_param = {
         'token': auth_user['token'],
