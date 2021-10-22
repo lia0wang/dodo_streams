@@ -3,6 +3,9 @@ import pytest
 from src import config
 
 BASE_URL = config.url
+PERFECT = 200
+ACCESS_ERROR = 403
+INPUT_ERROR = 400
 
 def test_invalid_token():
     '''
@@ -45,7 +48,7 @@ def test_invalid_token():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code == 403
+    assert response.status_code == ACCESS_ERROR
 
 def test_invalid_uid():
     '''
@@ -77,7 +80,7 @@ def test_invalid_uid():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code == 400
+    assert response.status_code == INPUT_ERROR
     
 def test_last_global():
     '''
@@ -101,7 +104,7 @@ def test_last_global():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code == 400
+    assert response.status_code == INPUT_ERROR
     
 def test_invalid_permission():
     '''
@@ -133,7 +136,7 @@ def test_invalid_permission():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code == 400
+    assert response.status_code == INPUT_ERROR
     
 def test_token_not_global():
     '''
@@ -173,7 +176,7 @@ def test_token_not_global():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code == 403
+    assert response.status_code == ACCESS_ERROR
     
 def test_basic():
     '''
@@ -218,7 +221,7 @@ def test_basic():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code == 200
+    assert response.status_code == PERFECT
     
     token = {
         'token': user_1['token']
@@ -243,4 +246,4 @@ def test_basic():
         'message_id': message['message_id']
     }
     response = requests.delete(f"{BASE_URL}/message/remove/v1", json = message_remove)
-    assert response.status_code == 200
+    assert response.status_code == PERFECT
