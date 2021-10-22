@@ -3,11 +3,25 @@ import pytest
 from src import config
 
 BASE_URL = config.url
+PERFECT = 200
+ACCESS_ERROR = 403
+INPUT_ERROR = 400
 
 def test_invalid_token():
     '''
     Checking if the function identifies incorrect tokens
     '''
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    register_param_0 = {
+        "email": "bob123@gmail.com",
+        "password": "bobahe",
+        "name_first": "Bob",
+        "name_last": "Marley"
+    }
+    
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_0).json()
+    
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     register_param_1 = {
@@ -16,7 +30,7 @@ def test_invalid_token():
         "name_first": "shifan",
         "name_last": "chen"
     }
-    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
     
     register_param_2 = {
         "email": "11037.666@gmail.com",
@@ -27,14 +41,14 @@ def test_invalid_token():
     user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
     permission_info = {
-        'token': auth_user['token'] + '1', # Invalid Token
+        'token': invalid['token'], # Invalid Token
         'u_id': user_1['auth_user_id'],
         'permission_id': 2
     }
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code != 200
+    assert response.status_code == ACCESS_ERROR
 
 def test_invalid_uid():
     '''
@@ -66,7 +80,7 @@ def test_invalid_uid():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code != 200
+    assert response.status_code == INPUT_ERROR
     
 def test_last_global():
     '''
@@ -90,7 +104,7 @@ def test_last_global():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code != 200
+    assert response.status_code == INPUT_ERROR
     
 def test_invalid_permission():
     '''
@@ -122,7 +136,7 @@ def test_invalid_permission():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code != 200
+    assert response.status_code == INPUT_ERROR
     
 def test_token_not_global():
     '''
@@ -162,7 +176,7 @@ def test_token_not_global():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code != 200
+    assert response.status_code == ACCESS_ERROR
     
 def test_basic():
     '''
@@ -207,7 +221,7 @@ def test_basic():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code == 200
+    assert response.status_code == PERFECT
     
     token = {
         'token': user_1['token']
@@ -232,4 +246,4 @@ def test_basic():
         'message_id': message['message_id']
     }
     response = requests.delete(f"{BASE_URL}/message/remove/v1", json = message_remove)
-    assert response.status_code == 200
+    assert response.status_code == PERFECT
