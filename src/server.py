@@ -274,6 +274,10 @@ def message_send():
     save_database_updates(new_message)
     return dumps(new_message)
 
+@APP.route("/message/remove/v1", methods=['DELETE'])
+def message_remove():
+    return dumps({})
+
 @APP.route("/message/senddm/v1", methods=['POST'])
 def message_senddm():
     request_data = request.get_json()

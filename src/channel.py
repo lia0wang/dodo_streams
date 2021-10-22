@@ -144,7 +144,6 @@ def channel_details_v1(auth_user_id, channel_id):
                 'name_first': member['name_first'],
                 'name_last': member['name_last'],
                 'handle_str': member['handle_str'],
-                'permission_id': member['permission_id']
         }
         all_members.append(member_details)
 
