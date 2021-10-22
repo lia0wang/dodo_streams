@@ -428,7 +428,6 @@ def profile():
 
     check_valid_token(request_data['token'])
     # find user in database
-    decoded_jwt = decode_jwt(request_data['token'])
     for user in db_store['users']:
         if user['u_id'] == request_data['u_id']:
             target_user = user

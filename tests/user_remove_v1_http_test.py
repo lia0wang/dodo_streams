@@ -236,7 +236,8 @@ def test_basic():
         'start': 0
     }
     channel_message_details = requests.get(f"{BASE_URL}/channel/messages/v2", json = channel_message_details_param).json()
-    assert channel_message_details['messages'][0]['message'] == "Removed user"
+    assert channel_message_details['messages'] == "Removed user"
+    # [0]['message']
     
     # Message content replaced by 'Removed user' in dms
     dm_message_details_param = {
@@ -244,5 +245,5 @@ def test_basic():
         'channel_id': channel['channel_id'],
         'start': 0
     }
-    dm_message_details = requests.get(f"{BASE_URL}/message/senddm/v1", json = dm_message_details_param).json()
+    dm_message_details = requests.get(f"{BASE_URL}/dm/messages/v1", json = dm_message_details_param).json()
     assert dm_message_details['messages'][0]['message'] == "Removed user"
