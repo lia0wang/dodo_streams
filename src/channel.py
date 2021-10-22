@@ -133,7 +133,6 @@ def channel_details_v1(auth_user_id, channel_id):
                 'name_first': owner_member['name_first'],
                 'name_last': owner_member['name_last'],
                 'handle_str': owner_member['handle_str'],
-                'permission_id': owner_member['permission_id']
         }
         owner_members.append(owner_member_details)
     
