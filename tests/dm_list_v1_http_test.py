@@ -3,11 +3,24 @@ import pytest
 from src import config
 
 BASE_URL = config.url
+PERFECT = 200
+ACCESS_ERROR = 403
 
 def test_invalid_token():
     '''
     Checking if the function can identify incorrect tokens
     '''
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    register_param_0 = {
+        "email": "bob123@gmail.com",
+        "password": "bobahe",
+        "name_first": "Bob",
+        "name_last": "Marley"
+    }
+    
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_0).json()
+    
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     register_param = {
@@ -42,14 +55,12 @@ def test_invalid_token():
     requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param).json()
     
     token = {
-        "token": auth_user["token"] + "1796" # Invalid token
+        "token": invalid['token']
     }
     
     response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
     
-    assert response.status_code == 200
-    # Ishan please fix the above case, had temporarily changed it to pass the
-    # tests 
+    assert response.status_code == ACCESS_ERROR
     
 def test_basic():
     '''
@@ -87,7 +98,7 @@ def test_basic():
     response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
     dm_list = response.json()
     
-    assert response.status_code == 200
+    assert response.status_code == PERFECT
     assert dm_list == [{'dm_id': dm['dm_id'], 'dm_name': "hopefulboyyy, shifanchen"}]
 
 def test_multiple_dms():
@@ -138,6 +149,6 @@ def test_multiple_dms():
     response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
     dm_list = response.json()
     
-    assert response.status_code == 200
+    assert response.status_code == PERFECT
     assert dm_list == [{'dm_id': dm_1['dm_id'], 'dm_name': "hopefulboyyy, shifanchen"}, 
                        {'dm_id': dm_2['dm_id'], 'dm_name': "leonliao, shifanchen"}]
