@@ -181,6 +181,7 @@ def test_basic():
         'start': 0
     }
     channel_message_details = requests.get(f"{BASE_URL}/channel/messages/v2", json = channel_message_details_param).json()
+    # This is wrong on purpose to see what the output of channel_message_details is
     assert channel_message_details == "Removed user"
     
     dm_create_param = {
