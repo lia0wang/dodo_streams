@@ -189,7 +189,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
             valid_channel = True
             target_channel = channel
     if valid_channel == False:
-        raise InputError("Invalid channel ID!")
+        raise InputError(description="Invalid channel ID!")
 
     # Check if authorised user is a member of the target channel
     # Search list of members in the target channel
@@ -198,17 +198,52 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         if member['u_id'] == auth_user_id:
             is_member = True
     if is_member == False:
-        raise AccessError("Error: Authorised user is not a member")
+        raise AccessError(description="Error: Authorised user is not a member")
 
+    messages = target_channel['messages']
     total_messages = 0
+    for message in messages:
+        total_messages += 1
+
     if start > total_messages:
-        raise InputError("Error: Start must be lower than total_messages")
+        raise InputError(description="Error: Start must be lower than total_messages")
+    if total_messages == 0:
+        end = -1
+        return {
+            'messages': [],
+            'start': start,
+            'end': end,
+        }
+    else:
+        segment_messages = []
+        #index = start
+        #for message in reversed(messages):
+        # [start:] is slicing where i am limiting it from start to the end
+        for index, message in enumerate(reversed(messages[start:]), start):
+            message_content = {
+                    'message_id': message['message_id'],
+                    'u_id': message['u_id'],
+                    'message': message['message'],
+                    'time_created': message['time_created'],
+            } 
+            index+=1
+            if (index < start + 50) and (index != total_messages):                  
+                segment_messages.append(message_content)
+                end = index + 1
+            elif index == total_messages:
+                end = -1
+            else:
+                break
 
     return {
-        'messages': [ ],
+        'messages': segment_messages,
         'start': start,
-        'end': -1,
+        'end': end,
+        'index': index,
+        'total_msg': total_messages
     }
+
+
 
 def channel_join_v1(auth_user_id, channel_id):
     """
