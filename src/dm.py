@@ -101,7 +101,7 @@ def dm_details_v1(auth_user_id, dm_id):
             target_dm = dm
             is_valid_dm = True
     if is_valid_dm == False:
-        raise InputError(description="Error: Invalid channel id")
+        raise InputError(description="Error: Invalid dm id")
     # Check if authorised user is a member of the target dm
     # Search list of members in the target dm
     is_member = False
