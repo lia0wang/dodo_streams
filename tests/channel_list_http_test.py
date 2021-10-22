@@ -67,7 +67,7 @@ def test_http_invalid_token():
     
     response = requests.get(f"{BASE_URL}/channels/list/v2", json = token)
     
-    assert response.status_code == 200
+    assert response.status_code == 500
 
 def test_http_list_multiple():
     '''
