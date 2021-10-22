@@ -4,7 +4,7 @@ import re
 from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.channel import channel_addowner_v1, channel_join_v1, channel_details_v1
+from src.channel import channel_addowner_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1
 from src.message import message_send_v1, message_senddm_v1
@@ -205,6 +205,23 @@ def channel_addowner():
     save_data_store_updates()
     return dumps({})
 
+@APP.route("/channel/removeowner/v1", methods=['POST'])
+def channel_removeowner():
+    # Retrieve token
+    request_data = request.get_json()
+    token = request_data['token']
+    check_valid_token(token)
+    
+    # Decode token, retrieve parameters
+    decode_token = decode_jwt(token)
+    channel_id = request_data['channel_id']
+    u_id = request_data['u_id']
+
+    # Pass parameters
+    channel_removeowner_v1(decode_token['u_id'], channel_id, u_id)
+    save_data_store_updates()
+    return dumps({})
+
 @APP.route("/channel/details/v2", methods=['GET'])
 def details():
     request_data = request.get_json()
@@ -229,12 +246,53 @@ def dm_create():
 
     return dumps(dm)
 
-@APP.route("/dm/list/v1", methods=['GET'])
-def dm_list():
+@APP.route("/dm/leave/v1", methods=['POST'])
+def dm_leave():
+
     # Retrieve token
     request_data = request.get_json()
     token = request_data['token']
     check_valid_token(token)
+
+    # Decode token, retrieve parameters
+    decode_token = decode_jwt(token)
+    target_u_id = decode_token['u_id']
+    target_dm_id = request_data['dm_id']
+
+    store = get_data()
+
+    # Check if auth_user_id refers to existing user
+    is_valid_user = False
+    for user in store['users']:
+        if user['u_id'] == target_u_id:
+            is_valid_user = True
+    if is_valid_user == False:
+        raise AccessError(description="Error: Invalid user id")
+    
+    # Check if dm_id refers to valid dm
+    # Find and save target dm if it exists
+    is_valid_dm = False
+    for dm in store['dms']:
+        if dm['dm_id'] == target_dm_id:
+            target_dm = dm
+            is_valid_dm = True
+    if is_valid_dm == False:
+        raise InputError(description="Error: Invalid dm id")
+    # Check if authorised user is a member of the target dm
+    # Search list of members in the target dm
+    is_member = False
+    for u_id in target_dm['u_ids']:
+        if u_id == target_u_id:
+            is_member = True
+    if is_member == False:
+        raise AccessError(description="Error: Authorised user is not a member")
+
+    target_dm['u_ids'].remove(target_u_id)
+    
+    save_database_updates(store)
+    return dumps({}) 
+@APP.route("/dm/list/v1", methods=['GET'])
+def dm_list():
     
     # Getting dm list
     store = get_data()
