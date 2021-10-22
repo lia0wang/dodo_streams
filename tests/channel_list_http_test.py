@@ -6,7 +6,7 @@ from src.other import clear_v1
 from src import config
 
 BASE_URL = config.url
-PERFECT = 200
+OK = 200
 ACCESS_ERROR = 403
 
 
@@ -37,7 +37,7 @@ def test_http_list_basic():
     
     response = requests.get(f"{BASE_URL}/channels/list/v2", json = token)
     
-    assert response.status_code == PERFECT
+    assert response.status_code == OK
     channel_list = response.json()
     
     assert channel_list == {'channels': [{'channel_id': channel['channel_id'], 'name': 'league'}]}
@@ -117,7 +117,7 @@ def test_http_list_multiple():
     
     response = requests.get(f"{BASE_URL}/channels/list/v2", json = token)
     
-    assert response.status_code == PERFECT
+    assert response.status_code == OK
     channel_list = response.json()
     
     assert channel_list == {'channels': [{'channel_id': channel_1['channel_id'], 'name': 'league1'}, 
