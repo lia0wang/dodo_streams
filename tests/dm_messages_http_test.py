@@ -339,7 +339,6 @@ def test_invalid_channel_id():
         'start': 0       
     }
     dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages)
-    msg_return = dm_msg_return.json()
     assert dm_msg_return.status_code == 400
 
 def test_start_more_than_total_messages():
