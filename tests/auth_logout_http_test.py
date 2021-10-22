@@ -92,5 +92,33 @@ def test_function_use_after_logout():
     setname = requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param)
     assert setname.status_code == 403
 
+def test_session_leftover_after_logout():
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    register_param1 = {
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
+    }
+    register =  requests.post(f"{BASE_URL}/auth/register/v2", json = register_param1).json()
 
+    login_data1 = {
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037"        
+    }
+    login_1 =  requests.post(f"{BASE_URL}/auth/login/v2", json = login_data1).json()
+    token = {
+        "token": register['token']
+    }
+    requests.post(f"{BASE_URL}/auth/logout/v1", json = token)
+    channel_param = {
+        'token': register['token'],
+        'name': 'league',
+        'is_public': True
+    }
+    create = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
+    assert create.status_code == 403
+    channel_param['token'] = login_1['token']
+    create = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
+    assert create.status_code == 200
 
