@@ -187,8 +187,8 @@ def test_basic():
     requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_param).json()
     
     delete_info = {
-        'token': user['token'], 
-        'u_id': auth_user['auth_user_id']
+        'token': auth_user['token'], 
+        'u_id': token['auth_user_id']
     }
     
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = delete_info)
