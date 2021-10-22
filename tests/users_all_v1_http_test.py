@@ -3,12 +3,24 @@ import pytest
 from src import config
 
 BASE_URL = config.url
-    
+OK = 200
+ACCESS_ERROR = 403    
     
 def test_invalid_token():
     '''
     Checking output when the token is incorrect
     '''
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    register_param_0 = {
+        "email": "bob123@gmail.com",
+        "password": "bobahe",
+        "name_first": "Bob",
+        "name_last": "Marley"
+    }
+    
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_0).json()
+    
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     register_param = {
@@ -17,15 +29,15 @@ def test_invalid_token():
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
     
     token = {
-        'token': user['token'] + '1' # Incorrect token
+        'token': invalid['token'] # Incorrect token
     }
     
     response = requests.get(f"{BASE_URL}/users/all/v1", json = token)
     
-    assert response.status_code != 200
+    assert response.status_code == ACCESS_ERROR
     
 def test_single_user():
     '''
@@ -47,7 +59,7 @@ def test_single_user():
     
     response = requests.get(f"{BASE_URL}/users/all/v1", json = token)
     
-    assert response.status_code == 200
+    assert response.status_code == OK
     
     user_list = response.json()
     assert user_list == [{"u_id": 1,"email": "11037.666@gmail.com", "name_first": "Hopeful", 
@@ -83,7 +95,7 @@ def test_multiple_users():
     
     response = requests.get(f"{BASE_URL}/users/all/v1", json = token)
     
-    assert response.status_code == 200
+    assert response.status_code == OK
     
     user_list = response.json()
     assert user_list == [{"u_id": 1,"email": "11037.666@gmail.com", "name_first": "Hopeful", 
