@@ -309,17 +309,28 @@ def dm_leave():
     return dumps({}) 
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list():
+    # retrieve token
+    data = request.get_json()
+    token = data['token']
     
-    # Getting dm list
+    # Checking and decoding token
+    check_valid_token(token)
+    decoded_jwt = decode_jwt(token)
+    u_id = decoded_jwt['u_id']
+    
+    # Getting dm data and making dms list
     store = get_data()
     dms = []
-    for dm in store['dms']:
-        new_dm = dm
-        del new_dm['auth_user_id']
-        del new_dm['u_ids']
-        del new_dm['messages']
-        dms.append(new_dm)
     
+    # Traversing through dms, appending those that
+    # have u_id as a member
+    for dm in store['dms']:
+        if u_id in dm['u_ids']:
+            new_dm = dm
+            del new_dm['auth_user_id']
+            del new_dm['u_ids']
+            del new_dm['messages']
+            dms.append(new_dm)
     return dumps(dms)
 
 @APP.route("/dm/details/v1", methods=['GET'])
@@ -347,6 +358,10 @@ def message_send():
     new_message = message_send_v1(token,channel_id,message)
     save_database_updates(new_message)
     return dumps(new_message)
+
+@APP.route("/message/remove/v1", methods=['DELETE'])
+def message_remove():
+    return dumps({})
 
 @APP.route("/message/senddm/v1", methods=['POST'])
 def message_senddm():
@@ -512,6 +527,72 @@ def list_users():
         users.append(new_user)
     
     return dumps(users)
+
+@APP.route("/admin/user/remove/v1", methods=["DELETE"])
+def remove_user():
+    return dumps({})
+
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+def change_permission():
+    # Retrieve token
+    data = request.get_json()
+    token = data['token']
+    
+    # Check if token is valid
+    check_valid_token(token)
+    
+    # Get data
+    u_id = data['u_id']
+    permission_id = data['permission_id']
+    decoded_token = decode_jwt(token)
+    auth_user_id = decoded_token['u_id']
+    store = get_data()
+    
+    valid_u_id = False
+    valid_auth = False
+    multiple_global_owners = False
+    
+    # Checking for errors
+    if permission_id == 1 or permission_id == 2:
+        for user in store['users']:
+            if user['u_id'] == u_id:
+                valid_u_id = True
+            
+            if user['u_id'] == auth_user_id and user['permission_id'] == 1:
+                valid_auth = True
+            elif user['permission_id'] == 1:
+                multiple_global_owners = True
+    else:
+        raise InputError(description="permission_id is invalid")
+    
+    # Returning error messages in case of errors
+    if not valid_u_id:
+        raise InputError(description="u_id does not refer to a valid user")
+
+    if not valid_auth:
+        raise AccessError(description="Authorised user is not a global owner")
+    
+    if permission_id == 2 and auth_user_id == u_id and not multiple_global_owners:
+        raise InputError(description="There must be at least one global owner")
+    
+    # Changing user's permissions in users list
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            user['permission_id'] = permission_id
+    
+    # Changing user's permissions in channel members list
+    for channel in store['channels']:
+        for member in channel['owner_members']:
+            if member['u_id'] == u_id:
+                member['permission_id'] = permission_id
+        
+        for member in channel['all_members']:
+            if member['u_id'] == u_id:
+                member['permission_id'] = permission_id
+
+    save_database_updates(store)
+    
+    return dumps({})
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

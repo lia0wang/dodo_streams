@@ -178,6 +178,10 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     """
         
     store = data_store.get()
+    
+    if is_database_exist():
+        store = get_data()
+
     # Check if the channel_id is valid
     valid_channel = False
     for channel in store['channels']:
