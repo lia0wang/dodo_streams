@@ -24,6 +24,7 @@ def message_send_v1(token, channel_id, message):
 
     for chan in db_store['channels']:
         if chan['channel_id'] == channel_id:
+            target_channel = chan
             valid_channel = True
         for user in chan["all_members"]:
             if user['u_id'] == u_id:
@@ -43,9 +44,22 @@ def message_send_v1(token, channel_id, message):
         save_database_updates(db_store)
     else:
         data_store.set(db_store)
+    
+    # abitary for now, jimmy should actually edit it
+    time_created = 0
+
+    message = {
+        'message_id': message_id,
+        'u_id': u_id,
+        'message': message,
+        'time_created': time_created
+    }
+
+    target_channel['messages'].append(message)
+    save_database_updates(db_store)
 
     return {
-    'message_id': message_id,
+        'message_id': message_id,
     }
             
     
@@ -64,6 +78,7 @@ def message_senddm_v1(token, dm_id, message):
     valid = False
     for dm in db_store['dms']:
         if dm['dm_id'] == dm_id:
+            target_dm = dm
             valid = True
         if not valid:
             raise InputError(description="dm_id does not refer to a valid dm id")
@@ -79,12 +94,27 @@ def message_senddm_v1(token, dm_id, message):
     #seek_target_channel_and_errors(db_store, u_id, channel_id)
     message_id = db_store['message_index']
     db_store['message_index']+=1
+
+    # Jimmy please edit this:
+    time_created = 0
+
+    dm_message = {
+        'message_id': message_id,
+        'u_id': u_id,
+        'message': message,
+        'time_created': time_created
+    }
+
+    target_dm['messages'].append(dm_message)
+    save_database_updates(db_store)
+
+
     if is_database_exist:
         save_database_updates(db_store)
     else:
         data_store.set(db_store)        
     return {
-    'message_id': message_id,
+        'message_id': message_id,
     }
          
          
