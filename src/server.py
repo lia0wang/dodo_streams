@@ -641,6 +641,9 @@ def remove_user():
             for message in dm['messages']:
                 if message['u_id'] == u_id:
                     message['message'] = "Removed user"
+    
+    save_database_updates(store)
+    
     return dumps({})
 
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
