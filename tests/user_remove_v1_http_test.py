@@ -207,7 +207,7 @@ def test_basic():
         'token': user_0['token'],
         'channel_id': channel['channel_id']
     }
-    channel_details = requests.get(f"{BASE_URL}/channel/details/v2", json = channel_details_param}).json()
+    channel_details = requests.get(f"{BASE_URL}/channel/details/v2", json = channel_details_param).json()
     assert channel_details['all_members'] == [{'u_id': 1, 'email': register_param_1['email'], 'name_first': register_param_1['name_first'], 
                                               'name_last': register_param_1['name_last'], 'handle_string': "shifanchen"}]
     
