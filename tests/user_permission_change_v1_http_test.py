@@ -34,7 +34,7 @@ def test_invalid_token():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code != 200
+    assert response.status_code == 403
 
 def test_invalid_uid():
     '''

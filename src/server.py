@@ -112,7 +112,8 @@ def channels_create():
     request_data = request.get_json()
 
     token = request_data['token']
-    check_valid_token(token)
+    if not check_valid_token(token):
+        raise AccessError(description="Invalid Token")
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
     name = request_data['name']
@@ -131,7 +132,8 @@ def channel_list():
     token = data['token']
     
     # Check if token is valid and decode it
-    check_valid_token(token)
+    if not check_valid_token(token):
+        raise AccessError(description="Invalid Token")
     decoded_token = decode_jwt(token)
     auth_user_id = decoded_token['u_id']
     
@@ -146,7 +148,8 @@ def channel_listall():
     token = data['token']
     
     # Check if token is valid and decode it
-    check_valid_token(token)
+    if not check_valid_token(token):
+        raise AccessError(description="Invalid Token")
     decoded_token = decode_jwt(token)
     auth_user_id = decoded_token['u_id']
     
@@ -157,7 +160,8 @@ def channel_listall():
 @APP.route("/auth/logout/v1", methods=['POST'])
 def logout():
     request_data = request.get_json()
-    check_valid_token(request_data['token'])
+    if not check_valid_token(request_data['token']):
+        raise AccessError(description="Invalid Token")
     decoded_token = decode_jwt(request_data['token'])
         
     # Fetch data from database
@@ -176,7 +180,8 @@ def channel_join():
     # Retrieve token
     request_data = request.get_json()
     token = request_data['token']
-    check_valid_token(token)
+    if not check_valid_token(token):
+        raise AccessError(description="Invalid Token")
 
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
@@ -193,7 +198,8 @@ def channel_addowner():
     # Retrieve token
     request_data = request.get_json()
     token = request_data['token']
-    check_valid_token(token)
+    if not check_valid_token(token):
+        raise AccessError(description="Invalid Token")
     
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
@@ -208,7 +214,8 @@ def channel_addowner():
 @APP.route("/channel/details/v2", methods=['GET'])
 def details():
     request_data = request.get_json()
-    check_valid_token(request_data['token'])
+    if not check_valid_token(request_data['token']):
+        raise AccessError(description="Invalid Token")
     decoded_jwt = decode_jwt(request_data['token'])
     details = channel_details_v1(decoded_jwt['u_id'], request_data['channel_id'])
     return dumps(details)
@@ -218,7 +225,8 @@ def dm_create():
     # Retrieve token
     request_data = request.get_json()
     token = request_data['token']
-    check_valid_token(token)
+    if not check_valid_token(token):
+        raise AccessError(description="Invalid Token")
 
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
@@ -229,12 +237,54 @@ def dm_create():
 
     return dumps(dm)
 
-@APP.route("/dm/list/v1", methods=['GET'])
-def dm_list():
+@APP.route("/dm/leave/v1", methods=['POST'])
+def dm_leave():
+
     # Retrieve token
     request_data = request.get_json()
     token = request_data['token']
-    check_valid_token(token)
+    if not check_valid_token(token):
+        raise AccessError(description="Invalid Token")
+
+    # Decode token, retrieve parameters
+    decode_token = decode_jwt(token)
+    target_u_id = decode_token['u_id']
+    target_dm_id = request_data['dm_id']
+
+    store = get_data()
+
+    # Check if auth_user_id refers to existing user
+    is_valid_user = False
+    for user in store['users']:
+        if user['u_id'] == target_u_id:
+            is_valid_user = True
+    if is_valid_user == False:
+        raise AccessError(description="Error: Invalid user id")
+    
+    # Check if dm_id refers to valid dm
+    # Find and save target dm if it exists
+    is_valid_dm = False
+    for dm in store['dms']:
+        if dm['dm_id'] == target_dm_id:
+            target_dm = dm
+            is_valid_dm = True
+    if is_valid_dm == False:
+        raise InputError(description="Error: Invalid dm id")
+    # Check if authorised user is a member of the target dm
+    # Search list of members in the target dm
+    is_member = False
+    for u_id in target_dm['u_ids']:
+        if u_id == target_u_id:
+            is_member = True
+    if is_member == False:
+        raise AccessError(description="Error: Authorised user is not a member")
+
+    target_dm['u_ids'].remove(target_u_id)
+    
+    save_database_updates(store)
+    return dumps({}) 
+@APP.route("/dm/list/v1", methods=['GET'])
+def dm_list():
     
     # Getting dm list
     store = get_data()
@@ -252,7 +302,8 @@ def dm_list():
 def dm_details():
     # retrieve token
     request_data = request.get_json()
-    check_valid_token(request_data['token'])
+    if not check_valid_token(request_data['token']):
+        raise AccessError(description="Invalid Token")
     decoded_jwt = decode_jwt(request_data['token'])
     auth_user_id = decoded_jwt['u_id']
     details = dm_details_v1(auth_user_id, request_data['dm_id'])
@@ -263,7 +314,8 @@ def message_send():
     request_data = request.get_json()
     # Retrieve token
     token = request_data['token']
-    check_valid_token(token)
+    if not check_valid_token(token):
+        raise AccessError(description="Invalid Token")
 
     # Retrieve channel id
     channel_id = request_data['channel_id']
@@ -274,16 +326,13 @@ def message_send():
     save_database_updates(new_message)
     return dumps(new_message)
 
-@APP.route("/message/remove/v1", methods=['DELETE'])
-def message_remove():
-    return dumps({})
-
 @APP.route("/message/senddm/v1", methods=['POST'])
 def message_senddm():
     request_data = request.get_json()
     # Retrieve token
     token = request_data['token']
-    check_valid_token(token)
+    if not check_valid_token(token):
+        raise AccessError(description="Invalid Token")
 
     # Retrieve channel id
     dm_id = request_data['dm_id']
@@ -307,7 +356,8 @@ def profile():
     if is_valid_user == False:
         raise InputError(description="u_id does not refer to existing user")
 
-    check_valid_token(request_data['token'])
+    if not check_valid_token(request_data['token']):
+        raise AccessError(description="Invalid Token")
     # find user in database
     decoded_jwt = decode_jwt(request_data['token'])
     for user in db_store['users']:
@@ -335,7 +385,8 @@ def setname():
     if len(name_last) < 1 or len(name_last) > 50:
         raise InputError(description="Error: Invalid last name")
 
-    check_valid_token(request_data['token'])
+    if not check_valid_token(request_data['token']):
+        raise AccessError(description="Invalid Token")
 
     decoded_jwt = decode_jwt(request_data['token'])
     for index, user in enumerate(db_store['users']):
@@ -372,7 +423,8 @@ def set_email():
         if user['email'] == email:
             raise InputError(description="Error: email taken")
 
-    check_valid_token(request_data['token'])
+    if not check_valid_token(request_data['token']):
+        raise AccessError(description="Invalid Token")
 
     decoded_jwt = decode_jwt(request_data['token'])
     for index, user in enumerate(db_store['users']):
@@ -403,7 +455,8 @@ def set_handle():
         if user['handle_str'] == handle_str:
             raise InputError(description="Invalid handle")
 
-    check_valid_token(request_data['token'])
+    if not check_valid_token(request_data['token']):
+        raise AccessError(description="Invalid Token")
 
     decoded_jwt = decode_jwt(request_data['token'])
     for index, user in enumerate(db_store['users']):
@@ -428,7 +481,8 @@ def list_users():
     token = data['token']
     
     # Check if token is valid
-    check_valid_token(token)
+    if not check_valid_token(token):
+        raise AccessError(description="Invalid Token")
     
     # Get data
     data_store = get_data()
@@ -442,68 +496,6 @@ def list_users():
         users.append(new_user)
     
     return dumps(users)
-
-@APP.route("/admin/userpermission/change/v1", methods=['POST'])
-def change_permission():
-    # Retrieve token
-    data = request.get_json()
-    token = data['token']
-    
-    # Check if token is valid
-    check_valid_token(token)
-    
-    # Get data
-    u_id = data['u_id']
-    permission_id = data['permission_id']
-    decoded_token = decode_jwt(token)
-    auth_user_id = decoded_token['u_id']
-    store = get_data()
-    
-    valid_u_id = False
-    valid_auth = False
-    multiple_global_owners = False
-    
-    # Checking for errors
-    if permission_id == 1 or permission_id == 2:
-        for user in store['users']:
-            if user['u_id'] == u_id:
-                valid_u_id = True
-            
-            if user['u_id'] == auth_user_id and user['permission_id'] == 1:
-                valid_auth = True
-            elif user['permission_id'] == 1:
-                multiple_global_owners = True
-    else:
-        raise InputError(description="permission_id is invalid")
-    
-    # Returning error messages in case of errors
-    if not valid_u_id:
-        raise InputError(description="u_id does not refer to a valid user")
-
-    if not valid_auth:
-        raise AccessError(description="Authorised user is not a global owner")
-    
-    if permission_id == 2 and auth_user_id == u_id and not multiple_global_owners:
-        raise InputError(description="There must be at least one global owner")
-    
-    # Changing user's permissions in users list
-    for user in store['users']:
-        if user['u_id'] == u_id:
-            user['permission_id'] = permission_id
-    
-    # Changing user's permissions in channel members list
-    for channel in store['channels']:
-        for member in channel['owner_members']:
-            if member['u_id'] == u_id:
-                member['permission_id'] = permission_id
-        
-        for member in channel['all_members']:
-            if member['u_id'] == u_id:
-                member['permission_id'] = permission_id
-
-    save_database_updates(store)
-    
-    return dumps({})
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
