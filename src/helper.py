@@ -32,7 +32,10 @@ def decode_jwt(encoded_jwt):
     Returns:
         - dictionary containing 'u_id' and 'session_id'
     '''
-    return jwt.decode(encoded_jwt, SECRET, algorithms= ['HS256'])
+    try:
+        return jwt.decode(encoded_jwt, SECRET, algorithms= ['HS256'])
+    except:
+        raise AccessError(description="Invalid Token")
 
 def create_session_id():
     """
