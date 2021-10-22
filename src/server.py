@@ -4,7 +4,8 @@ import re
 from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.channel import channel_addowner_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1, channel_messages_v1
+from src.channel import channel_addowner_v1, channel_join_v1, \
+channel_details_v1, channel_leave_v1, channel_removeowner_v1,channel_messages_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1
 from src.message import message_send_v1, message_senddm_v1
@@ -13,8 +14,8 @@ from src import config
 from src.auth import auth_register_v1, auth_login_v1
 from src.channels import channels_list_v1, channels_listall_v1
 from src.data_store import data_store
-from src.helper import check_valid_token, get_data, save_data_store_updates, create_session_id
-from src.helper import is_database_exist, save_database_updates, create_jwt, decode_jwt, hash_encrypt
+from src.helper import check_valid_token, get_data, save_data_store_updates,\
+create_session_id, save_database_updates, create_jwt, decode_jwt
 from src.other import clear_v1
 
 def quit_gracefully(*args):
@@ -170,7 +171,6 @@ def logout():
             save_database_updates(db_store)
     return dumps({})
 
-
 @APP.route("/channel/join/v2", methods=['POST'])
 def channel_join():
     # Retrieve token
@@ -184,6 +184,23 @@ def channel_join():
 
     # Pass parameters
     channel_join_v1(decode_token['u_id'], channel_id)
+    save_data_store_updates()
+    
+    return dumps({})
+
+@APP.route("/channel/leave/v2", methods=['POST'])
+def channel_leave():
+    # Retrieve token
+    request_data = request.get_json()
+    token = request_data['token']
+    check_valid_token(token)
+
+    # Decode token, retrieve parameters
+    decode_token = decode_jwt(token)
+    channel_id = request_data['channel_id']
+
+    # Pass parameters
+    channel_leave_v1(decode_token['u_id'], channel_id)
     save_data_store_updates()
     
     return dumps({})
@@ -293,17 +310,28 @@ def dm_leave():
     return dumps({}) 
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list():
+    # retrieve token
+    data = request.get_json()
+    token = data['token']
     
-    # Getting dm list
+    # Checking and decoding token
+    check_valid_token(token)
+    decoded_jwt = decode_jwt(token)
+    u_id = decoded_jwt['u_id']
+    
+    # Getting dm data and making dms list
     store = get_data()
     dms = []
-    for dm in store['dms']:
-        new_dm = dm
-        del new_dm['auth_user_id']
-        del new_dm['u_ids']
-        del new_dm['messages']
-        dms.append(new_dm)
     
+    # Traversing through dms, appending those that
+    # have u_id as a member
+    for dm in store['dms']:
+        if u_id in dm['u_ids']:
+            new_dm = dm
+            del new_dm['auth_user_id']
+            del new_dm['u_ids']
+            del new_dm['messages']
+            dms.append(new_dm)
     return dumps(dms)
 
 @APP.route("/dm/details/v1", methods=['GET'])

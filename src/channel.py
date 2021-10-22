@@ -265,6 +265,7 @@ def channel_join_v1(auth_user_id, channel_id):
         AccessError        - Channel_id refers to a channel that is private
                              and the authorised user is not already a channel member
                              and is not a global owner
+                           - Token invalid
     Return Value:
         Return an empty dictionary
     """
@@ -288,7 +289,7 @@ def channel_join_v1(auth_user_id, channel_id):
             } # Catch the new_member without password
             valid = True
     if not valid:
-        raise AccessError(description="Invalid user ID!")
+        raise AccessError(description="Invalid token!")
 
     # Check if the channel_id is valid
     valid = False
@@ -315,6 +316,74 @@ def channel_join_v1(auth_user_id, channel_id):
     data_store.set(store)
     return {
     }
+
+def channel_leave_v1(auth_user_id, channel_id):
+    """ 
+    users with auth_user_id leave the channel with given channel_id
+    Arguments:
+        auth_user_id (int) - The ID of the authorised valid user
+        channel_id (int)   - The ID of the channel where the user will leave
+    Exceptions:
+        InputError         - channel_id does not refer to a valid channel
+                           - auth_user invalid
+        AccessError        - channel_id is valid and the authorised user
+                             is not a member of the channel
+    Return Value:
+        Returns {} (dict) on success
+    """
+        # Fetch data
+    store = data_store.get()
+    if is_database_exist():
+        store = get_data()
+
+    # Check if the auth_user_id is valid
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            target_user = {
+                'u_id': auth_user_id,
+                'email': user['email'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last'],
+                'handle_str': user['handle_str'],
+                'permission_id': user['permission_id']
+            } # Catch the new_member without password
+            valid = True
+    if not valid:
+        raise AccessError(description="Invalid token!")
+
+    # Check if the channel_id is valid
+    valid = False
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            valid = True
+            target_channel = channel
+    if not valid:
+        raise InputError(description="Invalid channel ID!")
+
+    # A user can't leave a channel where he is not a member.
+    is_member = False
+    for member in target_channel['all_members']:
+        if member['u_id'] == auth_user_id:
+            is_member = True
+    if not is_member:
+        raise AccessError(description="This user is not a member of the channel!")
+
+    # Check if the user is an owner
+    is_owner = False
+    for owner in target_channel['owner_members']:
+        if owner['u_id'] == auth_user_id:
+            is_owner = True
+    
+    for index, channel in enumerate(store['channels']):
+        if channel['channel_id'] == channel_id:
+            # Remove the user from owner list
+            if is_owner:
+                store['channels'][index]['owner_members'].remove(target_user)
+            # Remove the user from member list
+            store['channels'][index]['all_members'].remove(target_user)
+    data_store.set(store)
+    return {}
 
 def channel_addowner_v1(auth_user_id, channel_id, u_id):
     """ 
@@ -366,11 +435,11 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
         raise InputError(description="Invalid user ID!")
 
     # Check if the user is not a member of the channel
-    valid = False
+    is_member = False
     for member in target_channel['all_members']:
         if member['u_id'] == u_id:
-            valid = True
-    if not valid:
+            is_member = True
+    if not is_member:
         raise InputError(description="This user is not a member of the channel!")
         
     # Check if the user is already a owner of the channel
