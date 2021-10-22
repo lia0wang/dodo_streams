@@ -65,10 +65,9 @@ def register():
     name_first = request_data['name_first']
     name_last = request_data['name_last'] 
 
-    # Register user and update database with changes to data_store
+    # Register user
     register_return = auth_register_v1(email, password, name_first, name_last)
     save_data_store_updates()
-
     # Fetch data from database
     database_store = get_data()
 

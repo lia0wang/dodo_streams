@@ -23,32 +23,21 @@ def auth_login_v1(email, password):
         that has been registered and password is correct for that u_id.
 
     """
-    if is_database_exist() == True:
-        database_store = get_data()
-        for user in database_store['users']:
-            if user['email'] == email:
-                # check if encrypted password in database matches 
-                # input password after encryption
-                if user['password'] == hash_encrypt(password):
-                    return {
-                        'auth_user_id' : user['u_id']
-                    }
-                else:
-                    raise InputError(description = 'Error: Invalid password')
-        raise InputError('Error: Invalid email') 
-    else:
-        store = data_store.get()
-        for user in store['users']:
-            if user['email'] == email:
-                # check if encrypted password in database matches 
-                # input password after encryption
-                if user['password'] == hash_encrypt(password):
-                    return {
-                        'auth_user_id' : user['u_id']
-                    }
-                else:
-                    raise InputError(description = 'Error: Invalid password')
-        raise InputError(description = 'Error: Invalid email')
+    store = data_store.get()
+    if is_database_exist():
+        store = get_data()
+    store = data_store.get()
+    for user in store['users']:
+        if user['email'] == email:
+            # check if encrypted password in database matches 
+            # input password after encryption
+            if user['password'] == hash_encrypt(password):
+                return {
+                    'auth_user_id' : user['u_id']
+                }
+            else:
+                raise InputError(description = 'Error: Invalid password')
+    raise InputError(description = 'Error: Invalid email')
 
 def auth_register_v1(email, password, name_first, name_last):
     '''
@@ -87,23 +76,23 @@ def auth_register_v1(email, password, name_first, name_last):
 
     # Fetch data
     store = data_store.get()
-
     if is_database_exist() == True:
-        database_store = get_data()
+        store = get_data()
+        new_store = data_store.get()
 
     # Check for repeated email
         # Put all emails in list
         # Append 'input email' to emails list
         # Check for duplicates in list of emails
     
-    if is_database_exist() == True:
+    if is_database_exist():
         emails = []
-        for user in database_store['users']:
+        for user in new_store['users']:
             emails.append(user['email'])
         emails.append(email)
         if len(emails) != len(set(emails)):
             raise InputError("Error: email taken")
-    elif len(store['users']) != 0:
+    if len(store['users']) != 0:
         emails = []
         for user in store['users']:
             emails.append(user['email'])
@@ -113,29 +102,13 @@ def auth_register_v1(email, password, name_first, name_last):
             raise InputError("Error: email taken")
 
     # Generate handle
-    if is_database_exist() == True:
-        handle_str = create_handle(name_first, name_last, database_store)
-    else:
-        handle_str = create_handle(name_first, name_last, store)
+    handle_str = create_handle(name_first, name_last, store)
   
-
     # Generate permission_id
-    if is_database_exist() == True:
-        permission_id = create_permission_id(database_store)
-    else:
-        permission_id = create_permission_id(store)
+    permission_id = create_permission_id(store)
  
-
     # Generate id
-        # Check if database file exists.
-        # Check if database file is empty.
-        # If it exists and is not empty then, generate id according to...
-        # length of users list in data base.
-        # Otherwise generate id according to users in data_store.
-    if is_database_exist() == True:
-        user_id = len(database_store['users']) + 1
-    else:
-        user_id = len(store['users']) + 1
+    user_id = len(store['users']) + 1
 
     # Create and store account
     user = {
