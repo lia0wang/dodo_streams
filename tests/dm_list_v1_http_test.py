@@ -6,6 +6,14 @@ BASE_URL = config.url
 OK = 200
 ACCESS_ERROR = 403
 
+import requests
+import pytest
+from src import config
+
+BASE_URL = config.url
+OK = 200
+ACCESS_ERROR = 403
+
 def test_invalid_token():
     '''
     Checking if the function can identify incorrect tokens
