@@ -193,7 +193,7 @@ def test_multiple_dms():
     dm_2 = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param_2).json()
     
     token = {
-        "token": user_2["token"]
+        "token": auth_user["token"]
     }
     
     response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)

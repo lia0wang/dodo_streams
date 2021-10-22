@@ -302,13 +302,14 @@ def dm_list():
     decoded_jwt = decode_jwt(token)
     u_id = decoded_jwt['u_id']
     
-    # Getting dm list
+    # Getting dm data and making dms list
     store = get_data()
-    
     dms = []
+    
+    # Traversing through dms, appending those that
+    # have u_id as a member
     for dm in store['dms']:
         if u_id in dm['u_ids']:
-            # if u_id == user:
             new_dm = dm
             del new_dm['auth_user_id']
             del new_dm['u_ids']
