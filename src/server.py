@@ -443,6 +443,10 @@ def list_users():
     
     return dumps(users)
 
+@APP.route("/admin/user/remove/v1", methods=["DELETE"])
+def remove_user():
+    return dumps({})
+
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def change_permission():
     # Retrieve token
