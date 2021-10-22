@@ -38,11 +38,11 @@ def test_invalid_token():
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
     delete_info = {
         'token': invalid['token'],     # Invalid token
-        'u_id': user_1['auth_user_id']
+        'u_id': user['auth_user_id']
     }
     
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = delete_info)
@@ -61,7 +61,7 @@ def test_invalid_uid():
         "name_first": "shifan",
         "name_last": "chen"
     }
-    user_0 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
 
     register_param_2 = {
         "email": "11037.666@gmail.com",
@@ -69,11 +69,11 @@ def test_invalid_uid():
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
     delete_info = {
-        'token': user_0['token'], 
-        'u_id': user_1['auth_user_id'] + 12  # Invalid id
+        'token': auth_user['token'], 
+        'u_id': user['auth_user_id'] + 12  # Invalid id
     }
     
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = delete_info)
@@ -91,11 +91,11 @@ def test_last_global():
         "name_first": "shifan",
         "name_last": "chen"
     }
-    user_0 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
         
     delete_info = {
-        'token': user_0['token'], 
-        'u_id': user_0['auth_user_id']
+        'token': auth_user['token'], 
+        'u_id': auth_user['auth_user_id']
     }
     
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = delete_info)
@@ -113,7 +113,7 @@ def test_token_not_global():
         "name_first": "shifan",
         "name_last": "chen"
     }
-    user_0 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
 
     register_param_2 = {
         "email": "11037.666@gmail.com",
@@ -121,11 +121,11 @@ def test_token_not_global():
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
     delete_info = {
-        'token': user_1['token'], 
-        'u_id': user_0['auth_user_id']
+        'token': user['token'], 
+        'u_id': auth_user['auth_user_id']
     }
     
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = delete_info)
@@ -143,7 +143,7 @@ def test_basic():
         "name_first": "shifan",
         "name_last": "chen"
     }
-    user_0 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
 
     register_param_2 = {
         "email": "11037.666@gmail.com",
@@ -151,45 +151,45 @@ def test_basic():
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
     channel_create_param = {
-        'token': user_0['token'],
+        'token': auth_user['token'],
         'name': "channel",
         'is_public': True
     }
     channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_create_param).json()
     
     channel_join_param = {
-        'token': user_1['token'],
+        'token': user['token'],
         'channel_id': channel['channel_id']
     }
     requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
     
     channel_message_param = {
-        'token': user_1['token'],
+        'token': user['token'],
         'channel_id': channel['channel_id'],
         'message': "Hello"
     }
     requests.post(f"{BASE_URL}/message/send/v1", json = channel_message_param).json()
     
     dm_create_param = {
-        'token': user_0['token'],
-        'u_ids': [user_1["auth_user_id"]]
+        "token": auth_user["token"],
+        "u_ids": [user["auth_user_id"]]
     }
     dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param)
     assert dm.status_code == OK
     
     dm_message_param = {
-        'token': user_1['token'],
+        'token': user['token'],
         'dm_id': dm['dm_id'],
         'message': "Hey"
     }
     requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_param).json()
     
     delete_info = {
-        'token': user_1['token'], 
-        'u_id': user_0['auth_user_id']
+        'token': user['token'], 
+        'u_id': auth_user['auth_user_id']
     }
     
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = delete_info)
@@ -197,7 +197,7 @@ def test_basic():
     
     # Removed from users list
     token = {
-        'token': user_0['token']
+        'token': auth_user['token']
     }
     user_list = requests.get(f"{BASE_URL}/users/all/v1", json = token).json()
     assert user_list == [{'u_id': 1, 'email': register_param_1['email'], 'name_first': register_param_1['name_first'], 
@@ -205,7 +205,7 @@ def test_basic():
     
     # Removed from channels
     channel_details_param = {
-        'token': user_0['token'],
+        'token': auth_user['token'],
         'channel_id': channel['channel_id']
     }
     channel_details = requests.get(f"{BASE_URL}/channel/details/v2", json = channel_details_param).json()
@@ -214,7 +214,7 @@ def test_basic():
     
     # Removed from dms
     dm_details_param = {
-        'token': user_0['token'],
+        'token': auth_user['token'],
         'dm_id': dm['dm_id']
     }
     dm_details = requests.get(f"{BASE_URL}/dm/details/v1", json = dm_details_param).json()
@@ -223,8 +223,8 @@ def test_basic():
     
     # Retrieve profile
     user_profile_param = {
-        'token': user_0['token'],
-        'u_id': user_1['auth_user_id']
+        'token': auth_user['token'],
+        'u_id': user['auth_user_id']
     }
     user_profile = requests.get(f"{BASE_URL}/user/profile/v1", json = user_profile_param).json()
     assert user_profile['name_first'] == "Removed"
@@ -232,7 +232,7 @@ def test_basic():
     
     # Message content replaced by 'Removed user' in channels
     channel_message_details_param = {
-        'token': user_0['token'],
+        'token': auth_user['token'],
         'channel_id': channel['channel_id'],
         'start': 0
     }
@@ -241,7 +241,7 @@ def test_basic():
     
     # Message content replaced by 'Removed user' in dms
     dm_message_details_param = {
-        'token': user_0['token'],
+        'token': auth_user['token'],
         'channel_id': channel['channel_id'],
         'start': 0
     }
