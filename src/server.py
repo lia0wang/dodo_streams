@@ -454,7 +454,24 @@ def change_permission():
     token = data['token']
     
     # Check if token is valid
-    check_valid_token(token)
+    # check_valid_token(token)
+    
+    db_store = get_data()
+    decoded_jwt = decode_jwt(token)
+
+    u_id = decoded_jwt['u_id']
+    session_id = decoded_jwt['session_id']
+    
+    is_token_valid = False
+    for user in db_store['users']:
+        if user['u_id'] == u_id:
+            if session_id not in user['session_list']:
+                raise AccessError(description="Invalid Token")
+            else:
+                is_token_valid = True
+    if is_token_valid == False:
+        raise AccessError(description="Invalid Token")
+    
     
     # Get data
     u_id = data['u_id']
