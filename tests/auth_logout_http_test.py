@@ -93,20 +93,4 @@ def test_function_use_after_logout():
     assert setname.status_code == 403
 
 
-def test_invalid_token_logout():
-    requests.delete(f"{BASE_URL}/clear/v1", json = {})
-    register_param = {
-        "email": "JoJo@gmail.com", 
-        "password": "HermitPurple",
-        "name_first": "Joseph", 
-        "name_last": "Joestar"
-    }
-    reg = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
-    
-    register_param = {
-        "token": reg['token'] + "1"
-    }
-    
-    logout = requests.post(f"{BASE_URL}/auth/logout/v1", json = register_param)
-    assert logout.status_code == 403
 
