@@ -395,22 +395,25 @@ def profile():
 @APP.route("/user/profile/setname/v1", methods=['PUT'])
 def setname():
     request_data = request.get_json()
+    # fetch data
     db_store = get_data()
     name_first = request_data['name_first']
     name_last = request_data['name_last']
+    # check name length errors
     if len(name_first) < 1 or len(name_first) > 50:
         raise InputError(description="Error: Invalid first name")
     if len(name_last) < 1 or len(name_last) > 50:
         raise InputError(description="Error: Invalid last name")
-
+    # check if token is valid
     check_valid_token(request_data['token'])
 
+    # update user's names in users list
     decoded_jwt = decode_jwt(request_data['token'])
     for index, user in enumerate(db_store['users']):
         if user['u_id'] == decoded_jwt['u_id']:
             db_store['users'][index]['name_first'] = name_first
             db_store['users'][index]['name_last'] = name_last
-
+    # update user's 
     for index, chann in enumerate(db_store['channels']):
         for index2, owner_mem in enumerate(chann['owner_members']):
             if owner_mem['u_id'] == decoded_jwt['u_id']:
