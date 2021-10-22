@@ -4,7 +4,7 @@ import re
 from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.channel import channel_addowner_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1
+from src.channel import channel_addowner_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1, channel_messages_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1
 from src.message import message_send_v1, message_senddm_v1
@@ -329,7 +329,6 @@ def message_send():
     message = request_data['message']
     # Pass parameters
     new_message = message_send_v1(token,channel_id,message)
-    save_database_updates(new_message)
     return dumps(new_message)
 
 @APP.route("/message/remove/v1", methods=['DELETE'])
@@ -352,6 +351,22 @@ def message_senddm():
     save_database_updates(new_dm)
     return dumps(new_dm)
 
+@APP.route("/channel/messages/v2", methods=['GET'])
+def channel_messages_v2():
+    request_data = request.get_json()
+    # Retrieve token
+    token = request_data['token']
+    check_valid_token(token)
+
+    decoded_jwt = decode_jwt(request_data['token'])
+    auth_user_id = decoded_jwt['u_id']
+
+    channel_id = request_data['channel_id']
+    start = request_data['start']
+
+    messages = channel_messages_v1(auth_user_id, channel_id, start)
+    return dumps(messages)
+    
 @APP.route("/user/profile/v1", methods=['GET'])
 def profile():
     request_data = request.get_json()
@@ -571,4 +586,4 @@ def change_permission():
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    APP.run(port=config.port, debug = True) # Do not edit this port
