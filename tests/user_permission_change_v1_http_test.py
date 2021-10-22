@@ -186,6 +186,19 @@ def test_basic():
     }
     user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
+    channel_param_1 = {
+        'token': auth_user['token'],
+        'name': 'league1',
+        'is_public': True
+    }
+    channel_1 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param_1).json()
+    
+    join_details = {
+        'token': user_1['token'],
+        'channel_id': channel_1['channel_id']
+    }
+    requests.post(f"{BASE_URL}/channel/join/v2", json = join_details)
+    
     permission_info = {
         'token': auth_user['token'],
         'u_id': user_1['auth_user_id'],
@@ -205,3 +218,18 @@ def test_basic():
                           "name_last": "Boyyy", "handle_str": "hopefulboyyy", "permission_id": 1},
                          {"u_id": 2,"email": "bob123@gmail.com", "name_first": "Bob", 
                           "name_last": "Marley", "handle_str": "bobmarley", "permission_id": 1}]
+
+    details_info = {
+        'token': auth_user['token'],
+        'channel_id': channel_1['channel_id']
+    }
+    
+    channel_details = requests.get(f"{BASE_URL}/channel/details/v2", json = details_info).json()
+    assert channel_details == {'name': 'league1', 'is_public': True, 
+                               'owner_members': [{"u_id": 1,"email": "11037.666@gmail.com", 
+                                                  "name_first": "Hopeful", "name_last": "Boyyy", 
+                                                  "handle_str": "hopefulboyyy", "permission_id": 1}],
+                               'all_members': [{"u_id": 1,"email": "11037.666@gmail.com", "name_first": "Hopeful", 
+                                                "name_last": "Boyyy", "handle_str": "hopefulboyyy", "permission_id": 1}, 
+                                               {"u_id": 2,"email": "bob123@gmail.com", "name_first": "Bob", 
+                                                "name_last": "Marley", "handle_str": "bobmarley", "permission_id": 1}]}
