@@ -3,7 +3,7 @@ import pytest
 from src import config
 
 BASE_URL = config.url
-PERFECT = 200
+OK = 200
 ACCESS_ERROR = 403
 INPUT_ERROR = 400
 
@@ -30,7 +30,7 @@ def test_invalid_token():
         "name_first": "shifan",
         "name_last": "chen"
     }
-    user_0 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
 
     register_param_2 = {
         "email": "11037.666@gmail.com",
@@ -129,7 +129,7 @@ def test_token_not_global():
     }
     
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = delete_info)
-    assert response_status_code ==  ACCESS_ERROR
+    assert response.status_code ==  ACCESS_ERROR
     
 def test_basic():
     '''
@@ -171,7 +171,7 @@ def test_basic():
         'channel_id': channel['channel_id'],
         'message': "Hello"
     }
-    channel_message = requests.post(f"{BASE_URL}/message/send/v1", json = channel_message_param).json()
+    requests.post(f"{BASE_URL}/message/send/v1", json = channel_message_param).json()
     
     dm_create_param = {
         'token': user_0['token'],
@@ -184,7 +184,7 @@ def test_basic():
         'dm_id': dm['dm_id'],
         'message': "Hey"
     }
-    dm_message = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_param).json()
+    requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_param).json()
     
     delete_info = {
         'token': user_1['token'], 
@@ -244,5 +244,5 @@ def test_basic():
         'channel_id': channel['channel_id'],
         'start': 0
     }
-    dm_message_details = requests.get(f"{BASE_URL}/channel/messages/v2", json = channel_message_details_param).json()
+    dm_message_details = requests.get(f"{BASE_URL}/message/senddm/v1", json = dm_message_details_param).json()
     assert dm_message_details['messages'][0]['message'] == "Removed user"
