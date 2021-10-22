@@ -3,7 +3,7 @@ import pytest
 from src import config
 
 BASE_URL = config.url
-PERFECT = 200
+OK = 200
 ACCESS_ERROR = 403
 INPUT_ERROR = 400
 
@@ -221,7 +221,7 @@ def test_basic():
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = permission_info)
     
-    assert response.status_code == PERFECT
+    assert response.status_code == OK
     
     token = {
         'token': user_1['token']
@@ -246,4 +246,4 @@ def test_basic():
         'message_id': message['message_id']
     }
     response = requests.delete(f"{BASE_URL}/message/remove/v1", json = message_remove)
-    assert response.status_code == PERFECT
+    assert response.status_code == OK
