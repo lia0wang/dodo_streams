@@ -17,7 +17,7 @@ def test_invalid_token():
         "name_last": "Marley"
     }
     
-    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_0).json()
     
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
