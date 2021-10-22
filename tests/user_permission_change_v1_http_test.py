@@ -10,6 +10,17 @@ def test_invalid_token():
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
+    register_param_0 = {
+        "email": "bob123@gmail.com",
+        "password": "bobahe",
+        "name_first": "Bob",
+        "name_last": "Marley"
+    }
+    
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
     register_param_1 = {
         "email": "shifanchen@gmail.com",
         "password": "djkadldjsa21",
@@ -27,7 +38,7 @@ def test_invalid_token():
     user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
     permission_info = {
-        'token': auth_user['token'] + '1', # Invalid Token
+        'token': invalid['token'], # Invalid Token
         'u_id': user_1['auth_user_id'],
         'permission_id': 2
     }
