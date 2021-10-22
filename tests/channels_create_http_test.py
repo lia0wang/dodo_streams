@@ -65,29 +65,6 @@ def test_http_invalid_channel_name():
     assert response_1.status_code == 400
     assert response_2.status_code == 400
 
-def test_http_invalid_token():
-    '''
-    Test when the user token is invalid
-    '''
-    requests.delete(f"{BASE_URL}/clear/v1", json = {})
-    
-    register_param = {
-        "email": "11037.666@gmail.com",
-        "password": "Hope11037",
-        "name_first": "Hopeful",
-        "name_last": "Boyyy"
-    }
-    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
-
-    channel_param = {
-        'token': user['token'] + '1', # token invalid
-        'name': 'league',
-        'is_public': True
-    }
-    response = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
-
-    assert response.status_code == 500
-
 def test_http_create_multiples():
     '''
     Test when create multiple channels
