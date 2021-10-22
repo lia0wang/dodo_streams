@@ -217,8 +217,8 @@ def test_basic():
         'dm_id': dm['dm_id']
     }
     dm_details = requests.get(f"{BASE_URL}/dm/details/v1", json = dm_details_param).json()
-    assert dm_details['members'] == [{{'u_id': 1, 'email': register_param_1['email'], 'name_first': register_param_1['name_first'], 
-                                       'name_last': register_param_1['name_last'], 'handle_str': "shifanchen"}}]
+    assert dm_details['members'] == [{'u_id': 1, 'email': register_param_1['email'], 'name_first': register_param_1['name_first'], 
+                                       'name_last': register_param_1['name_last'], 'handle_str': "shifanchen"}]
     
     # Retrieve profile
     user_profile_param = {
