@@ -188,7 +188,7 @@ def test_basic():
     
     delete_info = {
         'token': auth_user['token'], 
-        'u_id': token['auth_user_id']
+        'u_id': user['auth_user_id']
     }
     
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = delete_info)
