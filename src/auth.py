@@ -26,7 +26,6 @@ def auth_login_v1(email, password):
     store = data_store.get()
     if is_database_exist():
         store = get_data()
-    store = data_store.get()
     for user in store['users']:
         if user['email'] == email:
             # check if encrypted password in database matches 
@@ -78,20 +77,11 @@ def auth_register_v1(email, password, name_first, name_last):
     store = data_store.get()
     if is_database_exist() == True:
         store = get_data()
-        new_store = data_store.get()
 
     # Check for repeated email
         # Put all emails in list
         # Append 'input email' to emails list
         # Check for duplicates in list of emails
-    
-    if is_database_exist():
-        emails = []
-        for user in new_store['users']:
-            emails.append(user['email'])
-        emails.append(email)
-        if len(emails) != len(set(emails)):
-            raise InputError("Error: email taken")
     if len(store['users']) != 0:
         emails = []
         for user in store['users']:
@@ -100,6 +90,8 @@ def auth_register_v1(email, password, name_first, name_last):
         emails.append(email)
         if len(emails) != len(set(emails)):
             raise InputError("Error: email taken")
+
+
 
     # Generate handle
     handle_str = create_handle(name_first, name_last, store)

@@ -113,10 +113,10 @@ def channel_details_v1(auth_user_id, channel_id):
                     handle_str (string)
     '''
     # Fetch data
+    store = data_store.get()
     if is_database_exist():
         store = get_data()
-    else:
-        store = data_store.get()
+
 
     target_channel = seek_target_channel_and_errors(store, auth_user_id, channel_id)
 
