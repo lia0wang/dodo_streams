@@ -42,7 +42,7 @@ def test_invalid_token():
     requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param).json()
     
     token = {
-        "token": auth_user["token"] + "1" # Invalid token
+        "token": auth_user["token"] + "1796" # Invalid token
     }
     
     response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
