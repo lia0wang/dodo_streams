@@ -4,6 +4,53 @@ from src import config
 
 BASE_URL = config.url
 
+def test_single_message():
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    register_param = {
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
+    }
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+
+    channel_param = {
+        'token': user['token'],
+        'name': 'league',
+        'is_public': True
+    }
+    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
+    channel_return = channel.json()
+
+    msg = 'Hi'
+    message_send_program = {
+        'token': user['token'],
+        'channel_id': channel_return['channel_id'],
+        'message': msg
+    }
+    eg = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program)
+    # running once
+    assert eg.status_code == 200
+
+    channel_messages = {
+        'token': user['token'],
+        'channel_id': channel_return['channel_id'],
+        'start': 0       
+    }
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages)
+    msg_return = chan_msg_return.json()
+
+    assert msg_return['messages'][0]['message_id'] == 0
+    assert msg_return['messages'][0]['u_id'] == 1
+    assert msg_return['messages'][0]['message'] == 'Hi'
+    assert msg_return['messages'][0]['time_created'] == 0
+
+    assert chan_msg_return.status_code == 200
+    assert msg_return['start'] == 0
+    assert msg_return['end'] == -1
+
+
 def test_basic_message_return():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
