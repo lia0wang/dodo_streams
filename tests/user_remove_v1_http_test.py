@@ -173,6 +173,14 @@ def test_basic():
     }
     requests.post(f"{BASE_URL}/message/send/v1", json = channel_message_param).json()
     
+    channel_message_details_param = {
+        'token': auth_user['token'],
+        'channel_id': channel['channel_id'],
+        'start': 0
+    }
+    channel_message_details = requests.get(f"{BASE_URL}/channel/messages/v2", json = channel_message_details_param).json()
+    assert channel_message_details['messages'] == "Removed user"
+    
     dm_create_param = {
         "token": auth_user["token"],
         "u_ids": [user["auth_user_id"]]
