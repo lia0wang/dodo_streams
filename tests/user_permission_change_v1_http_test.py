@@ -27,7 +27,7 @@ def test_invalid_token():
         "name_first": "shifan",
         "name_last": "chen"
     }
-    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
     
     register_param_2 = {
         "email": "11037.666@gmail.com",
