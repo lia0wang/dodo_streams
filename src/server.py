@@ -293,17 +293,26 @@ def dm_leave():
     return dumps({}) 
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list():
+    # retrieve token
+    data = request.get_json()
+    token = data['token']
+    
+    # Checking and decoding token
+    check_valid_token(token)
+    decoded_jwt = decode_jwt(token)
+    u_id = decoded_jwt['u_id']
     
     # Getting dm list
     store = get_data()
+    
     dms = []
     for dm in store['dms']:
-        new_dm = dm
-        del new_dm['auth_user_id']
-        del new_dm['u_ids']
-        del new_dm['messages']
-        dms.append(new_dm)
-    
+        if u_id in dm['u_ids']:
+            new_dm = dm
+            del new_dm['auth_user_id']
+            del new_dm['u_ids']
+            del new_dm['messages']
+            dms.append(new_dm)
     return dumps(dms)
 
 @APP.route("/dm/details/v1", methods=['GET'])
