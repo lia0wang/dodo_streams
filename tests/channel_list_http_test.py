@@ -6,6 +6,8 @@ from src.other import clear_v1
 from src import config
 
 BASE_URL = config.url
+OK = 200
+ACCESS_ERROR = 403
 
 
 def test_http_list_basic():
@@ -35,7 +37,7 @@ def test_http_list_basic():
     
     response = requests.get(f"{BASE_URL}/channels/list/v2", json = token)
     
-    assert response.status_code == 200
+    assert response.status_code == OK
     channel_list = response.json()
     
     assert channel_list == {'channels': [{'channel_id': channel['channel_id'], 'name': 'league'}]}
@@ -44,7 +46,18 @@ def test_http_invalid_token():
     '''
     Testing whether the v2 function can identify incorrect tokens
     '''
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    register_param_0 = {
+        "email": "bob123@gmail.com",
+        "password": "bobahe",
+        "name_first": "Bob",
+        "name_last": "Marley"
+    }
+    
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_0).json()
+    
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     register_param = {
         "email": "11037.666@gmail.com",
@@ -62,12 +75,12 @@ def test_http_invalid_token():
     requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json()
     
     token = {
-        'token': user['token'] + '1' # Incorrect token
+        'token': invalid['token']  # Incorrect token
     }
     
     response = requests.get(f"{BASE_URL}/channels/list/v2", json = token)
     
-    assert response.status_code == 500
+    assert response.status_code == ACCESS_ERROR
 
 def test_http_list_multiple():
     '''
@@ -104,7 +117,7 @@ def test_http_list_multiple():
     
     response = requests.get(f"{BASE_URL}/channels/list/v2", json = token)
     
-    assert response.status_code == 200
+    assert response.status_code == OK
     channel_list = response.json()
     
     assert channel_list == {'channels': [{'channel_id': channel_1['channel_id'], 'name': 'league1'}, 
