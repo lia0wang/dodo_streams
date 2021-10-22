@@ -170,7 +170,7 @@ def test_basic():
     channel_message_param = {
         'token': user['token'],
         'channel_id': channel['channel_id'],
-        'message': "Hello"
+        'message': 'Hello'
     }
     send = requests.post(f"{BASE_URL}/message/send/v1", json = channel_message_param)
     assert send.status_code == OK
@@ -192,7 +192,7 @@ def test_basic():
     dm_message_param = {
         'token': user['token'],
         'dm_id': dm['dm_id'],
-        'message': "Hey"
+        'message': 'Hey'
     }
     requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_param).json()
     
