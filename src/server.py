@@ -430,7 +430,7 @@ def profile():
     # find user in database
     decoded_jwt = decode_jwt(request_data['token'])
     for user in db_store['users']:
-        if user['u_id'] == decoded_jwt['u_id']:
+        if user['u_id'] == request_data['u_id']:
             target_user = user
 
     # create dictionary to be returned
