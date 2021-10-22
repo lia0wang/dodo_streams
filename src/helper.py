@@ -213,12 +213,12 @@ def check_valid_token(token):
     is_token_valid = False
     for user in db_store['users']:
         if user['u_id'] == u_id:
-            if session_id in user['session_list']:
+            if session_id not in user['session_list']:
+                raise AccessError(description="Invalid Token")
+            else:
                 is_token_valid = True
-    if not is_token_valid:
-        return False
-    else:
-        return True
+    if is_token_valid == False:
+        raise AccessError(description="Invalid Token")
 
 def hash_encrypt(password_str):
     """encrypts password string 
