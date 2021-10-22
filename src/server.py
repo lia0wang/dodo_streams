@@ -555,7 +555,7 @@ def list_users():
     # Create list and add users to the list
     users = []
     for user in data_store['users']:
-        if user['password'] != "":
+        if 5 < len(user['password']):
             new_user = user
             del new_user['password']
             del new_user['session_list']
