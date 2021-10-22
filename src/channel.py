@@ -113,13 +113,12 @@ def channel_details_v1(auth_user_id, channel_id):
                     handle_str (string)
     '''
     # Fetch data
-    store = data_store.get()
-
-    if is_database_exist() == True:
-        db_store = get_data()
-        target_channel = seek_target_channel_and_errors(db_store, auth_user_id, channel_id)
+    if is_database_exist():
+        store = get_data()
     else:
-        target_channel = seek_target_channel_and_errors(store, auth_user_id, channel_id)
+        store = data_store.get()
+
+    target_channel = seek_target_channel_and_errors(store, auth_user_id, channel_id)
 
     # Generate list of owner members and members 
     # 'permission_id' and 'password' are excluded from member details
