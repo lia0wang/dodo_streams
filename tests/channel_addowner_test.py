@@ -108,4 +108,4 @@ def test_channel_addowner_basic():
     channel_addowner_v1(owner['auth_user_id'], channel['channel_id'], new_user['auth_user_id'])
 
     assert user['auth_user_id'] in [user['u_id'] for user in channel_details_v1(owner['auth_user_id'], channel['channel_id'])['owner_members']]
-    assert user['auth_user_id'] in [user['u_id'] for user in channel_details_v1(owner['auth_user_id'], channel['channel_id'])['owner_members']]
+    assert new_user['auth_user_id'] in [user['u_id'] for user in channel_details_v1(owner['auth_user_id'], channel['channel_id'])['owner_members']]
