@@ -4,7 +4,7 @@ import re
 from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.channel import channel_addowner_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1, channel_messages_v1
+from src.channel import channel_addowner_v1, channel_invite_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1, channel_messages_v1
 from src.channel import channel_leave_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1
@@ -171,7 +171,6 @@ def logout():
             save_database_updates(db_store)
     return dumps({})
 
-
 @APP.route("/channel/join/v2", methods=['POST'])
 def channel_join():
     # Retrieve token
@@ -206,6 +205,23 @@ def channel_leave():
     
     return dumps({})
 
+@APP.route("/channel/invite/v2", methods=['POST'])
+def channel_invite():
+    # Retrieve token
+    request_data = request.get_json()
+    token = request_data['token']
+    check_valid_token(token)
+
+    # Decode token, retrieve parameters
+    decode_token = decode_jwt(token)
+    channel_id = request_data['channel_id']
+    u_id = request_data['u_id']
+
+    # Pass parameters
+    channel_invite_v1(decode_token['u_id'], channel_id, u_id)
+    save_data_store_updates()
+    
+    return dumps({})
 
 @APP.route("/channel/addowner/v1", methods=['POST'])
 def channel_addowner():

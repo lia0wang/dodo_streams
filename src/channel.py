@@ -5,8 +5,8 @@ from src.helper import get_data, seek_target_channel_and_errors, is_database_exi
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
-    Let an authorised user with ID auth_user_id to invite a user with ID u_id to j
-    oin a channel with ID channel_id. Once invited, the user is added to the channel immediately.
+    Invites a user with ID u_id to join a channel with ID channel_id.
+    Once invited, the user is added to the channel immediately.
     In both public and private channels, all members are able to invite users.
     
     Arguments:
@@ -15,64 +15,71 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         u_id (int)
         
     Exceptions:
-        InputError - occurs if channel_id does not refer to existing channel
-        InputError - occurs if u_id does not refer to existing user
-        InputError - occurs if u_id is already a member of the channel
-        AccessError - occurs if auth_user_id does not refer to member of the valid channel
-        
+        InputError - channel_id does not refer to a valid channel
+        InputError - u_id does not refer to a valid user
+        InputError - u_id refers to a user who is already a member of the channel
+        AccessError - channel_id is valid and the authorised user is not a member of the channel
+
     Return Value:
         N/A
     '''
+    # Fetch data
     store = data_store.get()
-    valid_user1 = False
-    valid_user2 = False
-    valid_channel = False
-    is_member = False
-    new_member = {} 
+
+    if is_database_exist():
+        store = get_data()
+
     # Check if auth_user_id is valid
+    valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
-            valid_user1 = True
-    # Check if u_id is valid
+            valid = True
+            auth_user = user # catch the authorized user
+    if not valid:
+        raise AccessError(description="Invalid token!")
+    
+    # Check if the channel_id is valid
+    valid = False
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            valid = True
+            target_channel = channel # Catch the channel where the new_member is gonna join
+    if not valid:
+        raise InputError(description="Invalid channel ID!")
+
+    # Check if the user(u_id) is valid
+    valid = False
     for user in store['users']:
         if user['u_id'] == u_id:
-            valid_user2 = True
-            new_member = {
+            valid = True
+            invited_user = {
                 'u_id': u_id,
                 'email': user['email'],
                 'name_first': user['name_first'],
                 'name_last': user['name_last'],
                 'handle_str': user['handle_str'],
                 'permission_id': user['permission_id']
-            } 
-    # auth_user_id is invalid         
-    if valid_user1 == False:
-        raise InputError("Authorised u_id does not refer to a valid user")
-    # u_id is valid
-    if valid_user2 == False:
-        raise InputError("u_id does not refer to a valid user")
+            } # Catch the invited_user without password
+    if not valid:
+        raise InputError(description="Invalid user ID!")
+
+    # Check if the user is already a member of the channel
+    for member in target_channel['all_members']:
+        if member['u_id'] == invited_user['u_id']:
+            raise InputError(description="Sorry, the invited user is already a member.")
     
-    # Check channel_id is valid
-    for chan in store['channels']:
-        if chan['channel_id'] == channel_id:
-            valid_channel = True
-            target_channel = chan
-            for user in chan["all_members"]:
-                if user['u_id'] == auth_user_id:
-                    is_member = True # Check if authorised user is a member of the channel
-                    break
-            for user in chan["all_members"]:
-                if user['u_id'] == new_member['u_id']: # Duplicated user
-                    raise InputError("The user is already a member of the channel")
-                
-    if valid_channel == False:
-        raise InputError("channel_id does not refer to a valid channel")
-   
-    if is_member == False:
-        raise AccessError("Authorised user is not a member of the channel")
-   
-    # Add user to the channel after checking all conditions
-    target_channel['all_members'].append(new_member)
+    # Check if the auth user is not a member of the channel
+    is_member = False
+    for member in target_channel['all_members']:
+        if member['u_id'] == auth_user['u_id']:
+            is_member = True
+    if not is_member:
+        raise AccessError(description="Sorry, the authorized user is not a member of the channel.")
+
+    # Append the new member to the target channel
+    for index, channel in enumerate(store['channels']):
+        if channel['channel_id'] == channel_id:
+            store['channels'][index]['all_members'].append(invited_user)
     data_store.set(store)
     return {
     }
@@ -242,7 +249,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'index': index,
         'total_msg': total_messages
     }
-
 
 
 def channel_join_v1(auth_user_id, channel_id):
