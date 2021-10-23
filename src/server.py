@@ -131,9 +131,10 @@ def channel_list():
     # Retrieve token
     token = request.args.get('token')
     
-    # Decode token
+    # Check token and decode
+    check_valid_token(token)
     decoded_token = decode_jwt(token)
-    auth_user_id = check_session_id(decoded_token['u_id'], decoded_token['session_id'])
+    auth_user_id = decoded_token['u_id']
     
     # Pass parameters
     channels = channels_list_v1(auth_user_id)
@@ -144,9 +145,10 @@ def channel_listall():
     # Retrieve token
     token = request.args.get('token')
     
-    # Decode token
+    # Check token and decode
+    check_valid_token(token)
     decoded_token = decode_jwt(token)
-    auth_user_id = check_session_id(decoded_token['u_id'], decoded_token['session_id'])
+    auth_user_id = decoded_token['u_id']
     
     # Pass parameters
     channels = channels_listall_v1(auth_user_id)
@@ -326,8 +328,7 @@ def dm_leave():
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list():
     # retrieve token
-    data = request.get_json()
-    token = data['token']
+    token = request.args.get('token')
     
     # Checking and decoding token
     check_valid_token(token)
@@ -471,22 +472,15 @@ def set_handle():
 
 @APP.route("/users/all/v1", methods=['GET'])
 def list_users():
-    
-    # token = request.args.get('token')
-    
-    # # Decode token
-    # decoded_token = decode_jwt(token)
-    # auth_user_id = check_session_id(decoded_token['u_id'], decoded_token['session_id'])
-    
     # Retrieve token
     token = request.args.get('token')
     # token = data['token']
     
-    # Decode token
+    # Check if token is valid token
+    check_valid_token(token)
     decoded_token = decode_jwt(token)
-    auth_user_id = check_session_id(decoded_token['u_id'], decoded_token['session_id'])
     
-    users = users_all_v1(auth_user_id)
+    users = users_all_v1()
     return dumps(users)
 
 @APP.route("/admin/user/remove/v1", methods=["DELETE"])

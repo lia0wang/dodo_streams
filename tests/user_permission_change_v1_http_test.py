@@ -227,7 +227,7 @@ def test_basic():
         'token': user_1['token']
     }
     
-    user_list = requests.get(f"{BASE_URL}/users/all/v1", json = token).json()
+    user_list = requests.get(f"{BASE_URL}/users/all/v1", params = token).json()
     assert user_list == [{"u_id": 1,"email": "11037.666@gmail.com", "name_first": "Hopeful", 
                           "name_last": "Boyyy", "handle_str": "hopefulboyyy", "permission_id": 1},
                          {"u_id": 2,"email": "bob123@gmail.com", "name_first": "Bob", 

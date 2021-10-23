@@ -66,7 +66,7 @@ def test_invalid_token():
         "token": invalid['token'] # Invalid token
     }
     
-    response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
+    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token)
     
     assert response.status_code == ACCESS_ERROR
 
@@ -111,7 +111,7 @@ def test_no_dms():
         "token": user_2["token"]
     }
     
-    response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
+    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token)
     dm_list = response.json()
     
     assert response.status_code == OK
@@ -150,7 +150,7 @@ def test_basic():
         "token": auth_user["token"]
     }
     
-    response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
+    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token)
     dm_list = response.json()
     
     assert response.status_code == OK
@@ -204,7 +204,7 @@ def test_multiple_dms():
         "token": auth_user["token"]
     }
     
-    response = requests.get(f"{BASE_URL}/dm/list/v1", json = token)
+    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token)
     dm_list = response.json()
     
     assert response.status_code == OK
