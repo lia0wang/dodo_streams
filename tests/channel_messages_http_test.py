@@ -1,7 +1,7 @@
 import requests
 import pytest
 from src import config
-
+from src.helper import datetime_to_unix_time_stamp
 BASE_URL = config.url
 
 def test_single_message():
@@ -41,15 +41,17 @@ def test_single_message():
     chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages)
     msg_return = chan_msg_return.json()
 
+    # create a time stamp right after message being sent to check if time sent
+    # is roughly the same
+    expected_timestamp = datetime_to_unix_time_stamp()
+
     assert msg_return['messages'][0]['message_id'] == 0
     assert msg_return['messages'][0]['u_id'] == 1
     assert msg_return['messages'][0]['message'] == 'Hi'
-    assert msg_return['messages'][0]['time_created'] == 0
-
+    assert abs(msg_return['messages'][0]['time_created'] - expected_timestamp) < 1
     assert chan_msg_return.status_code == 200
     assert msg_return['start'] == 0
     assert msg_return['end'] == -1
-
 
 def test_basic_message_return():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -95,6 +97,27 @@ def test_basic_message_return():
     assert msg_return['start'] == 0
     assert msg_return['end'] == 50
 
+    # create a time stamp right after message being sent to check if time sent
+    # is roughly the same
+    expected_timestamp = datetime_to_unix_time_stamp()
+
+    # test the contents of the messages
+    i = 0 
+    while i < 50:
+        # 123 - i, because in this specifc tests, there is 124 messages,
+        # so message_id from 0 - 123, the channel/messages/v2 will return
+        # a latest message to least recent message and so its 123 and decrements.
+        # In this case it assumes the message_id is in numerical order
+        # since messages are only created by one user only, in one channel only
+        # even though message ids are unique, where another message may be sent
+        # some where else by another user
+        assert msg_return['messages'][i]['message_id'] == 123 - i
+        assert msg_return['messages'][i]['u_id'] == 1
+        assert msg_return['messages'][i]['message'] == 'Hi'
+        # checks that the time stamp is correct
+        assert abs(msg_return['messages'][i]['time_created'] - expected_timestamp) < 1
+        i+=1
+
     # running second for batch 2 of 50 messages
     channel_messages2 = {
         'token': user['token'],
@@ -115,6 +138,7 @@ def test_basic_message_return():
     }
     chan_msg_return3 = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages3)
     msg_return3 = chan_msg_return3.json()
+
     assert chan_msg_return.status_code == 200
     assert msg_return3['start'] == 100
     assert msg_return3['index'] == 124

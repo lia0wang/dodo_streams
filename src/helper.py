@@ -4,7 +4,7 @@ import os
 import hashlib
 from src.data_store import data_store
 from src.error import InputError, AccessError
-
+from datetime import date, timezone, datetime
 
 SECRET = "DODO"
 SESSION_ID = 0
@@ -230,4 +230,12 @@ def hash_encrypt(password_str):
         The hexidigest value of the encoded string
     """
     return hashlib.sha256(password_str.encode()).hexdigest()
+
+def datetime_to_unix_time_stamp():
+    today = date.today()
+    print(f"{today.year}")
+    dt = datetime(today.year, today.month, today.day)
+    timestamp = dt.replace(tzinfo=timezone.utc).timestamp()
+    timestamp = int(timestamp)
+    return timestamp
 
