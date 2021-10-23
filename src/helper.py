@@ -239,3 +239,15 @@ def datetime_to_unix_time_stamp():
     timestamp = int(timestamp)
     return timestamp
 
+def check_session_id(u_id, session_id):
+    '''
+    Checks session id for provided u_id, 
+    if session id incorrect, changes u_id to -1
+    causing invalid token error when checked by the function
+    '''
+    store = get_data()
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            if session_id not in user['session_list']:
+                u_id = -1
+    return u_id

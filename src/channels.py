@@ -34,7 +34,10 @@ def channels_list_v1(auth_user_id):
             valid = True
     
     if not valid:
-        raise AccessError("Error: Invalid user id")
+        if is_database_exist():
+            raise AccessError("Error: Invalid token")
+        else:
+            raise AccessError("Error: Invalid user id")
 
     # Creating a list of channels
     channels_list['channels'] = []
@@ -82,7 +85,10 @@ def channels_listall_v1(auth_user_id):
             valid = True
         
     if not valid:
-        raise AccessError("Error: Invalid user id")
+        if is_database_exist():
+            raise AccessError("Error: Invalid token")
+        else:
+            raise AccessError("Error: Invalid user id")
     
     # Creating a list of channels
     channels_list['channels'] = []

@@ -16,7 +16,7 @@ from src import config
 from src.auth import auth_register_v1, auth_login_v1
 from src.channels import channels_list_v1, channels_listall_v1
 from src.data_store import data_store
-from src.helper import check_valid_token, get_data, save_data_store_updates, create_session_id
+from src.helper import check_valid_token, get_data, save_data_store_updates, create_session_id, check_session_id
 from src.helper import is_database_exist, save_database_updates, create_jwt, decode_jwt, hash_encrypt
 from src.other import clear_v1
 
@@ -129,13 +129,11 @@ def channels_create():
 @APP.route("/channels/list/v2", methods=['GET'])
 def channel_list():
     # Retrieve token
-    data = request.get_json()
-    token = data['token']
+    token = request.args.get('token')
     
-    # Check if token is valid and decode it
-    check_valid_token(token)
+    # Decode token
     decoded_token = decode_jwt(token)
-    auth_user_id = decoded_token['u_id']
+    auth_user_id = check_session_id(decoded_token['u_id'], decoded_token['session_id'])
     
     # Pass parameters
     channels = channels_list_v1(auth_user_id)
@@ -144,13 +142,11 @@ def channel_list():
 @APP.route("/channels/listall/v2", methods=['GET'])
 def channel_listall():
     # Retrieve token
-    data = request.get_json()
-    token = data['token']
+    token = request.args.get('token')
     
-    # Check if token is valid and decode it
-    check_valid_token(token)
+    # Decode token
     decoded_token = decode_jwt(token)
-    auth_user_id = decoded_token['u_id']
+    auth_user_id = check_session_id(decoded_token['u_id'], decoded_token['session_id'])
     
     # Pass parameters
     channels = channels_listall_v1(auth_user_id)
@@ -475,12 +471,22 @@ def set_handle():
 
 @APP.route("/users/all/v1", methods=['GET'])
 def list_users():
+    
+    # token = request.args.get('token')
+    
+    # # Decode token
+    # decoded_token = decode_jwt(token)
+    # auth_user_id = check_session_id(decoded_token['u_id'], decoded_token['session_id'])
+    
     # Retrieve token
-    data = request.get_json()
-    token = data['token']
-    # Check if token is valid
-    check_valid_token(token)
-    users = users_all_v1()
+    token = request.args.get('token')
+    # token = data['token']
+    
+    # Decode token
+    decoded_token = decode_jwt(token)
+    auth_user_id = check_session_id(decoded_token['u_id'], decoded_token['session_id'])
+    
+    users = users_all_v1(auth_user_id)
     return dumps(users)
 
 @APP.route("/admin/user/remove/v1", methods=["DELETE"])

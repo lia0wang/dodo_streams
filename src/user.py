@@ -110,13 +110,22 @@ def user_profile_sethandle_v1(u_id, handle_str):
     return {}
 
 
-def users_all_v1():
-    # Get data
-    data_store = get_data()
+def users_all_v1(auth_user_id):
+    # Fetching data
+    store = get_data()
+    
+    # Checking if the auth_user_id is correct
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            valid = True
+    
+    if not valid:
+        raise AccessError(description="Invalid Token")
     
     # Create list and add users to the list
     users = []
-    for user in data_store['users']:
+    for user in store['users']:
         if 5 < len(user['password']):
             new_user = user
             del new_user['password']
