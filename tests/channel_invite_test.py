@@ -9,25 +9,22 @@ from src.error import InputError, AccessError
 from src.data_store import data_store
 
 def test_valid_input():
-    '''tests for valid channel_invite_v1 implementation'''
+    '''
+    Tests for valid channel_invite_v1 implementation
+    '''
     clear_v1()
-    user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
-    user2 = auth_register_v1("JohnSmith@hotmail.com", "abcd1234", "John", "Smith")
-    auth_id = user1['auth_user_id']
-    u_id = user2['auth_user_id']
-    channel = channels_create_v1(auth_id, 'comp1531', True)
-    channel_id = channel["channel_id"]
-    channel_invite_v1(auth_id,channel_id,u_id)
+    owner = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
+    channel = channels_create_v1(owner['auth_user_id'], 'comp1531', True)
+    user = auth_register_v1("JohnSmith@hotmail.com", "abcd1234", "John", "Smith")
 
-    channel_test_id = channels_listall_v1(u_id)
-    output = channel_test_id['channels'][0]['channel_id']
-    
-    assert output == 1
+    channel_invite_v1(owner['auth_user_id'], channel["channel_id"], user['auth_user_id'])
 
-'''Input Error Testing Module'''
+    assert channels_listall_v1(user['auth_user_id'])['channels'][0]['channel_id'] == 1
 
 def test_invalid_channel():
-    '''tests for valid channel_invite_v1 with invalid channel_id'''
+    '''
+    Tests for valid channel_invite_v1 with invalid channel_id
+    '''
     clear_v1()
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
     user2 = auth_register_v1("JohnSmith@hotmail.com", "abcd1234", "John", "Smith")
@@ -45,7 +42,9 @@ def test_invalid_channel():
         channel_invite_v1(auth_id, invalid_channel2, u_id)
 
 def test_invalid_user():
-    '''tests for valid channel_invite_v1 with invalid auth_user_id or u_id'''
+    '''
+    Tests for valid channel_invite_v1 with invalid auth_user_id or u_id
+    '''
     clear_v1()
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
     user2 = auth_register_v1("JohnSmith@hotmail.com", "abcd1234", "John", "Smith")
@@ -63,7 +62,9 @@ def test_invalid_user():
         channel_invite_v1(auth_id, channel_id, invalid_u_id)
 
 def test_repeated_user():
-    '''tests for valid channel_invite_v1 with a user is already a member of the channel'''
+    '''
+    Tests for valid channel_invite_v1 with a user is already a member of the channel
+    '''
     clear_v1()
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
     user2 = auth_register_v1("JohnSmith@hotmail.com", "abcd1234", "John", "Smith")
