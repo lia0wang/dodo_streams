@@ -35,7 +35,7 @@ def test_invalid_token():
         'token': invalid['token'] # Incorrect token
     }
     
-    response = requests.get(f"{BASE_URL}/users/all/v1", json = token)
+    response = requests.get(f"{BASE_URL}/users/all/v1", params = token)
     
     assert response.status_code == ACCESS_ERROR
     
@@ -57,7 +57,7 @@ def test_single_user():
         'token': user['token']
     }
     
-    response = requests.get(f"{BASE_URL}/users/all/v1", json = token)
+    response = requests.get(f"{BASE_URL}/users/all/v1", params = token)
     
     assert response.status_code == OK
     
@@ -93,7 +93,7 @@ def test_multiple_users():
         'token': user_1['token']
     }
     
-    response = requests.get(f"{BASE_URL}/users/all/v1", json = token)
+    response = requests.get(f"{BASE_URL}/users/all/v1", params = token)
     
     assert response.status_code == OK
     

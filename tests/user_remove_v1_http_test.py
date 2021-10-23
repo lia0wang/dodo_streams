@@ -200,7 +200,7 @@ def test_basic():
     token = {
         'token': auth_user['token']
     }
-    user_list = requests.get(f"{BASE_URL}/users/all/v1", json = token).json()
+    user_list = requests.get(f"{BASE_URL}/users/all/v1", params = token).json()
     assert user_list == [{'u_id': 1, 'email': register_param_1['email'], 'name_first': register_param_1['name_first'], 
                           'name_last': register_param_1['name_last'], 'handle_str': "shifanchen", 'permission_id': 1}]
     

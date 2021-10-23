@@ -111,12 +111,12 @@ def user_profile_sethandle_v1(u_id, handle_str):
 
 
 def users_all_v1():
-    # Get data
-    data_store = get_data()
-    
+    # Fetching data
+    store = get_data()
+       
     # Create list and add users to the list
     users = []
-    for user in data_store['users']:
+    for user in store['users']:
         if 5 < len(user['password']):
             new_user = user
             del new_user['password']

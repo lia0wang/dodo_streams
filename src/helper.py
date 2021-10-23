@@ -238,4 +238,3 @@ def datetime_to_unix_time_stamp():
     timestamp = dt.replace(tzinfo=timezone.utc).timestamp()
     timestamp = int(timestamp)
     return timestamp
-

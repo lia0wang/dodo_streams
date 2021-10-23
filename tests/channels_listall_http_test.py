@@ -35,7 +35,7 @@ def test_http_list_basic():
         'token': user['token']
     }
     
-    response = requests.get(f"{BASE_URL}/channels/listall/v2", json = token)
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", params = token)
     
     assert response.status_code == OK
     channel_list = response.json()
@@ -78,7 +78,7 @@ def test_http_invalid_token():
         'token': invalid['token'] # Incorrect token
     }
     
-    response = requests.get(f"{BASE_URL}/channels/listall/v2", json = token)
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", params = token)
     
     assert response.status_code == ACCESS_ERROR
 
@@ -124,7 +124,7 @@ def test_http_list_multiple():
         'token': user_1['token']
     }
     
-    response = requests.get(f"{BASE_URL}/channels/listall/v2", json = token)
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", params = token)
     
     assert response.status_code == OK
     channel_list = response.json()

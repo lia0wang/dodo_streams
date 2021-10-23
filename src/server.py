@@ -129,10 +129,9 @@ def channels_create():
 @APP.route("/channels/list/v2", methods=['GET'])
 def channel_list():
     # Retrieve token
-    data = request.get_json()
-    token = data['token']
+    token = request.args.get('token')
     
-    # Check if token is valid and decode it
+    # Check token and decode
     check_valid_token(token)
     decoded_token = decode_jwt(token)
     auth_user_id = decoded_token['u_id']
@@ -144,10 +143,9 @@ def channel_list():
 @APP.route("/channels/listall/v2", methods=['GET'])
 def channel_listall():
     # Retrieve token
-    data = request.get_json()
-    token = data['token']
+    token = request.args.get('token')
     
-    # Check if token is valid and decode it
+    # Check token and decode
     check_valid_token(token)
     decoded_token = decode_jwt(token)
     auth_user_id = decoded_token['u_id']
@@ -331,8 +329,7 @@ def dm_leave():
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list():
     # retrieve token
-    data = request.get_json()
-    token = data['token']
+    token = request.args.get('token')
     
     # Checking and decoding token
     check_valid_token(token)
@@ -478,10 +475,12 @@ def set_handle():
 @APP.route("/users/all/v1", methods=['GET'])
 def list_users():
     # Retrieve token
-    data = request.get_json()
-    token = data['token']
-    # Check if token is valid
+    token = request.args.get('token')
+    # token = data['token']
+    
+    # Check if token is valid token
     check_valid_token(token)
+    
     users = users_all_v1()
     return dumps(users)
 
