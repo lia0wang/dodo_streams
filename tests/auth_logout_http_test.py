@@ -81,7 +81,7 @@ def test_function_use_after_logout():
     create = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
     assert create.status_code == 403
     # have user request channel details
-    details = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_param)
+    details = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_param)
     assert details.status_code == 403
     # have user change name
     setname_param = {
