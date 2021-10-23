@@ -8,7 +8,6 @@ BASE_URL = config.url
 
 def test_http_details_multiple_members():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
-    
     register_param = {
         "email": "shifanchen@gmail.com",
         "password": "djkadldjsa21",
@@ -45,7 +44,7 @@ def test_http_details_multiple_members():
         "dm_id": dm["dm_id"]
     }
 
-    get_request = requests.get(f"{BASE_URL}/dm/details/v1", json = dm_details_param)
+    get_request = requests.get(f"{BASE_URL}/dm/details/v1", params = dm_details_param)
     request_data = get_request.json()
 
     # Checking details of multiple members
@@ -97,7 +96,7 @@ def test_http_invalid_dm_id():
         "dm_id": dm["dm_id"] + 1
     }
 
-    get_request = requests.get(f"{BASE_URL}/dm/details/v1", json = dm_details_param)
+    get_request = requests.get(f"{BASE_URL}/dm/details/v1", params = dm_details_param)
     assert get_request.status_code == 400
 
 def test_http_not_member():
@@ -138,7 +137,7 @@ def test_http_not_member():
         "dm_id": dm["dm_id"]
     }
 
-    get_request = requests.get(f"{BASE_URL}/dm/details/v1", json = dm_details_param)
+    get_request = requests.get(f"{BASE_URL}/dm/details/v1", params = dm_details_param)
     assert get_request.status_code == 403
 
 
@@ -196,9 +195,9 @@ def test_http_details_multiple_dms():
         "dm_id": dm_create_return2["dm_id"]
     }
 
-    get_request1 = requests.get(f"{BASE_URL}/dm/details/v1", json = dm_details_param1)
+    get_request1 = requests.get(f"{BASE_URL}/dm/details/v1", params = dm_details_param1)
     request_data1 = get_request1.json()
-    get_request2 = requests.get(f"{BASE_URL}/dm/details/v1", json = dm_details_param2)
+    get_request2 = requests.get(f"{BASE_URL}/dm/details/v1", params = dm_details_param2)
     request_data2 = get_request2.json()
 
     # check details of first dm

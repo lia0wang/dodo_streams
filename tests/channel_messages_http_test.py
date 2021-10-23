@@ -38,7 +38,7 @@ def test_single_message():
         'channel_id': channel_return['channel_id'],
         'start': 0       
     }
-    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages)
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
     msg_return = chan_msg_return.json()
 
     # create a time stamp right after message being sent to check if time sent
@@ -91,7 +91,7 @@ def test_basic_message_return():
         'channel_id': channel_return['channel_id'],
         'start': 0       
     }
-    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages)
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
     msg_return = chan_msg_return.json()
     assert chan_msg_return.status_code == 200
     assert msg_return['start'] == 0
@@ -124,7 +124,7 @@ def test_basic_message_return():
         'channel_id': channel_return['channel_id'],
         'start': 50       
     }
-    chan_msg_return2 = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages2)
+    chan_msg_return2 = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages2)
     msg_return2 = chan_msg_return2.json()
     assert chan_msg_return.status_code == 200
     assert msg_return2['start'] == 50
@@ -136,7 +136,7 @@ def test_basic_message_return():
         'channel_id': channel_return['channel_id'],
         'start': 100      
     }
-    chan_msg_return3 = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages3)
+    chan_msg_return3 = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages3)
     msg_return3 = chan_msg_return3.json()
 
     assert chan_msg_return.status_code == 200
@@ -169,7 +169,7 @@ def test_total_messages_is_zero():
         'channel_id': channel_return['channel_id'],
         'start': 0       
     }
-    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages)
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
     assert chan_msg_return.status_code == 200
     msg_return = chan_msg_return.json()
     assert chan_msg_return.status_code == 200
@@ -213,7 +213,7 @@ def test_total_messages_is_less_than_50():
         i+=1
         requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program)
 
-    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages)
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
     msg_return = chan_msg_return.json()
     assert chan_msg_return.status_code == 200
     assert msg_return['start'] == 0
@@ -256,7 +256,7 @@ def test_total_messages_is_50():
         i+=1
         requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program)
 
-    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages)
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
     msg_return = chan_msg_return.json()
     assert chan_msg_return.status_code == 200
     assert msg_return['start'] == 0
@@ -300,7 +300,7 @@ def test_invalid_channel_id():
         'channel_id': channel_return['channel_id'] + 1,
         'start': 0       
     }
-    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages)
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
     assert chan_msg_return.status_code == 400
 
 def test_start_more_than_total_messages():
@@ -327,7 +327,7 @@ def test_start_more_than_total_messages():
         'channel_id': channel_return['channel_id'],
         'start': 1       
     }
-    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages)
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
     assert chan_msg_return.status_code == 400
 
 def test_channel_id_and_auth_user_id_invalid():
@@ -360,7 +360,7 @@ def test_channel_id_and_auth_user_id_invalid():
         'channel_id': channel_return['channel_id'] + 1,
         'start': 1       
     }
-    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages)
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
     assert chan_msg_return.status_code == 403
 
 def test_auth_user_id_not_member_of_channel():
@@ -394,5 +394,5 @@ def test_auth_user_id_not_member_of_channel():
         'channel_id': channel_return['channel_id'],
         'start': 1       
     }
-    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",json = channel_messages)
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
     assert chan_msg_return.status_code == 403
