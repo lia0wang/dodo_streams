@@ -44,9 +44,9 @@ def test_http_multiple_profile():
         "u_id": register_return3["auth_user_id"],
         "token": register_return3["token"]
     }
-    profile_return1 = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param1).json()
-    profile_return2 = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param2).json()
-    profile_return3 = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param3).json()
+    profile_return1 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param1).json()
+    profile_return2 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param2).json()
+    profile_return3 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param3).json()
 
     assert profile_return1['u_id'] == register_return1["auth_user_id"]
     assert profile_return1['email'] == "11037@gmail.com"
@@ -81,7 +81,7 @@ def test_http_only_profile():
         "u_id": register_return1["auth_user_id"],
         "token": register_return1["token"]
     }
-    profile_return1 = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param1).json()
+    profile_return1 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param1).json()
 
     assert profile_return1['u_id'] == register_return1["auth_user_id"]
     assert profile_return1['email'] == "11037@gmail.com"
@@ -104,5 +104,5 @@ def test_http_profile_u_id_invlaid():
         "u_id": register_return1["auth_user_id"] + 1,
         "token": register_return1["token"]
     }
-    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param1)
+    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param1)
     assert profile_return.status_code == 400

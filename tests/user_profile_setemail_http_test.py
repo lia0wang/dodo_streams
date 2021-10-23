@@ -33,13 +33,13 @@ def test_http_setemail_once():
         "u_id": register_return1["auth_user_id"],
         "token": register_return1["token"]
     }
-    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param).json()
+    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param).json()
 
     ch_details_param = {
         "token": register_return1["token"], 
         "channel_id": create_return["channel_id"]
     }
-    request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json()
+    request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
 
     assert profile_return['email'] == "standuser@gmail.com"
     assert request_data["owner_members"][0]["email"] == "standuser@gmail.com"
@@ -73,13 +73,13 @@ def test_http_setemail_twice():
         "u_id": register_return1["auth_user_id"],
         "token": register_return1["token"]
     }
-    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param).json()
+    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param).json()
 
     ch_details_param = {
         "token": register_return1["token"], 
         "channel_id": create_return["channel_id"]
     }
-    request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json()
+    request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
 
     assert profile_return['email'] == "standuser@gmail.com"
     assert request_data["owner_members"][0]["email"] == "standuser@gmail.com"
@@ -91,8 +91,8 @@ def test_http_setemail_twice():
     }
     requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = setemail_param)
 
-    request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json()
-    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param).json()
+    request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
+    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param).json()
 
     assert profile_return['email'] == "eekumbokum@gmail.com"
     assert request_data["owner_members"][0]["email"] == "eekumbokum@gmail.com"
@@ -151,9 +151,9 @@ def test_http_setemail_different_users():
         "u_id": register_return3["auth_user_id"],
         "token": register_return3["token"]
     }
-    profile_return1 = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param1).json()
-    profile_return2 = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param2).json()
-    profile_return3 = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param3).json()
+    profile_return1 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param1).json()
+    profile_return2 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param2).json()
+    profile_return3 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param3).json()
 
     assert profile_return1['email'] == "CrazyDiamond@gmail.com"
     assert profile_return2['email'] == "TheHand@gmail.com"
@@ -211,7 +211,7 @@ def test_http_channel_member_setemail():
     }
     requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = setemail_param1)
 
-    get_request = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_join_param)
+    get_request = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_join_param)
     request_data = get_request.json()
 
     assert request_data["all_members"][1]["email"] == "TheHand@gmail.com"
