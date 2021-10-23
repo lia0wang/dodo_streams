@@ -194,7 +194,7 @@ def test_basic():
         'token': auth_user['token'],
         'channel_id': channel['channel_id']
     }
-    channel_details = requests.get(f"{BASE_URL}/channel/details/v2", json = channel_details_param).json()
+    channel_details = requests.get(f"{BASE_URL}/channel/details/v2", params = channel_details_param).json()
     assert channel_details['all_members'] == [{'u_id': 1, 'email': register_param_1['email'], 'name_first': register_param_1['name_first'], 
                                               'name_last': register_param_1['name_last'], 'handle_str': "shifanchen"}]
     
@@ -212,6 +212,6 @@ def test_basic():
         'token': auth_user['token'],
         'u_id': user['auth_user_id']
     }
-    user_profile = requests.get(f"{BASE_URL}/user/profile/v1", json = user_profile_param).json()
+    user_profile = requests.get(f"{BASE_URL}/user/profile/v1", params = user_profile_param).json()
     assert user_profile['name_first'] == "Removed"
     assert user_profile['name_last'] == "user"

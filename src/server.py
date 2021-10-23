@@ -260,10 +260,11 @@ def channel_removeowner():
 
 @APP.route("/channel/details/v2", methods=['GET'])
 def details():
-    request_data = request.get_json()
-    check_valid_token(request_data['token'])
-    decoded_jwt = decode_jwt(request_data['token'])
-    details = channel_details_v1(decoded_jwt['u_id'], request_data['channel_id'])
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    check_valid_token(token)
+    decoded_jwt = decode_jwt(token)
+    details = channel_details_v1(decoded_jwt['u_id'], channel_id)
     return dumps(details)
     
 @APP.route("/dm/create/v1", methods=['POST'])
@@ -432,10 +433,11 @@ def channel_messages_v2():
     
 @APP.route("/user/profile/v1", methods=['GET'])
 def profile():
-    request_data = request.get_json()
+    token = request.args.get('token')
+    u_id = int(request.args.get('u_id'))
     # check if token is valid
-    check_valid_token(request_data['token'])
-    user_return = user_profile_v1(request_data['u_id'])
+    check_valid_token(token)
+    user_return = user_profile_v1(u_id)
 
     return dumps(user_return)
 

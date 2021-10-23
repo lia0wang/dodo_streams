@@ -50,7 +50,7 @@ def test_http_details_multiple_members():
     }
     requests.post(f"{BASE_URL}/channel/join/v2", json = ch_join_param)
     requests.post(f"{BASE_URL}/channel/join/v2", json = ch_join_param2)
-    get_request = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_join_param)
+    get_request = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_join_param)
     request_data = get_request.json()
 
     assert request_data["name"] == "TheRealMonsters"
@@ -102,7 +102,7 @@ def test_http_details_one_member():
         "token": register_return1["token"], 
         "channel_id": create_return["channel_id"]
     }
-    get_request = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param)
+    get_request = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param)
     request_data = get_request.json()
 
     assert request_data["name"] == "TheRealMonsters"
@@ -143,7 +143,7 @@ def test_http_invalid_channel_id():
         "token": register_return1["token"], 
         "channel_id": create_return["channel_id"] + 1
     }
-    get_request = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param)
+    get_request = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param)
     assert get_request.status_code == 400
 
 def test_http_not_member():
@@ -177,7 +177,7 @@ def test_http_not_member():
         "token": register_return1["token"], 
         "channel_id": create_return["channel_id"]
     }
-    get_request = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param)
+    get_request = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param)
     assert get_request.status_code == 403
 
 def test_http_details_multiple_channels():
@@ -231,9 +231,9 @@ def test_http_details_multiple_channels():
         "channel_id": create_return2["channel_id"]
     }
     requests.post(f"{BASE_URL}/channel/join/v2", json = ch_param2)
-    get_request1 = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_param1)
+    get_request1 = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_param1)
     request_data1 = get_request1.json()
-    get_request2 = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_param2)
+    get_request2 = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_param2)
     request_data2 = get_request2.json()
 
     # check details of first channel
