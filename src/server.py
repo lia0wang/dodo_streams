@@ -4,9 +4,10 @@ import re
 from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.channel import channel_addowner_v1, channel_join_v1, channel_details_v1, channel_leave_v1, channel_removeowner_v1
+from src.channel import channel_addowner_v1, channel_invite_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1, channel_messages_v1
+from src.channel import channel_leave_v1
 from src.channels import channels_create_v1
-from src.dm import dm_create_v1, dm_details_v1
+from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1
 from src.message import message_send_v1, message_senddm_v1
 from src.error import InputError, AccessError
 from src import config
@@ -203,6 +204,24 @@ def channel_leave():
     
     return dumps({})
 
+@APP.route("/channel/invite/v2", methods=['POST'])
+def channel_invite():
+    # Retrieve token
+    request_data = request.get_json()
+    token = request_data['token']
+    check_valid_token(token)
+
+    # Decode token, retrieve parameters
+    decode_token = decode_jwt(token)
+    channel_id = request_data['channel_id']
+    u_id = request_data['u_id']
+
+    # Pass parameters
+    channel_invite_v1(decode_token['u_id'], channel_id, u_id)
+    save_data_store_updates()
+    
+    return dumps({})
+
 @APP.route("/channel/addowner/v1", methods=['POST'])
 def channel_addowner():
     # Retrieve token
@@ -332,6 +351,7 @@ def dm_list():
             dms.append(new_dm)
     return dumps(dms)
 
+
 @APP.route("/dm/details/v1", methods=['GET'])
 def dm_details():
     # retrieve token
@@ -355,7 +375,6 @@ def message_send():
     message = request_data['message']
     # Pass parameters
     new_message = message_send_v1(token,channel_id,message)
-    save_database_updates(new_message)
     return dumps(new_message)
 
 @APP.route("/message/remove/v1", methods=['DELETE'])
@@ -375,9 +394,40 @@ def message_senddm():
     message = request_data['message']
     # Pass parameters
     new_dm = message_senddm_v1(token,dm_id,message)
-    save_database_updates(new_dm)
     return dumps(new_dm)
 
+@APP.route("/dm/messages/v1", methods=['GET'])
+def dm_messages_v2():
+    request_data = request.get_json()
+    # Retrieve token
+    token = request_data['token']
+    check_valid_token(token)
+
+    decoded_jwt = decode_jwt(request_data['token'])
+    auth_user_id = decoded_jwt['u_id']
+
+    dm_id = request_data['dm_id']
+    start = request_data['start']
+
+    messages = dm_messages_v1(auth_user_id, dm_id, start)
+    return dumps(messages)
+
+@APP.route("/channel/messages/v2", methods=['GET'])
+def channel_messages_v2():
+    request_data = request.get_json()
+    # Retrieve token
+    token = request_data['token']
+    check_valid_token(token)
+
+    decoded_jwt = decode_jwt(request_data['token'])
+    auth_user_id = decoded_jwt['u_id']
+
+    channel_id = request_data['channel_id']
+    start = request_data['start']
+
+    messages = channel_messages_v1(auth_user_id, channel_id, start)
+    return dumps(messages)
+    
 @APP.route("/user/profile/v1", methods=['GET'])
 def profile():
     request_data = request.get_json()
@@ -393,9 +443,8 @@ def profile():
 
     check_valid_token(request_data['token'])
     # find user in database
-    decoded_jwt = decode_jwt(request_data['token'])
     for user in db_store['users']:
-        if user['u_id'] == decoded_jwt['u_id']:
+        if user['u_id'] == request_data['u_id']:
             target_user = user
 
     # create dictionary to be returned
@@ -523,15 +572,95 @@ def list_users():
     # Create list and add users to the list
     users = []
     for user in data_store['users']:
-        new_user = user
-        del new_user['password']
-        del new_user['session_list']
-        users.append(new_user)
-    
+        if 5 < len(user['password']):
+            new_user = user
+            del new_user['password']
+            del new_user['session_list']
+            users.append(new_user)
     return dumps(users)
 
 @APP.route("/admin/user/remove/v1", methods=["DELETE"])
 def remove_user():
+    #Retrieve token
+    data = request.get_json()
+    token = data['token']
+    
+    # Check if token is valid
+    check_valid_token(token)
+    
+    # Get data
+    u_id = data['u_id']
+    decoded_token = decode_jwt(token)
+    auth_user_id = decoded_token['u_id']
+    store = get_data()
+    
+    valid_u_id = False
+    valid_auth = False
+    multiple_global_owners = False
+    
+    # Checking for errors
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            valid_u_id = True
+            
+        if user['u_id'] == auth_user_id and user['permission_id'] == 1:
+            valid_auth = True
+        elif user['permission_id'] == 1:
+            multiple_global_owners = True
+    
+    # Returning error messages in case of errors
+    if not valid_u_id:
+        raise InputError(description="u_id does not refer to a valid user")
+
+    if not valid_auth:
+        raise AccessError(description="Authorised user is not a global owner")
+    
+    if auth_user_id == u_id and not multiple_global_owners:
+        raise InputError(description="There must be at least one global owner")
+
+    # Remove user from user list
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            user['name_first'] = "Removed"
+            user['name_last'] = "user"
+            user['email'] = ""
+            user['password'] = ""
+            user['handle_str'] = ""
+            user['permission_id'] = 2
+    
+    # Remove user from channels and change messages' content to "Removed user"
+    for channel in store['channels']:
+        user_in_channel = False
+        for member in channel['owner_members']:
+            if member['u_id'] == u_id:
+                channel['owner_members'].remove(member)
+        
+        for member in channel['all_members']:
+            if member['u_id'] == u_id:
+                channel['all_members'].remove(member)
+                user_in_channel = True
+        if user_in_channel:
+            for message in channel['messages']:
+                if message['u_id'] == u_id:
+                    message['message'] = "Removed user"
+    
+    # Remove user from dms and change messages' content to "Removed user"
+    for dm in store['dms']:
+        user_in_dm = False
+        if dm['auth_user_id'] == u_id:
+            dm['auth_user_id'] = ""
+        
+        for member in dm['u_ids']:
+            if member == u_id:
+                dm['u_ids'].remove(member)
+                user_in_dm = True
+        if user_in_dm:
+            for message in dm['messages']:
+                if message['u_id'] == u_id:
+                    message['message'] = "Removed user"
+    
+    save_database_updates(store)
+    
     return dumps({})
 
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
