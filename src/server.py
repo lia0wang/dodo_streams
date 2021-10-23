@@ -356,11 +356,12 @@ def dm_list():
 @APP.route("/dm/details/v1", methods=['GET'])
 def dm_details():
     # retrieve token
-    request_data = request.get_json()
-    check_valid_token(request_data['token'])
-    decoded_jwt = decode_jwt(request_data['token'])
+    token = str(request.args.get('token'))
+    dm_id = int(request.args.get('dm_id'))
+    check_valid_token(token)
+    decoded_jwt = decode_jwt(token)
     auth_user_id = decoded_jwt['u_id']
-    details = dm_details_v1(auth_user_id, request_data['dm_id'])
+    details = dm_details_v1(auth_user_id, dm_id)
     return dumps(details)
 
 @APP.route("/message/send/v1", methods=['POST'])
@@ -399,32 +400,31 @@ def message_senddm():
 
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages_v2():
-    request_data = request.get_json()
+
+    token = str(request.args.get('token'))
+    dm_id = int(request.args.get('dm_id'))
+    start = int(request.args.get('start'))
+
     # Retrieve token
-    token = request_data['token']
     check_valid_token(token)
 
-    decoded_jwt = decode_jwt(request_data['token'])
+    decoded_jwt = decode_jwt(token)
     auth_user_id = decoded_jwt['u_id']
-
-    dm_id = request_data['dm_id']
-    start = request_data['start']
 
     messages = dm_messages_v1(auth_user_id, dm_id, start)
     return dumps(messages)
 
 @APP.route("/channel/messages/v2", methods=['GET'])
 def channel_messages_v2():
-    request_data = request.get_json()
+    token = str(request.args.get('token'))
+    channel_id = int(request.args.get('channel_id'))
+    start = int(request.args.get('start'))
+
     # Retrieve token
-    token = request_data['token']
     check_valid_token(token)
 
-    decoded_jwt = decode_jwt(request_data['token'])
+    decoded_jwt = decode_jwt(token)
     auth_user_id = decoded_jwt['u_id']
-
-    channel_id = request_data['channel_id']
-    start = request_data['start']
 
     messages = channel_messages_v1(auth_user_id, channel_id, start)
     return dumps(messages)

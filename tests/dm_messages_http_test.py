@@ -52,7 +52,8 @@ def test_single_message():
     # is roughly the same
     expected_timestamp = datetime_to_unix_time_stamp()
 
-    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages)
+    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1", params = dm_messages)
+
     msg_return = dm_msg_return.json()
     assert dm_msg_return.status_code == 200
     assert msg_return['start'] == 0
@@ -62,7 +63,6 @@ def test_single_message():
     assert msg_return['messages'][0]['u_id'] == 1
     assert msg_return['messages'][0]['message'] == 'Hi'
     assert abs(msg_return['messages'][0]['time_created'] - expected_timestamp) < 1
-
 
 def test_basic_message_return():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -109,7 +109,8 @@ def test_basic_message_return():
         'dm_id': dm_return['dm_id'],
         'start': 0       
     }
-    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages)
+    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1", params = dm_messages)
+
     msg_return = dm_msg_return.json()
     assert dm_msg_return.status_code == 200
     assert msg_return['start'] == 0
@@ -142,7 +143,8 @@ def test_basic_message_return():
         'dm_id': dm_return['dm_id'],
         'start': 50       
     }
-    dm_msg_return2 = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages2)
+    dm_msg_return2 = requests.get(f"{BASE_URL}/dm/messages/v1", params = dm_messages2)
+
     msg_return2 = dm_msg_return2.json()
     assert dm_msg_return2.status_code == 200
     assert msg_return2['start'] == 50
@@ -154,7 +156,8 @@ def test_basic_message_return():
         'dm_id': dm_return['dm_id'],
         'start': 100      
     }
-    dm_msg_return3 = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages3)
+    dm_msg_return3 = requests.get(f"{BASE_URL}/dm/messages/v1", params = dm_messages3)
+
     msg_return3 = dm_msg_return3.json()
     assert dm_msg_return.status_code == 200
     assert msg_return3['start'] == 100
@@ -192,7 +195,8 @@ def test_total_messages_is_zero():
         'dm_id': dm_return['dm_id'],
         'start': 0       
     }
-    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages)
+    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",params = dm_messages)
+    
     msg_return = dm_msg_return.json()
     assert dm_msg_return.status_code == 200
     assert msg_return['start'] == 0
@@ -243,7 +247,7 @@ def test_total_messages_is_less_than_50():
         'dm_id': dm_return['dm_id'],
         'start': 0       
     }
-    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages)
+    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",params = dm_messages)
     msg_return = dm_msg_return.json()
     assert dm_msg_return.status_code == 200
     assert msg_return['start'] == 0
@@ -293,7 +297,7 @@ def test_total_messages_is_less_than_50():
         'dm_id': dm_return['dm_id'],
         'start': 0       
     }
-    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages)
+    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",params = dm_messages)
     msg_return = dm_msg_return.json()
     assert dm_msg_return.status_code == 200
     assert msg_return['start'] == 0
@@ -305,7 +309,7 @@ def test_total_messages_is_less_than_50():
         'dm_id': dm_return['dm_id'],
         'start': 50       
     }
-    dm_msg_return2 = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages2)
+    dm_msg_return2 = requests.get(f"{BASE_URL}/dm/messages/v1",params = dm_messages2)
     msg_return2 = dm_msg_return2.json()
     assert dm_msg_return2.status_code == 200
     assert msg_return2['start'] == 50
@@ -317,7 +321,7 @@ def test_total_messages_is_less_than_50():
         'dm_id': dm_return['dm_id'],
         'start': 100      
     }
-    dm_msg_return3 = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages3)
+    dm_msg_return3 = requests.get(f"{BASE_URL}/dm/messages/v1",params = dm_messages3)
     msg_return3 = dm_msg_return3.json()
     assert dm_msg_return.status_code == 200
     assert msg_return3['start'] == 100
@@ -368,7 +372,7 @@ def test_total_messages_is_50():
         'dm_id': dm_return['dm_id'],
         'start': 0       
     }
-    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages)
+    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",params = dm_messages)
     msg_return = dm_msg_return.json()
     assert dm_msg_return.status_code == 200
     assert msg_return['start'] == 0
@@ -419,7 +423,7 @@ def test_invalid_channel_id():
         'dm_id': dm_return['dm_id'] + 1,
         'start': 0       
     }
-    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages)
+    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",params = dm_messages)
     assert dm_msg_return.status_code == 400
 
 def test_start_more_than_total_messages():
@@ -454,7 +458,7 @@ def test_start_more_than_total_messages():
         'dm_id': dm_return['dm_id'],
         'start': 1       
     }
-    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages)
+    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",params = dm_messages)
     assert dm_msg_return.status_code == 400
 
 
@@ -496,7 +500,7 @@ def test_channel_id_and_auth_user_id_invalid():
         'dm_id': dm_return['dm_id'] + 1,
         'start': 0       
     }
-    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages)
+    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",params = dm_messages)
     assert dm_msg_return.status_code == 403
  
 def test_auth_user_id_not_member_of_dm():
@@ -538,5 +542,5 @@ def test_auth_user_id_not_member_of_dm():
         'dm_id': dm_return['dm_id'],
         'start': 0       
     }
-    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",json = dm_messages)
+    dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",params = dm_messages)
     assert dm_msg_return.status_code == 403
