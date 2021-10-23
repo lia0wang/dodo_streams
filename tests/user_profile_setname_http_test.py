@@ -32,13 +32,13 @@ def test_http_setname_once():
         "u_id": register_return1["auth_user_id"],
         "token": register_return1["token"]
     }
-    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param).json()
+    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param).json()
 
     ch_details_param = {
         "token": register_return1["token"], 
         "channel_id": create_return["channel_id"]
     }
-    request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json()
+    request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
 
     assert profile_return['name_first'] == "new"
     assert profile_return['name_last'] == "name"
@@ -77,13 +77,13 @@ def test_http_setname_twice():
         "u_id": register_return1["auth_user_id"],
         "token": register_return1["token"]
     }
-    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param).json()
+    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param).json()
 
     ch_details_param = {
         "token": register_return1["token"], 
         "channel_id": create_return["channel_id"]
     }
-    request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json()
+    request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
 
     assert profile_return['name_first'] == "new"
     assert profile_return['name_last'] == "name"
@@ -101,8 +101,8 @@ def test_http_setname_twice():
     }
     requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param)
 
-    request_data = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_details_param).json()
-    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param).json()
+    request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
+    profile_return = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param).json()
 
     assert profile_return['name_first'] == "even"
     assert profile_return['name_last'] == "newerName"
@@ -169,9 +169,9 @@ def test_http_setname_different_users():
         "u_id": register_return3["auth_user_id"],
         "token": register_return3["token"]
     }
-    profile_return1 = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param1).json()
-    profile_return2 = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param2).json()
-    profile_return3 = requests.get(f"{BASE_URL}/user/profile/v1", json = profile_param3).json()
+    profile_return1 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param1).json()
+    profile_return2 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param2).json()
+    profile_return3 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param3).json()
 
     assert profile_return1['name_first'] == "new"
     assert profile_return1['name_last'] == "Name"
@@ -234,7 +234,7 @@ def test_http_channel_member_setname():
     }
     requests.put(f"{BASE_URL}/user/profile/setname/v1", json = setname_param1)
 
-    get_request = requests.get(f"{BASE_URL}/channel/details/v2", json = ch_join_param)
+    get_request = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_join_param)
     request_data = get_request.json()
 
     assert request_data["all_members"][1]["name_first"] == "new"
