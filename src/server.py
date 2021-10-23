@@ -138,7 +138,7 @@ def channel_list():
     
     # Pass parameters
     channels = channels_list_v1(auth_user_id)
-    return channels
+    return dumps(channels)
 
 @APP.route("/channels/listall/v2", methods=['GET'])
 def channel_listall():
@@ -152,7 +152,7 @@ def channel_listall():
     
     # Pass parameters
     channels = channels_listall_v1(auth_user_id)
-    return channels
+    return dumps(channels)
 
 @APP.route("/auth/logout/v1", methods=['POST'])
 def logout():
