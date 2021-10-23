@@ -201,8 +201,8 @@ def dm_messages_v1(auth_user_id, dm_id, start):
                     'time_created': message['time_created'],
             } 
             index+=1
+            segment_messages.append(message_content)
             if (index < start + 50) and (index != total_messages):                  
-                segment_messages.append(message_content)
                 end = index + 1
             elif index == total_messages:
                 end = -1

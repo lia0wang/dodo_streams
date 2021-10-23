@@ -1,7 +1,8 @@
 import re
 import os
 from src.dm import dm_create_v1
-from src.helper import get_data,is_database_exist, check_valid_token, decode_jwt,save_database_updates
+from src.helper import get_data,is_database_exist, check_valid_token, \
+    decode_jwt,save_database_updates, datetime_to_unix_time_stamp
 from src.data_store import data_store
 from src.error import InputError, AccessError
 
@@ -45,14 +46,14 @@ def message_send_v1(token, channel_id, message):
     else:
         data_store.set(db_store)
     
-    # abitary for now, jimmy should actually edit it
-    time_created = 0
+    # creates the unix time_stamp
+    timestamp = datetime_to_unix_time_stamp()
 
     message = {
         'message_id': message_id,
         'u_id': u_id,
         'message': message,
-        'time_created': time_created
+        'time_created': timestamp
     }
 
     target_channel['messages'].append(message)
@@ -60,6 +61,7 @@ def message_send_v1(token, channel_id, message):
 
     return {
         'message_id': message_id,
+        'time_created': timestamp
     }
             
     
@@ -95,14 +97,14 @@ def message_senddm_v1(token, dm_id, message):
     message_id = db_store['message_index']
     db_store['message_index']+=1
 
-    # Jimmy please edit this:
-    time_created = 0
-
+    # creates the unix time_stamp
+    timestamp = datetime_to_unix_time_stamp()
+    
     dm_message = {
         'message_id': message_id,
         'u_id': u_id,
         'message': message,
-        'time_created': time_created
+        'time_created': timestamp
     }
 
     target_dm['messages'].append(dm_message)
