@@ -200,7 +200,7 @@ def test_basic():
     token = {
         'token': auth_user['token']
     }
-    user_list = requests.get(f"{BASE_URL}/users/all/v1", params = token).json()
+    user_list = requests.get(f"{BASE_URL}/users/all/v1", json = token).json()
     assert user_list == [{'u_id': 1, 'email': register_param_1['email'], 'name_first': register_param_1['name_first'], 
                           'name_last': register_param_1['name_last'], 'handle_str': "shifanchen", 'permission_id': 1}]
     
@@ -237,7 +237,7 @@ def test_basic():
         'channel_id': channel['channel_id'],
         'start': 0
     }
-    channel_message_details = requests.get(f"{BASE_URL}/channel/messages/v2", json = channel_message_details_param).json()
+    channel_message_details = requests.get(f"{BASE_URL}/channel/messages/v2", params = channel_message_details_param).json()
     assert channel_message_details['messages'][0]['message'] == "Removed user"
     
     # Message content replaced by 'Removed user' in dms
@@ -246,5 +246,5 @@ def test_basic():
         'dm_id': dm['dm_id'],
         'start': 0
     }
-    dm_message_details = requests.get(f"{BASE_URL}/dm/messages/v1", json = dm_message_details_param).json()
+    dm_message_details = requests.get(f"{BASE_URL}/dm/messages/v1", params = dm_message_details_param).json()
     assert dm_message_details['messages'][0]['message'] == "Removed user"
