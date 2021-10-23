@@ -167,12 +167,27 @@ def test_basic():
     join = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
     assert join.status_code == OK
     
+    channel_message_param = {
+        'token': user['token'],
+        'channel_id': channel['channel_id'],
+        'message': 'Hello'
+    }
+    requests.post(f"{BASE_URL}/message/send/v1", json = channel_message_param).json()
+    
     dm_create_param = {
-        "token": auth_user["token"],
-        "u_ids": [user["auth_user_id"]]
+        "token": user["token"],
+        "u_ids": [auth_user["auth_user_id"]]
     }
     dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param).json()
-        
+    
+    dm_message_param = {
+        'token': user['token'],
+        'dm_id': dm['dm_id'],
+        'message': 'Hey'
+    }
+    check = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_param)
+    assert check.status_code == OK
+    
     delete_info = {
         'token': auth_user['token'], 
         'u_id': user['auth_user_id']
@@ -215,3 +230,21 @@ def test_basic():
     user_profile = requests.get(f"{BASE_URL}/user/profile/v1", json = user_profile_param).json()
     assert user_profile['name_first'] == "Removed"
     assert user_profile['name_last'] == "user"
+    
+    # Message content replaced by 'Removed user' in channels
+    channel_message_details_param = {
+        'token': auth_user['token'],
+        'channel_id': channel['channel_id'],
+        'start': 0
+    }
+    channel_message_details = requests.get(f"{BASE_URL}/channel/messages/v2", json = channel_message_details_param).json()
+    assert channel_message_details['messages'][0]['message'] == "Removed user"
+    
+    # Message content replaced by 'Removed user' in dms
+    dm_message_details_param = {
+        'token': auth_user['token'],
+        'dm_id': dm['dm_id'],
+        'start': 0
+    }
+    dm_message_details = requests.get(f"{BASE_URL}/dm/messages/v1", json = dm_message_details_param).json()
+    assert dm_message_details['messages'][0]['message'] == "Removed user"
