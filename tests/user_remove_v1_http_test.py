@@ -172,21 +172,11 @@ def test_basic():
         'channel_id': channel['channel_id'],
         'message': 'Hello'
     }
-    send = requests.post(f"{BASE_URL}/message/send/v1", json = channel_message_param).json()
-    assert send['message_id'] == 0
-    
-    channel_message_details_param = {
-        'token': auth_user['token'],
-        'channel_id': channel['channel_id'],
-        'start': 0
-    }
-    channel_message_details = requests.get(f"{BASE_URL}/channel/messages/v2", json = channel_message_details_param).json()
-    # This is wrong on purpose to see what the output of channel_message_details is
-    assert channel_message_details == "Removed user"
+    requests.post(f"{BASE_URL}/message/send/v1", json = channel_message_param).json()
     
     dm_create_param = {
-        "token": auth_user["token"],
-        "u_ids": [user["auth_user_id"]]
+        "token": user["token"],
+        "u_ids": [auth_user["auth_user_id"]]
     }
     dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param).json()
     
@@ -195,7 +185,8 @@ def test_basic():
         'dm_id': dm['dm_id'],
         'message': 'Hey'
     }
-    requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_param).json()
+    check = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_param)
+    assert check.status_code == OK
     
     delete_info = {
         'token': auth_user['token'], 
@@ -247,13 +238,12 @@ def test_basic():
         'start': 0
     }
     channel_message_details = requests.get(f"{BASE_URL}/channel/messages/v2", json = channel_message_details_param).json()
-    assert channel_message_details['messages'] == "Removed user"
-    # [0]['message']
+    assert channel_message_details['messages'][0]['message'] == "Removed user"
     
     # Message content replaced by 'Removed user' in dms
     dm_message_details_param = {
         'token': auth_user['token'],
-        'channel_id': channel['channel_id'],
+        'dm_id': dm['dm_id'],
         'start': 0
     }
     dm_message_details = requests.get(f"{BASE_URL}/dm/messages/v1", json = dm_message_details_param).json()
