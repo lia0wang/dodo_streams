@@ -478,7 +478,6 @@ def list_users():
     
     # Check if token is valid token
     check_valid_token(token)
-    decoded_token = decode_jwt(token)
     
     users = users_all_v1()
     return dumps(users)
