@@ -513,9 +513,9 @@ def remove_user():
             user['name_first'] = "Removed"
             user['name_last'] = "user"
             user['email'] = ""
-            user['password'] = ""
             user['handle_str'] = ""
             user['permission_id'] = 2
+            user['session_id'] = []
     
     # Remove user from channels and change messages' content to "Removed user"
     for channel in store['channels']:

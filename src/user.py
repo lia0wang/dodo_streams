@@ -201,7 +201,7 @@ def users_all_v1():
     # Create list and add users to the list
     users = []
     for user in store['users']:
-        if 5 < len(user['password']):
+        if len(user['email']) != 0:
             new_user = user
             del new_user['password']
             del new_user['session_list']
