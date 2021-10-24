@@ -213,8 +213,6 @@ def dm_messages_v1(auth_user_id, dm_id, start):
         'messages': segment_messages,
         'start': start,
         'end': end,
-        'index': index,
-        'total_msg': total_messages
     }
 
 

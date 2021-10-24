@@ -57,7 +57,7 @@ def test_msg_rm_invalid_msg_id():
         'message': message_2
     }
 
-    msg_id_2 = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program_1).json()
+    msg_id_2 = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program_2).json()
  
 
     message_remove_program_1 = {
