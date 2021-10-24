@@ -192,7 +192,7 @@ def test_http_auth_is_not_member():
         'token': user['token'],
         'channel_id': channel['channel_id']
     }
-    requests.post(f"{BASE_URL}/channel/leave/v2", json = channel_leave_param)
+    requests.post(f"{BASE_URL}/channel/leave/v1", json = channel_leave_param)
 
     channel_invite_param = {
         'token': user['token'],

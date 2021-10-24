@@ -188,7 +188,7 @@ def channel_join():
     
     return dumps({})
 
-@APP.route("/channel/leave/v2", methods=['POST'])
+@APP.route("/channel/leave/v1", methods=['POST'])
 def channel_leave():
     # Retrieve token
     request_data = request.get_json()
