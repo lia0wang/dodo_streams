@@ -127,3 +127,33 @@ def test_http_name_last_short():
     }
     get_response = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
     assert get_response.status_code == 400
+
+def test_handle_length():
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    register_param = {
+        "email": "11037@gmail.com",
+        "password": "Hope11037",
+        "name_first": "abcdefghijklmnop",
+        "name_last": "qrstu"
+    }
+    get_response = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    register_param = {
+        "email": "1103@gmail.com",
+        "password": "Hope11037",
+        "name_first": "abcdefghijklmnop",
+        "name_last": "qrstu"
+    }
+    get_response1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    profile_param1 = {
+        "u_id": get_response["auth_user_id"],
+        "token": get_response["token"]
+    }
+    profile_param2 = {
+        "u_id": get_response1["auth_user_id"],
+        "token": get_response1["token"]
+    }
+    profile_return1 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param1).json()
+    profile_return2 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param2).json()
+
+    assert profile_return1['handle_str'] == "abcdefghijklmnopqrst"
+    assert profile_return2['handle_str'] == "abcdefghijklmnopqrst0"
