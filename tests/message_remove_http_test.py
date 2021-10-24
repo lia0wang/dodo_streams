@@ -34,7 +34,7 @@ def test_msg_rm_invalid_msg_id():
         'message': message_1
     }
 
-    requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program_1)
+    msg_id_1 = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program_1).json()
 
     register_param_2 = {
         "email": "tset@gmail.com",
@@ -57,19 +57,21 @@ def test_msg_rm_invalid_msg_id():
         'message': message_2
     }
 
-    requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program_2)
+    msg_id_2 = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program_1).json()
+ 
 
     message_remove_program_1 = {
         'token': auth_user_1['token'],
-        'channel_id': channel_2['channel_id'],
+        'message_id': msg_id_2['message_id']
     }
     message_remove_program_2 = {
         'token': auth_user_2['token'],
-        'channel_id': channel_1['channel_id'],
+        'message_id': msg_id_1['message_id']
     }
 
-    reponse_1 = requests.post(f"{BASE_URL}/message/remove/v2", json = message_remove_program_1)
-    reponse_2 = requests.post(f"{BASE_URL}/message/remove/v2", json = message_remove_program_2)
-
+    dm_remove_1 = requests.delete(f"{BASE_URL}/message/remove/v2", json = message_remove_program_1)
+    assert dm_remove_1.status_code == 404  
+    dm_remove_2 = requests.delete(f"{BASE_URL}/message/remove/v2", json = message_remove_program_2)
+    assert dm_remove_2.status_code == 404  
 
     
