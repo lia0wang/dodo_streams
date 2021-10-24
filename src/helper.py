@@ -204,6 +204,7 @@ def check_valid_token(token):
 
     for user in db_store['users']:
         if user['u_id'] == u_id:
+            print(user)
             if session_id not in user['session_list']:
                 raise AccessError(description="Invalid Token")
 
