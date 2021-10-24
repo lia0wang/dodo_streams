@@ -147,5 +147,5 @@ def test_handle_length_greater_than_20():
     profile_return1 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param1).json()
     profile_return2 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param2).json()
 
-    assert profile_return1['handle_str'] == "abcdefghijklmnopqrst"
-    assert profile_return2['handle_str'] == "abcdefghijklmnopqrst0"
+    assert profile_return1["user"]['handle_str'] == "abcdefghijklmnopqrst"
+    assert profile_return2["user"]['handle_str'] == "abcdefghijklmnopqrst0"

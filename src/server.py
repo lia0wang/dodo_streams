@@ -421,7 +421,7 @@ def profile():
     check_valid_token(token)
     user_return = user_profile_v1(u_id)
 
-    return dumps(user_return)
+    return dumps({"user": user_return})
 
 @APP.route("/user/profile/setname/v1", methods=['PUT'])
 def setname():

@@ -41,7 +41,7 @@ def test_http_sethandle_once():
     }
     request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
 
-    assert profile_return['handle_str'] == "newhandle"
+    assert profile_return["user"]['handle_str'] == "newhandle"
     assert request_data["owner_members"][0]["handle_str"] == "newhandle"
     assert request_data["all_members"][0]["handle_str"] == "newhandle"
 
@@ -81,7 +81,7 @@ def test_http_sethandle_twice():
     }
     request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
 
-    assert profile_return['handle_str'] == "newhandle"
+    assert profile_return["user"]['handle_str'] == "newhandle"
     assert request_data["owner_members"][0]["handle_str"] == "newhandle"
     assert request_data["all_members"][0]["handle_str"] == "newhandle"
 
@@ -94,7 +94,7 @@ def test_http_sethandle_twice():
     request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
     profile_return = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param).json()
 
-    assert profile_return['handle_str'] == "newnewhandle"
+    assert profile_return["user"]['handle_str'] == "newnewhandle"
     assert request_data["owner_members"][0]["handle_str"] == "newnewhandle"
     assert request_data["all_members"][0]["handle_str"] == "newnewhandle"
 
@@ -155,9 +155,9 @@ def test_http_sethandle_different_users():
     profile_return2 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param2).json()
     profile_return3 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param3).json()
 
-    assert profile_return1['handle_str'] == "newhandle1"
-    assert profile_return2['handle_str'] == "newhandle2"
-    assert profile_return3['handle_str'] == "newhandle3"
+    assert profile_return1["user"]['handle_str'] == "newhandle1"
+    assert profile_return2["user"]['handle_str'] == "newhandle2"
+    assert profile_return3["user"]['handle_str'] == "newhandle3"
     
 
 def test_http_channel_member_sethandle():
