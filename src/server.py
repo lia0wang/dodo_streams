@@ -9,7 +9,7 @@ from src.channel import channel_leave_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
 from src.user import user_profile_sethandle_v1, users_all_v1
 from src.channels import channels_create_v1
-from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1
+from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1
 from src.message import message_send_v1, message_senddm_v1
 from src.error import InputError, AccessError
 from src import config
@@ -330,25 +330,9 @@ def dm_leave():
 def dm_list():
     # retrieve token
     token = request.args.get('token')
+
+    dms = dm_list_v1(token)
     
-    # Checking and decoding token
-    check_valid_token(token)
-    decoded_jwt = decode_jwt(token)
-    u_id = decoded_jwt['u_id']
-    
-    # Getting dm data and making dms list
-    store = get_data()
-    dms = []
-    
-    # Traversing through dms, appending those that
-    # have u_id as a member
-    for dm in store['dms']:
-        if u_id in dm['u_ids']:
-            new_dm = dm
-            del new_dm['auth_user_id']
-            del new_dm['u_ids']
-            del new_dm['messages']
-            dms.append(new_dm)
     return dumps(dms)
 
 

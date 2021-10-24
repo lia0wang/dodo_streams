@@ -1,5 +1,5 @@
 from src.error import AccessError, InputError
-from src.helper import get_data, save_database_updates, is_database_exist
+from src.helper import get_data, save_database_updates, is_database_exist, check_valid_token, decode_jwt
 from src.data_store import data_store
 
 def dm_create_v1(auth_user_id, u_ids):
@@ -216,3 +216,37 @@ def dm_messages_v1(auth_user_id, dm_id, start):
         'index': index,
         'total_msg': total_messages
     }
+
+
+def dm_list_v1(token):
+    '''
+    Returns a dictionary containing a list of dms the user is a member of
+    
+    Arguments:
+        token - an encrypted value containing u_id and session_id of a user
+
+    Exceptions:
+        AccessError - token is invalid
+        
+    Return Value:
+        Dictionary of list of dms (dm_id, dm_name)
+    '''
+    # Checking and decoding token
+    check_valid_token(token)
+    decoded_jwt = decode_jwt(token)
+    u_id = decoded_jwt['u_id']
+    
+    # Getting dm data and making dms list
+    store = get_data()
+    dms = []
+    
+    # Traversing through dms, appending those that
+    # have u_id as a member
+    for dm in store['dms']:
+        if u_id in dm['u_ids']:
+            new_dm = dm
+            del new_dm['auth_user_id']
+            del new_dm['u_ids']
+            del new_dm['messages']
+            dms.append(new_dm)
+    return {"dms": dms}
