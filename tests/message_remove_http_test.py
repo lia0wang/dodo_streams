@@ -34,7 +34,7 @@ def test_msg_rm_invalid_msg_id():
         'message': message_1
     }
 
-    msg_1 = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program_1)
+    requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program_1)
 
     register_param_2 = {
         "email": "tset@gmail.com",
@@ -57,7 +57,7 @@ def test_msg_rm_invalid_msg_id():
         'message': message_2
     }
 
-    msg_2 = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program_2)
+    requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program_2)
 
     message_remove_program_1 = {
         'token': auth_user_1['token'],
@@ -69,7 +69,7 @@ def test_msg_rm_invalid_msg_id():
     }
 
     reponse_1 = requests.post(f"{BASE_URL}/message/remove/v2", json = message_remove_program_1)
-    reponse_1 = requests.post(f"{BASE_URL}/message/remove/v2", json = message_remove_program_2)
+    reponse_2 = requests.post(f"{BASE_URL}/message/remove/v2", json = message_remove_program_2)
 
 
     

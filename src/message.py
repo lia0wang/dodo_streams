@@ -71,7 +71,6 @@ def message_send_v1(token, channel_id, message):
 def message_edit_v1(token, message_id, message):
     # Fetch data
     auth_request = False
-    auth_permission = False
     has_owner_permission = False
     
     if len(message)>1000:
@@ -135,7 +134,8 @@ def message_edit_v1(token, message_id, message):
         'message': message,
         'time_created': timestamp
     }
-    
+
+    target_channel = db_store['channels'][target_channel_id-1]
     target_channel['messages'].append(message)
     db_store['messages'].append(message)
     if is_database_exist:
@@ -146,9 +146,7 @@ def message_edit_v1(token, message_id, message):
 
 def message_remove_v1(token, message_id):
     # Fetch data
-    valid_msg = False
     auth_request = False
-    auth_permission = False
     has_owner_permission = False
 
     db_store = data_store.get()
@@ -200,11 +198,6 @@ def message_remove_v1(token, message_id):
     target_channel['messages'].remove(target_message)
     print(target_channel['messages'])
     db_store['message_index']-=1
-
-    
-    # creates the unix time_stamp
-    timestamp = datetime_to_unix_time_stamp()
-
 
     db_store['messages'].remove(target_message)
     if is_database_exist:
