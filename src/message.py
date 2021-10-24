@@ -155,27 +155,31 @@ def message_remove_v1(token, message_id):
     #Check channel_id is valid
     #Also check if the authorised user is not a member of the channel
     channel_list = channels_list_v1(auth_user_id)
+    target_message = {}
     messgae_ids = [m['message_id'] for m in db_store['messages']]
     if message_id not in messgae_ids:
         raise InputError("Error: message_id does not refer to a \
                          valid message within a channel")
-    target_message = db_store['messages'][message_id]
+    for msg in db_store['messages']:
+        if msg['message_id'] == message_id:
+            target_message = msg
         
     target_channel_id = target_message['channel_id']
 
-    for chan in channel_list['channels']:
-        if chan['channel_id'] == target_channel_id:
-            valid_msg = True
-            print(target_channel_id)
-            target_channel = db_store['channels'][target_channel_id-1] #channels_index start with 0
-        if valid_msg == False:
-            raise InputError("Error: message_id does not refer to a \
+    channel_ids = [chan['channel_id'] for chan in channel_list['channels']]
+    print(target_channel_id)
+    
+    print(auth_user_id)
+    print(channel_ids)
+    if target_channel_id not in channel_ids:
+        raise InputError("Error: message_id does not refer to a \
                          valid message within the current channel")
     
     if target_message['u_id'] == auth_user_id:
         auth_request = True
 
     ownership = channel_details_v1(auth_user_id, target_channel_id)['owner_members']
+    print(ownership)
     if auth_user_id not in ownership:
             has_owner_permission = True
             
@@ -185,9 +189,10 @@ def message_remove_v1(token, message_id):
                           authorised user making this request")
 
     message_id = db_store['message_index']
-    #print(target_channel['messages'])
+    target_channel = db_store['channels'][target_channel_id-1]
+    print(target_channel['messages'])
     target_channel['messages'].remove(target_message)
-    #print(target_channel['messages'])
+    print(target_channel['messages'])
     db_store['message_index']-=1
 
     

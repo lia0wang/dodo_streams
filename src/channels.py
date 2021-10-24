@@ -34,6 +34,7 @@ def channels_list_v1(auth_user_id):
             valid = True
     
     if not valid:
+        print(user)
         raise AccessError("Error: Invalid token")
 
     # Creating a list of channels
