@@ -8,8 +8,6 @@ from src import config
 BASE_URL = config.url
 
 def test_http_register_basic():
-    #clear_v1()
-
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param = {
         "email": "11037@gmail.com",
@@ -22,7 +20,6 @@ def test_http_register_basic():
     
 
 def test_http_register_basic2():
-    #clear_v1()
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param = {
         "email": "11037@gmail.com",
@@ -34,7 +31,6 @@ def test_http_register_basic2():
     assert get_response.status_code == 200
 
 def test_http_invalid_email():
-    #clear_v1()
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
 
     register_param = {
@@ -65,7 +61,6 @@ def test_http_duplicate_email():
 
 
 def test_http_password_short():
-    #clear_v1()
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param = {
         "email": "11037@gmail.com",
@@ -77,7 +72,7 @@ def test_http_password_short():
     assert get_response.status_code == 400
 
 def test_http_name_first_long():
-    #clear_v1()
+
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
 
     register_param = {
@@ -90,7 +85,6 @@ def test_http_name_first_long():
     assert get_response.status_code == 400
 
 def test_http_name_last_long():
-    #clear_v1()
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
 
     register_param = {
@@ -103,7 +97,6 @@ def test_http_name_last_long():
     assert get_response.status_code == 400
 
 def test_http_name_first_short():
-    #clear_v1()
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
 
     register_param = {
@@ -116,7 +109,6 @@ def test_http_name_first_short():
     assert get_response.status_code == 400
 
 def test_http_name_last_short():
-    #clear_v1()
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
 
     register_param = {
@@ -128,7 +120,7 @@ def test_http_name_last_short():
     get_response = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
     assert get_response.status_code == 400
 
-def test_handle_length():
+def test_handle_length_greater_than_20():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param = {
         "email": "11037@gmail.com",
