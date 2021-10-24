@@ -176,7 +176,6 @@ def user_profile_sethandle_v1(u_id, handle_str):
 
 
 def users_all_v1():
-    """
     '''
     Returns all users
     
@@ -194,7 +193,7 @@ def users_all_v1():
             name_first (string)
             name_last (string)
             handle_str (string)
-    """
+    '''
     # Fetching data
     store = get_data()
        
