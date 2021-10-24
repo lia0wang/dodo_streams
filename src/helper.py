@@ -121,16 +121,11 @@ def get_data():
         dictionary in a smilar manner to datastore.get
     '''
     # Check if database exists
-    if os.path.isfile("database.json"):
-        filesize = os.path.getsize("database.json")
-        if filesize == 0:
-            return {}
-        with open('database.json') as file:
-            data = json.load(file)
-        file.close()
-        return data
-    else:
-        return{}
+    with open('database.json') as file:
+        data = json.load(file)
+    file.close()
+    return data
+  
 
 
 def create_handle(name_first, name_last, data):
@@ -195,11 +190,8 @@ def seek_target_channel_and_errors(data, auth_user_id, channel_id):
     return target_channel
 
 def is_database_exist():
-    if os.path.isfile("database.json"):
-        if os.path.getsize("database.json") != 0:
-            return True
-        else:
-            return False
+    if os.path.getsize("database.json") != 0:
+        return True
     else:
         return False
 
@@ -209,16 +201,11 @@ def check_valid_token(token):
 
     u_id = decoded_jwt['u_id']
     session_id = decoded_jwt['session_id']
-    
-    is_token_valid = False
+
     for user in db_store['users']:
         if user['u_id'] == u_id:
             if session_id not in user['session_list']:
                 raise AccessError(description="Invalid Token")
-            else:
-                is_token_valid = True
-    if is_token_valid == False:
-        raise AccessError(description="Invalid Token")
 
 def hash_encrypt(password_str):
     """encrypts password string 

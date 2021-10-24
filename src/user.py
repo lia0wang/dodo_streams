@@ -4,6 +4,26 @@ from src.error import InputError
 
 
 def user_profile_v1(u_id):
+    """
+    For a valid user, returns information about their user_id, email, first name, 
+    last name, and handle
+
+    Arguments:
+        u_id (int)       
+        ...
+
+    Exceptions:
+        InputError - u_id does not refer to valid user
+
+    Return Value:
+        returns dictionary with user information with keys
+        Each dictionary contains:
+            u_id (int)
+            email (string)
+            name_first (string)
+            name_last (string)
+            handle_str (string)
+    """
     is_valid_user = False
     db_store = get_data()
     for user in db_store['users']:
@@ -27,7 +47,22 @@ def user_profile_v1(u_id):
     return user_return
 
 def user_profile_setname_v1(u_id, name_first, name_last):
-  
+    """
+    Update the authorised user's first and last name
+
+    Arguments:
+        u_id (int)     
+        name_first (string) 
+        name_last (string) 
+        ...
+
+    Exceptions:
+        InputError - length of name_first or name_last 
+                    is not between 1 and 50 characters inclusive
+
+    Return Value:
+        empty dictionary
+    """
     # fetch data
     db_store = get_data()
 
@@ -57,6 +92,21 @@ def user_profile_setname_v1(u_id, name_first, name_last):
     return {}
 
 def user_profile_setemail_v1(u_id, email):
+    """
+    Update the authorised user's email
+    Arguments:
+        u_id (int)   
+        email (string)    
+        ...
+
+    Exceptions:
+        InputError 
+            - invalid email
+            - email is already being used by another user
+
+    Return Value:
+        empty dictionary
+    """
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
     # Check for input errors
@@ -84,7 +134,22 @@ def user_profile_setemail_v1(u_id, email):
     return {}
 
 def user_profile_sethandle_v1(u_id, handle_str):
+    """
+    Update the authorised user's handle/display name
+    Arguments:
+        u_id (int) 
+        handle_str (string)      
+        ...
 
+    Exceptions:
+        InputError 
+            - length of handle_str is not between 3 and 20 characters inclusive
+            - handle_str contains characters that are not alphanumeric
+            - the handle is already used by another user
+
+    Return Value:
+        empty dictionary
+    """
     if len(handle_str) < 3 or len(handle_str) > 20:
         raise InputError(description="Invalid handle")
     if not handle_str.isalnum():
@@ -111,6 +176,16 @@ def user_profile_sethandle_v1(u_id, handle_str):
 
 
 def users_all_v1():
+    """
+    Return Value:
+        Returns a list of user dictionaries with their associated details.
+        Each dictionary contains:
+            u_id (int)
+            email (string)
+            name_first (string)
+            name_last (string)
+            handle_str (string)
+    """
     # Fetching data
     store = get_data()
        
