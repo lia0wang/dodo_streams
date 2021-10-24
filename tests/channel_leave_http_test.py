@@ -44,7 +44,7 @@ def test_http_invalid_channel_id():
         'token': user_2['token'],
         'channel_id': channel['channel_id'] + 999
     }
-    response = requests.post(f"{BASE_URL}/channel/leave/v2", json = channel_leave_param)
+    response = requests.post(f"{BASE_URL}/channel/leave/v1", json = channel_leave_param)
     assert response.status_code == 400
 
 def test_http_user_is_not_member():
@@ -88,9 +88,9 @@ def test_http_user_is_not_member():
         'token': user_2['token'],
         'channel_id': channel['channel_id']
     }
-    response = requests.post(f"{BASE_URL}/channel/leave/v2", json = channel_leave_param)
+    response = requests.post(f"{BASE_URL}/channel/leave/v1", json = channel_leave_param)
     assert response.status_code == 200
-    response = requests.post(f"{BASE_URL}/channel/leave/v2", json = channel_leave_param)
+    response = requests.post(f"{BASE_URL}/channel/leave/v1", json = channel_leave_param)
     assert response.status_code == 403
 
 def test_http_owner_leave():
@@ -120,7 +120,7 @@ def test_http_owner_leave():
         'token': user_1['token'],
         'channel_id': channel['channel_id']
     }
-    response = requests.post(f"{BASE_URL}/channel/leave/v2", json = channel_leave_param)
+    response = requests.post(f"{BASE_URL}/channel/leave/v1", json = channel_leave_param)
     assert response.status_code == 200
 
 def test_http_user_leave():
@@ -163,7 +163,7 @@ def test_http_user_leave():
         'token': user_2['token'],
         'channel_id': channel['channel_id']
     }
-    response = requests.post(f"{BASE_URL}/channel/leave/v2", json = channel_leave_param)
+    response = requests.post(f"{BASE_URL}/channel/leave/v1", json = channel_leave_param)
     assert response.status_code == 200
 
 def test_http_swap_and_leave_owner():
@@ -214,12 +214,12 @@ def test_http_swap_and_leave_owner():
         'token': user_1['token'],
         'channel_id': channel['channel_id']
     }
-    response = requests.post(f"{BASE_URL}/channel/leave/v2", json = channel_leave_param)
+    response = requests.post(f"{BASE_URL}/channel/leave/v1", json = channel_leave_param)
     assert response.status_code == 200
 
     channel_leave_param = {
         'token': user_1['token'],
         'channel_id': channel['channel_id']
     }
-    response = requests.post(f"{BASE_URL}/channel/leave/v2", json = channel_leave_param)
+    response = requests.post(f"{BASE_URL}/channel/leave/v1", json = channel_leave_param)
     assert response.status_code == 403
