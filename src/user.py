@@ -176,7 +176,15 @@ def user_profile_sethandle_v1(u_id, handle_str):
 
 
 def users_all_v1():
-    """
+    '''
+    Returns all users
+    
+    Arguments:
+        token - an encrypted value containing u_id and session_id of a user
+
+    Exceptions:
+        AccessError - token is invalid
+    
     Return Value:
         Returns a list of user dictionaries with their associated details.
         Each dictionary contains:
@@ -185,16 +193,16 @@ def users_all_v1():
             name_first (string)
             name_last (string)
             handle_str (string)
-    """
+    '''
     # Fetching data
     store = get_data()
        
     # Create list and add users to the list
     users = []
     for user in store['users']:
-        if 5 < len(user['password']):
+        if len(user['email']) != 0:
             new_user = user
             del new_user['password']
             del new_user['session_list']
             users.append(new_user)
-    return users
+    return {"users": users}
