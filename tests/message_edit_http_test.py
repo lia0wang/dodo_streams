@@ -81,8 +81,6 @@ def test_msg_ed_invalid_length_too_long_html():
     }
 
     target_message = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program).json()
-
-    invalid_msg = ',' * 1001
     
     message_edit_program = {
         'token': auth_user['token'],

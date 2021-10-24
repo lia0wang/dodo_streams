@@ -78,7 +78,6 @@ def test_msg_rm_invalid_msg_id_2():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     message_1 = "dsdaada"
-    message_2 = "pojno"
     
     register_param_1 = {
         "email": "test@gmail.com",

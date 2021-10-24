@@ -42,7 +42,7 @@ def test_msg_rm_repeated():
     with pytest.raises(InputError):
         message_remove_v1(token2, invalid_msg_id_2['message_id'])
 
-def test_msg_rm_invalid_msg_id():
+def test_msg_rm_invalid_msg_id_1():
     clear_v1()
     session_id = create_session_id()
     
@@ -69,7 +69,7 @@ def test_msg_rm_invalid_msg_id():
     with pytest.raises(InputError):
         message_remove_v1(token1, invalid_msg_id_2['message_id'])
         
-def test_msg_rm_invalid_msg_id():
+def test_msg_rm_invalid_msg_id_2():
     clear_v1()
     session_id = create_session_id()
     

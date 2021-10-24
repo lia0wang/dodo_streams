@@ -58,7 +58,6 @@ def test_msg_ed_invalid_input_length():
     
     msg_1 = ',' 
     invalid_msg_1 = ','* 1001
-    invalid_msg_2 = ''
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
     auth_id = user1['auth_user_id']
     token = create_jwt(auth_id, session_id)
