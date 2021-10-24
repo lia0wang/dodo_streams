@@ -141,8 +141,6 @@ def test_basic_message_return():
 
     assert chan_msg_return.status_code == 200
     assert msg_return3['start'] == 100
-    assert msg_return3['index'] == 124
-    assert msg_return3['total_msg'] == 124
     assert msg_return3['end'] == -1
 
 def test_total_messages_is_zero():

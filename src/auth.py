@@ -65,13 +65,13 @@ def auth_register_v1(email, password, name_first, name_last):
 
     # Check for input errors
     if not re.fullmatch(regex, email):
-        raise InputError("Error: Invalid email")
+        raise InputError(description = "Error: Invalid email")
     if len(password) < 6:
-        raise InputError("Error: Invalid password")
+        raise InputError(description = "Error: Invalid password")
     if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError("Error: Invalid first name")
+        raise InputError(description = "Error: Invalid first name")
     if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError("Error: Invalid last name")
+        raise InputError(description = "Error: Invalid last name")
 
     # Fetch data
     store = data_store.get()

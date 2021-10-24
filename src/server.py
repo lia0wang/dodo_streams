@@ -10,7 +10,7 @@ from src.user import user_profile_v1, user_profile_setname_v1, user_profile_sete
 from src.user import user_profile_sethandle_v1, users_all_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1
-from src.message import message_send_v1, message_senddm_v1
+from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1
 from src.error import InputError, AccessError
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
@@ -363,9 +363,33 @@ def message_send():
     new_message = message_send_v1(token,channel_id,message)
     return dumps(new_message)
 
+@APP.route("/message/edit/v1", methods=['PUT'])
+def message_edit():
+    request_data = request.get_json()
+    # Retrieve token
+    token = request_data['token']
+    check_valid_token(token)
+
+    # Retrieve message id
+    message_id = request_data['message_id']
+    # Retrieve message
+    message = request_data['message']
+    # Pass parameters
+    new_message = message_send_v1(token,message_id,message)
+    return dumps(new_message)
+
 @APP.route("/message/remove/v1", methods=['DELETE'])
 def message_remove():
-    return dumps({})
+    request_data = request.get_json()
+    # Retrieve token
+    token = request_data['token']
+    check_valid_token(token)
+
+    # Retrieve message id
+    message_id = request_data['message_id']
+
+    # Pass parameters
+    return dumps(message_remove_v1(token,message_id))
 
 @APP.route("/message/senddm/v1", methods=['POST'])
 def message_senddm():
