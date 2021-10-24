@@ -49,16 +49,6 @@ def clear():
     #open('database.json', 'w').close()
     return dumps({})
 
-# Example
-@APP.route("/echo", methods=['GET'])
-def echo():
-    data = request.args.get('data')
-    if data == 'echo':
-   	    raise InputError(description='Cannot echo "echo"')
-    return dumps({
-        'data': data
-    })
-
 @APP.route("/auth/register/v2", methods=['POST'])
 def register():
     # Retrieve Parameters
@@ -349,7 +339,7 @@ def dm_list():
             del new_dm['u_ids']
             del new_dm['messages']
             dms.append(new_dm)
-    return dumps(dms)
+    return dumps({"dms":dms})
 
 
 @APP.route("/dm/details/v1", methods=['GET'])

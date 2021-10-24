@@ -197,4 +197,4 @@ def users_all_v1():
             del new_user['password']
             del new_user['session_list']
             users.append(new_user)
-    return users
+    return {"users":users}
