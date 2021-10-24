@@ -48,23 +48,23 @@ def test_http_multiple_profile():
     profile_return2 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param2).json()
     profile_return3 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param3).json()
 
-    assert profile_return1['u_id'] == register_return1["auth_user_id"]
-    assert profile_return1['email'] == "11037@gmail.com"
-    assert profile_return1['name_first'] == "Hopeful"
-    assert profile_return1['name_last'] == "Boy"
-    assert profile_return1['handle_str'] == "hopefulboy"
+    assert profile_return1["user"]['u_id'] == register_return1["auth_user_id"]
+    assert profile_return1["user"]['email'] == "11037@gmail.com"
+    assert profile_return1["user"]['name_first'] == "Hopeful"
+    assert profile_return1["user"]['name_last'] == "Boy"
+    assert profile_return1["user"]['handle_str'] == "hopefulboy"
 
-    assert profile_return2['u_id'] == register_return2["auth_user_id"]
-    assert profile_return2['email'] == "MotherReggie@gmail.com"
-    assert profile_return2['name_first'] == "Mother"
-    assert profile_return2['name_last'] == "Reggie"
-    assert profile_return2['handle_str'] == "motherreggie"
+    assert profile_return2["user"]['u_id'] == register_return2["auth_user_id"]
+    assert profile_return2["user"]['email'] == "MotherReggie@gmail.com"
+    assert profile_return2["user"]['name_first'] == "Mother"
+    assert profile_return2["user"]['name_last'] == "Reggie"
+    assert profile_return2["user"]['handle_str'] == "motherreggie"
 
-    assert profile_return3['u_id'] == register_return3["auth_user_id"]
-    assert profile_return3['email'] == "groundpound@gmail.com"
-    assert profile_return3['name_first'] == "MOther"
-    assert profile_return3['name_last'] == "ReGgie"
-    assert profile_return3['handle_str'] == "motherreggie0"
+    assert profile_return3["user"]['u_id'] == register_return3["auth_user_id"]
+    assert profile_return3["user"]['email'] == "groundpound@gmail.com"
+    assert profile_return3["user"]['name_first'] == "MOther"
+    assert profile_return3["user"]['name_last'] == "ReGgie"
+    assert profile_return3["user"]['handle_str'] == "motherreggie0"
     
 # test only existing profile
 def test_http_only_profile():
@@ -83,11 +83,11 @@ def test_http_only_profile():
     }
     profile_return1 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param1).json()
 
-    assert profile_return1['u_id'] == register_return1["auth_user_id"]
-    assert profile_return1['email'] == "11037@gmail.com"
-    assert profile_return1['name_first'] == "Hopeful"
-    assert profile_return1['name_last'] == "Boy"
-    assert profile_return1['handle_str'] == "hopefulboy"
+    assert profile_return1["user"]['u_id'] == register_return1["auth_user_id"]
+    assert profile_return1["user"]['email'] == "11037@gmail.com"
+    assert profile_return1["user"]['name_first'] == "Hopeful"
+    assert profile_return1["user"]['name_last'] == "Boy"
+    assert profile_return1["user"]['handle_str'] == "hopefulboy"
 
 # testing 'u_id does not refer to existing user' error
 def test_http_profile_u_id_invlaid():

@@ -40,8 +40,8 @@ def test_http_setname_once():
     }
     request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
 
-    assert profile_return['name_first'] == "new"
-    assert profile_return['name_last'] == "name"
+    assert profile_return["user"]['name_first'] == "new"
+    assert profile_return["user"]['name_last'] == "name"
 
     assert request_data["owner_members"][0]["name_first"] == "new"
     assert request_data["owner_members"][0]["name_last"] == "name"
@@ -85,8 +85,8 @@ def test_http_setname_twice():
     }
     request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
 
-    assert profile_return['name_first'] == "new"
-    assert profile_return['name_last'] == "name"
+    assert profile_return["user"]['name_first'] == "new"
+    assert profile_return["user"]['name_last'] == "name"
 
     assert request_data["owner_members"][0]["name_first"] == "new"
     assert request_data["owner_members"][0]["name_last"] == "name"
@@ -104,8 +104,8 @@ def test_http_setname_twice():
     request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
     profile_return = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param).json()
 
-    assert profile_return['name_first'] == "even"
-    assert profile_return['name_last'] == "newerName"
+    assert profile_return["user"]['name_first'] == "even"
+    assert profile_return["user"]['name_last'] == "newerName"
 
     assert request_data["owner_members"][0]["name_first"] == "even"
     assert request_data["owner_members"][0]["name_last"] == "newerName"
@@ -173,14 +173,14 @@ def test_http_setname_different_users():
     profile_return2 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param2).json()
     profile_return3 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param3).json()
 
-    assert profile_return1['name_first'] == "new"
-    assert profile_return1['name_last'] == "Name"
+    assert profile_return1["user"]['name_first'] == "new"
+    assert profile_return1["user"]['name_last'] == "Name"
 
-    assert profile_return2['name_first'] == "name"
-    assert profile_return2['name_last'] == "new"
+    assert profile_return2["user"]['name_first'] == "name"
+    assert profile_return2["user"]['name_last'] == "new"
 
-    assert profile_return3['name_first'] == "evolved"
-    assert profile_return3['name_last'] == "newerName"
+    assert profile_return3["user"]['name_first'] == "evolved"
+    assert profile_return3["user"]['name_last'] == "newerName"
 
 def test_http_channel_member_setname():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})

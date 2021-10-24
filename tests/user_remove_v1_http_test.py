@@ -228,8 +228,8 @@ def test_basic():
         'u_id': user['auth_user_id']
     }
     user_profile = requests.get(f"{BASE_URL}/user/profile/v1", params = user_profile_param).json()
-    assert user_profile['name_first'] == "Removed"
-    assert user_profile['name_last'] == "user"
+    assert user_profile["user"]['name_first'] == "Removed"
+    assert user_profile["user"]['name_last'] == "user"
     
     # Message content replaced by 'Removed user' in channels
     channel_message_details_param = {

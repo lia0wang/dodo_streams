@@ -41,7 +41,7 @@ def test_http_setemail_once():
     }
     request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
 
-    assert profile_return['email'] == "standuser@gmail.com"
+    assert profile_return["user"]['email'] == "standuser@gmail.com"
     assert request_data["owner_members"][0]["email"] == "standuser@gmail.com"
     assert request_data["all_members"][0]["email"] == "standuser@gmail.com"
 
@@ -81,7 +81,7 @@ def test_http_setemail_twice():
     }
     request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
 
-    assert profile_return['email'] == "standuser@gmail.com"
+    assert profile_return["user"]['email'] == "standuser@gmail.com"
     assert request_data["owner_members"][0]["email"] == "standuser@gmail.com"
     assert request_data["all_members"][0]["email"] == "standuser@gmail.com"
 
@@ -94,7 +94,7 @@ def test_http_setemail_twice():
     request_data = requests.get(f"{BASE_URL}/channel/details/v2", params = ch_details_param).json()
     profile_return = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param).json()
 
-    assert profile_return['email'] == "eekumbokum@gmail.com"
+    assert profile_return["user"]['email'] == "eekumbokum@gmail.com"
     assert request_data["owner_members"][0]["email"] == "eekumbokum@gmail.com"
     assert request_data["all_members"][0]["email"] == "eekumbokum@gmail.com"
 
@@ -155,9 +155,9 @@ def test_http_setemail_different_users():
     profile_return2 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param2).json()
     profile_return3 = requests.get(f"{BASE_URL}/user/profile/v1", params = profile_param3).json()
 
-    assert profile_return1['email'] == "CrazyDiamond@gmail.com"
-    assert profile_return2['email'] == "TheHand@gmail.com"
-    assert profile_return3['email'] == "Echoes@gmail.com"
+    assert profile_return1["user"]['email'] == "CrazyDiamond@gmail.com"
+    assert profile_return2["user"]['email'] == "TheHand@gmail.com"
+    assert profile_return3["user"]['email'] == "Echoes@gmail.com"
     
 
 def test_http_channel_member_setemail():
