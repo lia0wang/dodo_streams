@@ -1,4 +1,5 @@
 from src.data_store import data_store
+from src.helper import save_database_updates
 import os 
 
 def clear_v1():
@@ -19,7 +20,6 @@ def clear_v1():
     store['dms'] = []
     store['message_index'] = 0
     data_store.set(store)
-
-    open('database.json', 'w').close()    
+    save_database_updates(store)    
     return {
     }

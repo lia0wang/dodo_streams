@@ -2,7 +2,6 @@ import jwt
 import json
 import os
 import hashlib
-from src.data_store import data_store
 from src.error import InputError, AccessError
 from datetime import date, timezone, datetime
 
@@ -44,64 +43,6 @@ def create_session_id():
     global SESSION_ID 
     SESSION_ID  += 1
     return SESSION_ID
-
-# Only saves updates to users and channels
-# Might need to be updated later
-def save_data_store_updates():
-    '''
-    Saves updates to data_store. 
-    Saves it to json file database
-    '''
-    store = data_store.get()
-    if is_database_exist() == True:
-        with open("database.json") as file:
-            data = json.load(file)
-        file.close()
-        # Append new users
-        
-        id_list = []
-        id_list2 = []
-        target_id = []
-        for user in store['users']:
-            id_list.append(user['u_id'])
-        for data_user in data['users']:
-            id_list2.append(data_user['u_id'])
-        for id in id_list:
-            if id not in id_list2:
-                target_id.append(id)
-        for user in store['users']:
-            if user['u_id'] in target_id:
-                data['users'].append(user)
-
-        # Update 'already existing' channels information
-        for updated_chann in store['channels']:
-            for index, chann in enumerate(data['channels']):
-                if chann['channel_id'] == updated_chann['channel_id']:
-                    data['channels'][index] = updated_chann
-
-        # Append new channels
-        id_list = []
-        id_list2 = []
-        target_id = []
-        for chann in store['channels']:
-            id_list.append(chann['channel_id'])
-        for data_chann in data['channels']:
-            id_list2.append(data_chann['channel_id'])
-        for id in id_list:
-            if id not in id_list2:
-                target_id.append(id)
-        for chann in store['channels']:
-            if chann['channel_id'] in target_id:
-                data['channels'].append(chann)
-                
-        with open('database.json', 'w') as file:
-            json.dump(data, file)
-        file.close()
-    else:
-        with open('database.json', 'w') as file:
-            json.dump(store, file)
-        file.close()
-
 
 def save_database_updates(updated_database):
     '''
@@ -189,11 +130,6 @@ def seek_target_channel_and_errors(data, auth_user_id, channel_id):
 
     return target_channel
 
-def is_database_exist():
-    if os.path.getsize("database.json") != 0:
-        return True
-    else:
-        return False
 
 def check_valid_token(token):
     db_store = get_data()
