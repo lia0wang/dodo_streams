@@ -1,7 +1,9 @@
 import re
+import os
 from src.helper import get_data, create_handle, create_permission_id, hash_encrypt, save_database_updates
 from src.data_store import data_store
 from src.error import InputError
+from src.other import clear_v1
 
 def auth_login_v1(email, password):
     """
@@ -57,6 +59,8 @@ def auth_register_v1(email, password, name_first, name_last):
         Returns auth_user_id (integer in a dictionary accessed using key 'auth_user_id')
         on the condition that the email, password first and last names are all valid
     '''
+    if os.path.getsize("database.json") == 0:
+        clear_v1()  
 
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 

@@ -1,6 +1,13 @@
 from src.data_store import data_store
 from src.helper import save_database_updates
-import os 
+
+empty = {
+    "users": [],
+    "channels": [],
+    "messages": [],
+    "dms": [],
+    "message_index": 0
+}
 
 def clear_v1():
     '''
@@ -13,13 +20,7 @@ def clear_v1():
     Return Value:
         N/A  
     '''
-    store = data_store.get()
-    store['users'] = []
-    store['channels'] = []
-    store['messages'] = []
-    store['dms'] = []
-    store['message_index'] = 0
-    data_store.set(store)
-    save_database_updates(store)    
+    data_store.set(empty)
+    save_database_updates(empty)    
     return {
     }

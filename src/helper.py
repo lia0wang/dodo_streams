@@ -143,6 +143,7 @@ def check_valid_token(token):
             if session_id not in user['session_list']:
                 raise AccessError(description="Invalid Token")
 
+
 def hash_encrypt(password_str):
     """encrypts password string 
 
