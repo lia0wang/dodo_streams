@@ -246,4 +246,4 @@ def test_basic():
         'message_id': message['message_id']
     }
     response = requests.delete(f"{BASE_URL}/message/remove/v1", json = message_remove)
-    assert response.status_code == OK
+    assert response.status_code == ACCESS_ERROR
