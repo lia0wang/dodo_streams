@@ -141,7 +141,7 @@ def message_edit_v1(token, message_id, message):
                           authorised user making this request")
     if valid_message and auth_request:
         for channel in db_store['channels']:
-            for message in channel['messages']:
+            for msg in channel['messages']:
                 if msg['message_id'] == message_id:
                     msg['message'] = message
                     save_database_updates(db_store)
@@ -150,7 +150,6 @@ def message_edit_v1(token, message_id, message):
     if not valid_message:
         raise InputError("Error: message_id does not refer to a \
                          valid message within the current channel")
-
 
 
 def message_remove_v1(token, message_id):
