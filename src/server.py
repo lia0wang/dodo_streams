@@ -376,7 +376,7 @@ def message_edit():
     message = request_data['message']
     # Pass parameters
     new_message = message_edit_v1(token,message_id,message)
-    return(dumps(new_message))
+    return({})
 
 @APP.route("/message/remove/v1", methods=['DELETE'])
 def message_remove():
