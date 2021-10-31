@@ -85,7 +85,7 @@ def message_send_v1(token, channel_id, message):
         'time_created': timestamp
     }
 
-def message_edit_v1(token, message_id, message):
+def message_edit_v1(token, message_id, new_message):
     '''
     Given a message, update its text with new text.
     If the new message is an empty string, the message is deleted.
@@ -104,79 +104,53 @@ def message_edit_v1(token, message_id, message):
              N/A        
     '''
     # Fetch data
-    
-    if len(message)>1000:
+    auth_request = False
+    has_owner_permission = False
+    valid_message = False
+    if len(new_message)>1000:
         raise InputError("Error: message too long")
-    '''
-    elif len(message)<1:
+    
+    elif len(new_message)<1:
         message_remove_v1(token, message_id)
         return None
-        
-    db_store = data_store.get()
-    if is_database_exist() == True:
-        db_store = get_data()
+    
+
+    db_store = get_data()
         
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
             
-    #Check channel_id is valid
-    #Also check if the authorised user is not a member of the channel
-
-    channel_list = channels_list_v1(auth_user_id)
-    target_message = {}
-    messgae_ids = [m['message_id'] for m in db_store['messages']]
-    if message_id not in messgae_ids:
-        print ("message_id", message_id)
-        print("messgae_ids", messgae_ids)
-        raise InputError("Error: message_id does not refer to a \
-                         valid message within a channel")
-    for msg in db_store['messages']:
-        if msg['message_id'] == message_id:
-            target_message = msg
-        
-    target_channel_id = target_message['channel_id']
-
-    channel_ids = [chan['channel_id'] for chan in channel_list['channels']]
-    print(target_channel_id)
-    
-    print(auth_user_id)
-    print(channel_ids)
-    if target_channel_id not in channel_ids:
-        raise InputError("Error: message_id does not refer to a \
-                         valid message within the current channel")
-    
-    if target_message['u_id'] == auth_user_id:
-        auth_request = True
-
-    ownership = channel_details_v1(auth_user_id, target_channel_id)['owner_members']
-    print(ownership)
-    if auth_user_id not in ownership:
-            has_owner_permission = True
+    #Check message_id is valid
+    #Also check if the authorised user is not an owner member of the channel
+    for user in db_store['users']:
+        if user['u_id'] == auth_user_id:
+            targer_user = user
             
-    if has_owner_permission == False and auth_request == False:
-        raise AccessError("Authorised user does not have owner permisson \
+    for channel in db_store['channels']:
+        for message in channel['messages']:
+            if message['message_id'] == message_id:
+                valid_message = True
+                if message['u_id'] == auth_user_id:
+                    auth_request = True
+                for users in channel['owner_members']:
+                    if auth_user_id == users['u_id']:
+                        has_owner_permission = True
+                if targer_user['permission_id'] == 1:
+                    has_owner_permission = True
+                if has_owner_permission == False and auth_request == False:
+                    raise AccessError("Authorised user does not have owner permisson \
                           of the channel or the message was not sent by the \
                           authorised user making this request")
-    
-    # creates the unix time_stamp
-    timestamp = datetime_to_unix_time_stamp()
-
-    message = {
-        'message_id': message_id,
-        'u_id': auth_user_id,
-        'message': message,
-        'time_created': timestamp
-    }
-
-    target_channel = db_store['channels'][target_channel_id-1]
-    target_channel['messages'].append(message)
-    db_store['messages'].append(message)
-    if is_database_exist:
-        save_database_updates(db_store)
-    else:
-        data_store.set(db_store)
-    '''
-
+    if valid_message and auth_request:
+        for channel in db_store['channels']:
+            for msg in channel['messages']:
+                if msg['message_id'] == message_id:
+                    msg['message'] = new_message
+                    save_database_updates(db_store)
+                    
+    if not valid_message:
+        raise InputError("Error: message_id does not refer to a \
+                         valid message within the current channel")
 
 
 def message_remove_v1(token, message_id):
@@ -199,6 +173,7 @@ def message_remove_v1(token, message_id):
     # Fetch data
     auth_request = False
     has_owner_permission = False
+    valid_message = False
 
 
     db_store = get_data()
@@ -206,52 +181,37 @@ def message_remove_v1(token, message_id):
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
             
-    #Check channel_id is valid
-    #Also check if the authorised user is not a member of the channel
-    
-    channel_list = channels_list_v1(auth_user_id)
-    target_message = {}
-    messgae_ids = [m['message_id'] for m in db_store['messages']]
-    if message_id not in messgae_ids:
-        raise InputError("Error: message_id does not refer to a \
-                         valid message within a channel")
-    for msg in db_store['messages']:
-        if msg['message_id'] == message_id:
-            target_message = msg
-        
-    target_channel_id = target_message['channel_id']
-
-    channel_ids = [chan['channel_id'] for chan in channel_list['channels']]
-    print(target_channel_id)
-    
-    print(auth_user_id)
-    print(channel_ids)
-    if target_channel_id not in channel_ids:
-        raise InputError("Error: message_id does not refer to a \
-                         valid message within the current channel")
-    
-    if target_message['u_id'] == auth_user_id:
-        auth_request = True
-
-    ownership = channel_details_v1(auth_user_id, target_channel_id)['owner_members']
-    print(ownership)
-    if auth_user_id not in ownership:
-            has_owner_permission = True
+    #Check message_id is valid
+    #Also check if the authorised user is not an owner member of the channel
+    for user in db_store['users']:
+        if user['u_id'] == auth_user_id:
+            targer_user = user
             
-    if has_owner_permission == False and auth_request == False:
-        raise AccessError("Authorised user does not have owner permisson \
+    for channel in db_store['channels']:
+        for message in channel['messages']:
+            if message['message_id'] == message_id:
+                valid_message = True
+                if message['u_id'] == auth_user_id:
+                    auth_request = True
+                for users in channel['owner_members']:
+                    if auth_user_id == users['u_id']:
+                        has_owner_permission = True
+                if targer_user['permission_id'] == 1:
+                    has_owner_permission = True
+                if has_owner_permission == False and auth_request == False:
+                    raise AccessError("Authorised user does not have owner permisson \
                           of the channel or the message was not sent by the \
                           authorised user making this request")
-
-    target_channel = db_store['channels'][target_channel_id-1]
-    print(target_channel['messages'])
-    target_channel['messages'].remove(target_message)
-    db_store['message_index']-=1
-
-    db_store['messages'].remove(target_message)
-    
-    save_database_updates(db_store)
-
+    if valid_message and auth_request:
+        for channel in db_store['channels']:
+            for message in channel['messages']:
+                if message['message_id'] == message_id:
+                    channel['messages'].remove(message)
+                    save_database_updates(db_store)
+                    
+    if not valid_message:
+        raise InputError("Error: message_id does not refer to a \
+                         valid message within the current channel")
     
 def message_senddm_v1(token, dm_id, message):
     '''
@@ -277,12 +237,10 @@ def message_senddm_v1(token, dm_id, message):
     u_id = decode_jwt(token)['u_id']
 
     #Check if dm_id is not valid
-    valid = False
     for dm in db_store['dms']:
         if dm['dm_id'] == dm_id:
             target_dm = dm
-            valid = True
-        if not valid:
+        else:
             raise InputError(description="dm_id does not refer to a valid dm id")
 
     for dm in db_store['dms']:

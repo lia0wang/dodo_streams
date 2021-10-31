@@ -1,10 +1,78 @@
 import pytest
 from src.other import clear_v1
 from src.auth import auth_register_v1
-from src.channel import channel_join_v1, channel_details_v1, channel_addowner_v1
+from src.channel import channel_join_v1, channel_details_v1, channel_addowner_v1, channel_leave_v1
 from src.channels import channels_create_v1
 from src.error import InputError, AccessError
 
+def test_non_member_cannot_addowner():
+    '''
+    Test when the user is not in the member list of a channel
+    '''
+    clear_v1()
+    user1 = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+    channel = channels_create_v1(user1['auth_user_id'], 'league', True)
+    pri_channel = channels_create_v1(user1['auth_user_id'], 'league', False)
+
+    channel_leave_v1(user1['auth_user_id'], channel['channel_id'])
+
+    user2 = auth_register_v1('chenshifan@gmail.com', 'chenshifan0207', 'shifan', 'chen')
+    user3 = auth_register_v1('haha@gmail.com', 'haha1234', 'ha', 'ha')
+
+    channel_join_v1(user3['auth_user_id'], channel['channel_id'])
+
+    with pytest.raises(AccessError):
+        channel_addowner_v1(user2['auth_user_id'], channel['channel_id'], user3['auth_user_id'])
+
+    with pytest.raises(AccessError):
+        channel_addowner_v1(user2['auth_user_id'], pri_channel['channel_id'], user3['auth_user_id'])
+
+def test_global_cannot_addowner_public():
+    '''
+    Test when the global owner is not in the member list of a public channel
+    '''
+    clear_v1()
+    user1 = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+    user2 = auth_register_v1('chenshifan@gmail.com', 'chenshifan0207', 'shifan', 'chen')
+
+    channel = channels_create_v1(user2['auth_user_id'], 'league', True)
+
+    user3 = auth_register_v1('haha@gmail.com', 'haha1234', 'ha', 'ha')
+
+    with pytest.raises(AccessError):
+        channel_addowner_v1(user1['auth_user_id'], channel['channel_id'], user3['auth_user_id'])
+
+def test_global_cannot_addowner_private():
+    '''
+    Test when the user is not in the member list of a private channel
+    '''
+    clear_v1()
+    user1 = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+    user2 = auth_register_v1('chenshifan@gmail.com', 'chenshifan0207', 'shifan', 'chen')
+
+    channel = channels_create_v1(user2['auth_user_id'], 'league', False)
+
+    user3 = auth_register_v1('haha@gmail.com', 'haha1234', 'ha', 'ha')
+
+    with pytest.raises(AccessError):
+        channel_addowner_v1(user1['auth_user_id'], channel['channel_id'], user3['auth_user_id'])
+    
+def test_invalid_auth_user_id():
+    '''
+    Test when the auth_user_id is invalid
+    '''
+    clear_v1()
+    owner = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+    channel = channels_create_v1(owner['auth_user_id'], 'league', True)
+
+    user = auth_register_v1('chenshifan@gmail.com', 'chenshifan0207', 'shifan', 'chen')
+    channel_join_v1(user['auth_user_id'], channel['channel_id'])
+
+    with pytest.raises(AccessError):
+        channel_addowner_v1(owner['auth_user_id'] + 999, channel['channel_id'], user['auth_user_id'])
+    with pytest.raises(AccessError):
+        channel_addowner_v1(-1, channel['channel_id'], user['auth_user_id'])
+    
 def test_invalid_channel_id():
     '''
     Test when the channel_id is invalid

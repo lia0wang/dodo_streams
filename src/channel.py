@@ -384,6 +384,7 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
                            - u_id refers to a user who is already an owner of the channel
         AccessError        - channel_id is valid and the authorised user 
                              does not have owner permissions in the channel
+                           - when token is invalid
     Return Value:
         Returns {} (dict) on success
     """    
@@ -391,6 +392,14 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     # Fetch data
   
     store = get_data()
+
+    # Check if the auth_user_id is valid
+    valid = False
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            valid = True
+    if not valid:
+        raise AccessError(description="Invalid token!")
 
     # Check if the channel_id is valid
     valid = False
@@ -417,6 +426,15 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     if not valid:
         raise InputError(description="Invalid user ID!")
 
+    # Check if the auth_user_id is in the all_members list
+    auth_is_member = False
+    for member in target_channel['all_members']:
+        if member['u_id'] == auth_user_id:
+            auth_is_member = True
+
+    if not auth_is_member:
+        raise AccessError(description="The authorized user is not a member of the channel!") 
+
     # Check if the user is not a member of the channel
     is_member = False
     for member in target_channel['all_members']:
@@ -424,7 +442,7 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
             is_member = True
     if not is_member:
         raise InputError(description="This user is not a member of the channel!")
-        
+    
     # Check if the user is already a owner of the channel
     for owner in target_channel['owner_members']:
         if owner['u_id'] == u_id:
@@ -499,7 +517,31 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
             }
     if not valid:
         raise InputError(description="Invalid user ID!")
-    
+
+    # Check if the authorized user is a member of the channel
+    auth_is_member = False
+    for member in target_channel['all_members']:
+        if member['u_id'] == auth_user_id:
+            auth_is_member = True
+    if not auth_is_member:
+            raise AccessError(description="The authorized user is not a member of the channel.")
+
+    # Check if the authorised user has owner permissions in the channel
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            auth_user = user    # Fetch the auth user dict
+
+    has_global_permission = False
+    has_owner_permission = False
+    if auth_user['permission_id'] == 1:
+        has_global_permission = True
+    for owner in target_channel['owner_members']:
+        if owner['u_id'] == auth_user_id:
+            has_owner_permission = True
+
+    if not has_global_permission and not has_owner_permission:
+        raise AccessError(description="The authorised user does not have owner permissions in the valid channel!")
+
     # Check if the user is not an owner of the channel
     is_owner = False
     num_owner = 0
@@ -510,24 +552,7 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
     if not is_owner:
         raise InputError(description="This user is not an owner of the channel!")
     if num_owner == 1:
-        raise InputError(description="You can't remove the owner of the channel!")
-
-    # Check if the authorised user has owner permissions in the channel
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            auth_user = user
-
-    has_global_permission = False
-    has_owner_permission = False
-    if auth_user['permission_id'] == 1:
-        has_global_permission = True
-    else:
-        for owner in target_channel['owner_members']:
-            if owner['u_id'] == auth_user_id:
-                has_owner_permission = True
-
-    if not has_global_permission and not has_owner_permission:
-        raise AccessError(description="The authorised user does not have owner permissions in the valid channel!")
+        raise InputError(description="You can't remove the only owner of the channel!")
 
     # Remove the user from the owner list
     for index, channel in enumerate(store['channels']):
