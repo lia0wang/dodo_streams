@@ -244,11 +244,9 @@ def message_senddm_v1(token, dm_id, message):
     u_id = decode_jwt(token)['u_id']
 
     #Check if dm_id is not valid
-    valid = False
     for dm in db_store['dms']:
         if dm['dm_id'] == dm_id:
             target_dm = dm
-            valid = True
         else:
             raise InputError(description="dm_id does not refer to a valid dm id")
 

@@ -1,8 +1,6 @@
-
 import requests
 import pytest
 import json
-from src.message import message_send_v1, message_edit_v1, message_remove_v1
 
 from src import config
 
@@ -165,7 +163,7 @@ def test_global_owner_can_edit_members_message_channel_http():
         'u_id': user_2['auth_user_id']
     }
     
-    invite= requests.post(f"{BASE_URL}/channel/invite/v2", json = channel_invites_param)
+    requests.post(f"{BASE_URL}/channel/invite/v2", json = channel_invites_param)
 
     msg = "test"
     message_send_program = {

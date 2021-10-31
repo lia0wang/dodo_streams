@@ -99,52 +99,6 @@ def test_dm_invalid_length_too_short():
     }
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_send_program)
     assert response.status_code == 400
-def test_dm_normal():
-    requests.delete(f"{BASE_URL}/clear/v1", json = {})
-    
-    register_param_1 = {
-        "email": "test1@gmail.com",
-        "password": "abcd1234",
-        "name_first": "John",
-        "name_last": "Smith"
-    }
-    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
-
-    register_param_2 = {
-        "email": "test2@gmail.com",
-        "password": "abcd1234",
-        "name_first": "Agent",
-        "name_last": "Smith"
-    }
-    user1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
-    
-    register_param_3 = {
-        "email": "test3@gmail.com",
-        "password": "abcd1234",
-        "name_first": "Agent",
-        "name_last": "Johnson"
-    }
-    user2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_3).json()
-
-    u_id1 = user1['auth_user_id']
-    u_id2 = user2['auth_user_id']
-    u_ids = [u_id1,u_id2]
-
-    dm_param = {
-        'token': auth_user['token'],
-        'u_ids': u_ids
-    }
-    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param).json()
-    
-    msg = "test"
-
-    dm_send_program = {
-        'token': auth_user['token'],
-        'dm_id': dm['dm_id'],
-        'message': msg
-    }
-    response = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_send_program)
-    assert response.status_code == 200   
 
 def test_dm_invalid_dm():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -181,19 +135,19 @@ def test_dm_invalid_dm():
         'token': auth_user['token'],
         'u_ids': u_ids
     }
-    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param).json()
+    requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param).json()
     
     msg = 'Something'
-
+    
     dm_send_program = {
         'token': auth_user['token'],
         'dm_id': -1,
         'message': msg
     }
+    print()
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_send_program)
     assert response.status_code == 400
 
-### AccessError
 
 def test_dm__invalid_auth_id_http():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -245,5 +199,4 @@ def test_dm__invalid_auth_id_http():
 
     response = requests.post(f"{BASE_URL}/message/senddm/v1",json = dm_send_program)
     assert response.status_code == 403
-    
     

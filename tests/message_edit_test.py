@@ -15,7 +15,6 @@ def test_msg_edit_invalid_input_length():
     session_id = create_session_id()
     
     msg_1 = ','
-    msg_2 = ''
     invalid_msg_1 = ','* 1001
     
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
@@ -59,7 +58,6 @@ def test_owner_can_edit_members_message_channel():
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
     u_id_1 = user1['auth_user_id']
     #permission_id = 1
-    token_1 = create_jwt(u_id_1, session_id)
     channel = channels_create_v1(u_id_1, 'comp1531', True)
     channel_id = channel["channel_id"]
     
@@ -88,7 +86,6 @@ def test_original_poster_can_edit_message_channel():
     
     user1 = auth_register_v1("AgentSmith@hotmail.com", "abcd1234", "Agent", "Smith")
     u_id_1 = user1['auth_user_id']
-    token = create_jwt(u_id_1, session_id)
     channel = channels_create_v1(u_id_1, 'comp1531', True)
     channel_id = channel["channel_id"]
 
