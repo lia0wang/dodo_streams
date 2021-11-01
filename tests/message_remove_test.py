@@ -7,10 +7,9 @@ from src.message import message_send_v1,message_remove_v1
 from src.helper import create_jwt, create_session_id, check_valid_token
 from src.error import InputError, AccessError
 from src.data_store import data_store
-### Input Error
 
 
-def test_msg_rm_repeated():
+def test_msg_cannot_remove_deleted_message():
     clear_v1()
     session_id = create_session_id()
     
@@ -62,12 +61,14 @@ def test_msg_rm_invalid_msg_id_1():
 
     invalid_msg_id_1 = message_send_v1(token1, channel1['channel_id'], msg1)
     invalid_msg_id_2 = message_send_v1(token2, channel2['channel_id'], msg2)
+
+    #permission id = 1, # should succeed 
+    message_remove_v1(token1, invalid_msg_id_2['message_id'])
     
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         message_remove_v1(token2, invalid_msg_id_1['message_id'])
     
-    with pytest.raises(InputError):
-        message_remove_v1(token1, invalid_msg_id_2['message_id'])
+    
         
 def test_msg_rm_invalid_msg_id_2():
     clear_v1()
@@ -88,9 +89,6 @@ def test_msg_rm_invalid_msg_id_2():
     with pytest.raises(InputError):
         message_remove_v1(token1, invalid_msg_id_1['message_id'])
 
-        
-### Access Error
-def test_msg_rm_unauthed():
-    pass
+
         
 

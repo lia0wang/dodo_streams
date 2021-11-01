@@ -1,8 +1,9 @@
 import re
 import os
-from src.helper import get_data, create_handle, create_permission_id, is_database_exist, hash_encrypt
+from src.helper import get_data, create_handle, create_permission_id, hash_encrypt, save_database_updates
 from src.data_store import data_store
 from src.error import InputError
+from src.other import clear_v1
 
 def auth_login_v1(email, password):
     """
@@ -23,9 +24,7 @@ def auth_login_v1(email, password):
         that has been registered and password is correct for that u_id.
 
     """
-    store = data_store.get()
-    if is_database_exist():
-        store = get_data()
+    store = get_data()
     for user in store['users']:
         if user['email'] == email:
             # check if encrypted password in database matches 
@@ -60,6 +59,8 @@ def auth_register_v1(email, password, name_first, name_last):
         Returns auth_user_id (integer in a dictionary accessed using key 'auth_user_id')
         on the condition that the email, password first and last names are all valid
     '''
+    if os.path.getsize("database.json") == 0:
+        clear_v1()  
 
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
@@ -74,9 +75,8 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError(description = "Error: Invalid last name")
 
     # Fetch data
-    store = data_store.get()
-    if is_database_exist() == True:
-        store = get_data()
+ 
+    store = get_data()
 
     # Check for repeated email
         # Put all emails in list
@@ -114,7 +114,7 @@ def auth_register_v1(email, password, name_first, name_last):
         'permission_id': permission_id
     }
     store['users'].append(user)
-    data_store.set(store)
+    save_database_updates(store)
 
     return {
         'auth_user_id': user_id,

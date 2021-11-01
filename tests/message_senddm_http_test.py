@@ -100,7 +100,7 @@ def test_dm_invalid_length_too_short():
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_send_program)
     assert response.status_code == 400
 
-def test_dm_invalid_length_too_long():
+def test_dm_invalid_dm():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     register_param_1 = {
@@ -135,19 +135,19 @@ def test_dm_invalid_length_too_long():
         'token': auth_user['token'],
         'u_ids': u_ids
     }
-    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param).json()
+    requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param).json()
     
-    invalid_msg = ',' * 1001
-
+    msg = 'Something'
+    
     dm_send_program = {
         'token': auth_user['token'],
-        'dm_id': dm['dm_id'],
-        'message': invalid_msg
+        'dm_id': -1,
+        'message': msg
     }
+    print()
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_send_program)
     assert response.status_code == 400
 
-### AccessError
 
 def test_dm__invalid_auth_id_http():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -199,5 +199,4 @@ def test_dm__invalid_auth_id_http():
 
     response = requests.post(f"{BASE_URL}/message/senddm/v1",json = dm_send_program)
     assert response.status_code == 403
-    
     

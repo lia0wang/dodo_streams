@@ -15,10 +15,9 @@ from src.error import InputError, AccessError
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
 from src.channels import channels_list_v1, channels_listall_v1
-from src.data_store import data_store
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
-from src.helper import check_valid_token, get_data, save_data_store_updates, create_session_id
-from src.helper import is_database_exist, save_database_updates, create_jwt, decode_jwt, hash_encrypt
+from src.helper import check_valid_token, get_data, create_session_id
+from src.helper import save_database_updates, create_jwt, decode_jwt
 from src.other import clear_v1
 
 def quit_gracefully(*args):
@@ -71,7 +70,6 @@ def register():
 
     # Register user
     register_return = auth_register_v1(email, password, name_first, name_last)
-    save_data_store_updates()
     # Fetch data from database
     database_store = get_data()
 
@@ -123,7 +121,6 @@ def channels_create():
 
     # Pass parameters
     channel = channels_create_v1(decode_token['u_id'], name, is_public)
-    save_data_store_updates()
 
     return dumps(channel)
 
@@ -184,7 +181,6 @@ def channel_join():
 
     # Pass parameters
     channel_join_v1(decode_token['u_id'], channel_id)
-    save_data_store_updates()
     
     return dumps({})
 
@@ -201,8 +197,7 @@ def channel_leave():
 
     # Pass parameters
     channel_leave_v1(decode_token['u_id'], channel_id)
-    save_data_store_updates()
-    
+
     return dumps({})
 
 @APP.route("/channel/invite/v2", methods=['POST'])
@@ -219,7 +214,6 @@ def channel_invite():
 
     # Pass parameters
     channel_invite_v1(decode_token['u_id'], channel_id, u_id)
-    save_data_store_updates()
     
     return dumps({})
 
@@ -237,7 +231,6 @@ def channel_addowner():
 
     # Pass parameters
     channel_addowner_v1(decode_token['u_id'], channel_id, u_id)
-    save_data_store_updates()
     return dumps({})
 
 @APP.route("/channel/removeowner/v1", methods=['POST'])
@@ -254,7 +247,6 @@ def channel_removeowner():
 
     # Pass parameters
     channel_removeowner_v1(decode_token['u_id'], channel_id, u_id)
-    save_data_store_updates()
     return dumps({})
 
 @APP.route("/channel/details/v2", methods=['GET'])
@@ -375,8 +367,8 @@ def message_edit():
     # Retrieve message
     message = request_data['message']
     # Pass parameters
-    new_message = message_send_v1(token,message_id,message)
-    return dumps(new_message)
+    message_edit_v1(token,message_id,message)
+    return({})
 
 @APP.route("/message/remove/v1", methods=['DELETE'])
 def message_remove():
