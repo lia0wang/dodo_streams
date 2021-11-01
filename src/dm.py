@@ -241,5 +241,7 @@ def dm_list_v1(token):
             del new_dm['auth_user_id']
             del new_dm['u_ids']
             del new_dm['messages']
+            new_dm['name'] = new_dm['dm_name']
+            del new_dm['dm_name']
             dms.append(new_dm)
     return {"dms": dms}
