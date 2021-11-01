@@ -2,7 +2,7 @@ import pytest
 import requests
 import pytest
 import json
-from src.other import clear_v1
+
 
 from src import config
 

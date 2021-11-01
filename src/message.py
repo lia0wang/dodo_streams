@@ -1,7 +1,7 @@
 import re
 import os
 from src.dm import dm_create_v1
-from src.helper import get_data,is_database_exist, check_valid_token,\
+from src.helper import get_data, check_valid_token,\
      decode_jwt,save_database_updates, datetime_to_unix_time_stamp
 from src.channel import channel_details_v1, channel_messages_v1
 from src.channels import channels_list_v1
@@ -34,9 +34,8 @@ def message_send_v1(token, channel_id, message):
     # Fetch data
     if(len(message)<1 or len(message)>1000):
         raise InputError("Error: message too long or too short")
-    db_store = data_store.get()
-    if is_database_exist() == True:
-        db_store = get_data()
+
+    db_store = get_data()
         
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
@@ -77,10 +76,9 @@ def message_send_v1(token, channel_id, message):
     target_channel['messages'].append(message)
     db_store['messages'].append(message)
     
-    if is_database_exist:
-        save_database_updates(db_store)
-    else:
-        data_store.set(db_store)
+    
+    save_database_updates(db_store)
+
 
     return {
         'message_id': message_id,
@@ -116,9 +114,8 @@ def message_edit_v1(token, message_id, new_message):
         message_remove_v1(token, message_id)
         return None
     
-    db_store = data_store.get()
-    if is_database_exist() == True:
-        db_store = get_data()
+
+    db_store = get_data()
         
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
@@ -150,7 +147,6 @@ def message_edit_v1(token, message_id, new_message):
                 if msg['message_id'] == message_id:
                     msg['message'] = new_message
                     save_database_updates(db_store)
-                    data_store.set(db_store)
                     
     if not valid_message:
         raise InputError("Error: message_id does not refer to a \
@@ -179,9 +175,8 @@ def message_remove_v1(token, message_id):
     has_owner_permission = False
     valid_message = False
 
-    db_store = data_store.get()
-    if is_database_exist() == True:
-        db_store = get_data()
+
+    db_store = get_data()
         
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
@@ -213,7 +208,6 @@ def message_remove_v1(token, message_id):
                 if message['message_id'] == message_id:
                     channel['messages'].remove(message)
                     save_database_updates(db_store)
-                    data_store.set(db_store)
                     
     if not valid_message:
         raise InputError("Error: message_id does not refer to a \
@@ -237,9 +231,8 @@ def message_senddm_v1(token, dm_id, message):
     is_member = False
     if(len(message)<1 or len(message)>1000):
         raise InputError("Error: message too long or too short")
-    db_store = data_store.get()
-    if is_database_exist() == True:
-        db_store = get_data()
+
+    db_store = get_data()
     #Get authorised user id 
     u_id = decode_jwt(token)['u_id']
 
@@ -274,12 +267,7 @@ def message_senddm_v1(token, dm_id, message):
 
     target_dm['messages'].append(dm_message)
     save_database_updates(db_store)
-
-
-    if is_database_exist:
-        save_database_updates(db_store)
-    else:
-        data_store.set(db_store)        
+       
     return {
         'message_id': message_id,
     }
