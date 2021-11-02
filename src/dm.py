@@ -1,5 +1,5 @@
 from src.error import AccessError, InputError
-from src.helper import get_data, save_database_updates, is_database_exist, check_valid_token, decode_jwt
+from src.helper import get_data, save_database_updates, check_valid_token, decode_jwt
 from src.data_store import data_store
 
 def dm_create_v1(auth_user_id, u_ids):
@@ -21,9 +21,8 @@ def dm_create_v1(auth_user_id, u_ids):
     '''
 
     # Fetch data
-    store = data_store.get()
-    if is_database_exist():
-        store = get_data()
+ 
+    store = get_data()
 
     # Check if the auth_user_id is valid
     valid = False
@@ -71,10 +70,9 @@ def dm_create_v1(auth_user_id, u_ids):
 
     # Append the created dm to dms database
     store['dms'].append(dm)
-    if is_database_exist:
-        save_database_updates(store)
-    else:
-        data_store.set(store)
+
+    save_database_updates(store)
+
     
     return {
         'dm_id': dm_id,
@@ -82,9 +80,8 @@ def dm_create_v1(auth_user_id, u_ids):
 
 def dm_details_v1(auth_user_id, dm_id):
     # Fetch data
-    store = data_store.get()
-    if is_database_exist():
-        store = get_data()
+
+    store = get_data()
     # Check if auth_user_id refers to existing user
     is_valid_user = False
     for user in store['users']:
@@ -151,10 +148,8 @@ def dm_messages_v1(auth_user_id, dm_id, start):
         Returns messages 
     """
         
-    store = data_store.get()
-    
-    if is_database_exist():
-        store = get_data()
+
+    store = get_data()
 
     # Check if the dm_id is valid
     valid_dm = False
@@ -246,5 +241,7 @@ def dm_list_v1(token):
             del new_dm['auth_user_id']
             del new_dm['u_ids']
             del new_dm['messages']
+            new_dm['name'] = new_dm['dm_name']
+            del new_dm['dm_name']
             dms.append(new_dm)
     return {"dms": dms}

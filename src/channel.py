@@ -1,7 +1,6 @@
-import os
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import get_data, seek_target_channel_and_errors, is_database_exist, save_database_updates
+from src.helper import get_data, seek_target_channel_and_errors, save_database_updates
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
@@ -24,10 +23,8 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         N/A
     '''
     # Fetch data
-    store = data_store.get()
 
-    if is_database_exist():
-        store = get_data()
+    store = get_data()
 
     # Check if auth_user_id is valid
     valid = False
@@ -80,7 +77,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     for index, channel in enumerate(store['channels']):
         if channel['channel_id'] == channel_id:
             store['channels'][index]['all_members'].append(invited_user)
-    data_store.set(store)
+    save_database_updates(store)
     return {
     }
     
@@ -120,9 +117,7 @@ def channel_details_v1(auth_user_id, channel_id):
                     handle_str (string)
     '''
     # Fetch data
-    store = data_store.get()
-    if is_database_exist():
-        store = get_data()
+    store = get_data()
 
 
     target_channel = seek_target_channel_and_errors(store, auth_user_id, channel_id)
@@ -183,10 +178,8 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         Returns messages 
     """
         
-    store = data_store.get()
-    
-    if is_database_exist():
-        store = get_data()
+
+    store = get_data()
 
     # Check if the channel_id is valid
     valid_channel = False
@@ -267,10 +260,8 @@ def channel_join_v1(auth_user_id, channel_id):
     """
 
     # Fetch data
-    store = data_store.get()
 
-    if is_database_exist():
-        store = get_data()
+    store = get_data()
 
     valid = False
     for user in store['users']:
@@ -309,7 +300,7 @@ def channel_join_v1(auth_user_id, channel_id):
     for index, channel in enumerate(store['channels']):
         if channel['channel_id'] == channel_id:
             store['channels'][index]['all_members'].append(new_member)
-    data_store.set(store)
+    save_database_updates(store)
     return {
     }
 
@@ -328,9 +319,8 @@ def channel_leave_v1(auth_user_id, channel_id):
         Returns {} (dict) on success
     """
         # Fetch data
-    store = data_store.get()
-    if is_database_exist():
-        store = get_data()
+   
+    store = get_data()
 
     # Check if the auth_user_id is valid
     valid = False
@@ -378,7 +368,7 @@ def channel_leave_v1(auth_user_id, channel_id):
                 store['channels'][index]['owner_members'].remove(target_user)
             # Remove the user from member list
             store['channels'][index]['all_members'].remove(target_user)
-    data_store.set(store)
+    save_database_updates(store)
     return {}
 
 def channel_addowner_v1(auth_user_id, channel_id, u_id):
@@ -401,10 +391,8 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     """    
     
     # Fetch data
-    store = data_store.get()
-
-    if is_database_exist():
-        store = get_data()
+  
+    store = get_data()
 
     # Check if the auth_user_id is valid
     valid = False
@@ -482,7 +470,7 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     for index, channel in enumerate(store['channels']):
         if channel['channel_id'] == channel_id:
             store['channels'][index]['owner_members'].append(user_info)
-    data_store.set(store)
+    save_database_updates(store)
 
     return {}
 
@@ -503,11 +491,8 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
     Return Value:
         Returns {} (dict) on success
     """
-    # Fetch data
-    store = data_store.get()
-
-    if is_database_exist():
-        store = get_data()
+    # Fetch data:
+    store = get_data()
 
     # Check if the channel_id is valid
     valid = False
@@ -574,6 +559,6 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
     for index, channel in enumerate(store['channels']):
         if channel['channel_id'] == channel_id:
             store['channels'][index]['owner_members'].remove(user_info)
-    data_store.set(store)
+    save_database_updates(store)
 
     return {}

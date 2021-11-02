@@ -64,6 +64,7 @@ def admin_user_remove_v1(token, u_id):
             user['password'] = ""
             user['handle_str'] = ""
             user['permission_id'] = 2
+            user['session_id'] = []
     
     # Remove user from channels and change messages' content to "Removed user"
     for channel in store['channels']:

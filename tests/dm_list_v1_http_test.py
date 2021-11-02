@@ -154,7 +154,7 @@ def test_basic():
     dm_list = response.json()
     
     assert response.status_code == OK
-    assert dm_list == {"dms": [{'dm_id': dm['dm_id'], 'dm_name': "hopefulboyyy, shifanchen"}]}
+    assert dm_list == {"dms": [{'dm_id': dm['dm_id'], 'name': "hopefulboyyy, shifanchen"}]}
 
 def test_multiple_dms():
     '''
@@ -208,5 +208,5 @@ def test_multiple_dms():
     dm_list = response.json()
     
     assert response.status_code == OK
-    assert dm_list == {"dms": [{'dm_id': dm_1['dm_id'], 'dm_name': "hopefulboyyy, shifanchen"}, 
-                       {'dm_id': dm_2['dm_id'], 'dm_name': "leonliao, shifanchen"}]}
+    assert dm_list == {"dms": [{'dm_id': dm_1['dm_id'], 'name': "hopefulboyyy, shifanchen"}, 
+                       {'dm_id': dm_2['dm_id'], 'name': "leonliao, shifanchen"}]}
