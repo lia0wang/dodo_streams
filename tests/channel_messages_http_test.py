@@ -217,8 +217,6 @@ def test_total_messages_is_less_than_50():
     assert chan_msg_return.status_code == 200
     assert msg_return['start'] == 0
     assert msg_return['end'] == -1
-    #assert msg_return['messages'][-1] == 1
-    # note change start back to 0 and msg_return['start'] to 0
 
 def test_total_messages_is_50():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
