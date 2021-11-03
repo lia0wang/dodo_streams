@@ -143,7 +143,7 @@ def message_edit_v1(token, message_id, new_message):
                 if msg['message_id'] == message_id:
                     msg['message'] = new_message
                     save_database_updates(db_store)
-    
+ 
     for dm in db_store['dms']:
         for message in dm['messages']:
             if message['message_id'] == message_id:
@@ -153,22 +153,20 @@ def message_edit_v1(token, message_id, new_message):
                 if message['u_id'] == auth_user_id:
                     auth_request = True
                 elif dm_owner['u_id'] == auth_user_id:
-                    auth_request = True       
-                if valid_dm == True and auth_request == False:
-                    raise AccessError("Authorised user does not have owner permisson \
+                    auth_request = True     
+
+    if valid_dm and not auth_request:
+        raise AccessError("Authorised user does not have owner permisson \
                           of the channel or the message was not sent by the \
                           authorised user making this request")
-            if not valid_dm:
-                raise InputError("Error: message_id does not refer to a \
-                         valid message within the current dm")
-                
+    
     if valid_dm and auth_request:
         for dm in db_store['dms']:
             for message in dm['messages']:
                 if message['message_id'] == message_id:
-                    dm['messages'] = new_message
+                    message['message'] = new_message
                     save_database_updates(db_store)
-
+                    
     if valid_dm == False and valid_channel_message == False:
         raise InputError("Error: message_id oes not refer to a valid message within \
                          a channel /DM that the authorised user has joined")   
