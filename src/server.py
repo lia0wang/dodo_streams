@@ -1,6 +1,9 @@
 import sys
 import signal
 import re
+import string
+import random
+import smtplib, ssl
 from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
@@ -13,11 +16,11 @@ from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1
 from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1
 from src.error import InputError, AccessError
 from src import config
-from src.auth import auth_register_v1, auth_login_v1
+from src.auth import auth_passwordreset_request_v1, auth_register_v1, auth_login_v1
 from src.channels import channels_list_v1, channels_listall_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
-from src.helper import check_valid_token, get_data, create_session_id
-from src.helper import save_database_updates, create_jwt, decode_jwt
+from src.helper import check_valid_token, get_data, create_session_id, hash_encrypt
+from src.helper import save_database_updates, create_jwt, decode_jwt, create_reset_code
 from src.other import clear_v1
 
 def quit_gracefully(*args):
@@ -507,9 +510,43 @@ def change_permission():
     admin_userpermission_change_v1(token, u_id, permission_id)
     
     return dumps({})
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def request():
+    # Retrieve Parameters
+    request_data = request.get_json()
+    email = request_data['email']
+    auth_passwordreset_request_v1(email)
+    return dumps({})
 
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def reset():
+    request_data = request.get_json()
+    reset_code = request_data['reset_code']
+    new_password = request_data['new_password']
+
+    if len(new_password) < 6:
+        raise InputError(description = "Error: Invalid new password")
+
+    db_store = get_data()
+    is_valid_code = False
+    for reset_token in db_store['reset_tokens']:
+        decoded = decode_jwt(reset_token)
+        if decoded['reset_code'] == reset_code:
+            is_valid_code = True
+            target_decoded = decoded['u_id']
+            db_store['reset_tokens'].remove(reset_token)
+
+    if is_valid_code == False:
+        raise InputError(description = "Error: Invalid code")
+
+    for user in db_store['users']:
+        if user['u_id'] == target_decoded['u_id']:
+            user['password'] = hash_encrypt(new_password) 
+
+    save_database_updates(db_store)
+    return dumps({})
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    APP.run(port=config.port, debug = True) # Do not edit this port

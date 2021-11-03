@@ -1,6 +1,8 @@
 import re
 import os
+import smtplib, ssl
 from src.helper import get_data, create_handle, create_permission_id, hash_encrypt, save_database_updates
+from src.helper import create_reset_code, create_password_reset_jwt
 from src.data_store import data_store
 from src.error import InputError
 from src.other import clear_v1
@@ -119,3 +121,40 @@ def auth_register_v1(email, password, name_first, name_last):
     return {
         'auth_user_id': user_id,
     }
+
+def auth_passwordreset_request_v1(email):
+    db_store = get_data()
+    # See if email is registered in database
+    for index, user in enumerate(db_store['users']):
+        if user['email'] == email:
+            db_store['users'][index]['session_list'] = []
+            reset_code = create_reset_code()
+            reset_token = create_password_reset_jwt(user['u_id'], reset_code)
+            db_store['reset_tokens'].append(reset_token)
+            save_database_updates(db_store)
+
+            port = 465 
+            smtp_server = "smtp.gmail.com"
+            sender_email = "noreply.dodostreams@gmail.com" 
+            receiver_email = email
+            password = "Dodostreams1531"
+            message = f"""\
+Subject: Reset Code
+
+This is an automatically generated e-mail from Streams.
+
+-------------------------
+Thank you for using a Streams Account.
+Please use the following code to change your password.
+
+{reset_code}
+
+If you do not know why you have received this e-mail, please delete it.
+
+-------------------------
+Sincerely.
+Streams Co."""
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+                server.login(sender_email, password)
+                server.sendmail(sender_email, receiver_email, message)
