@@ -1,9 +1,6 @@
 import sys
 import signal
 import re
-import string
-import random
-import smtplib, ssl
 from json import dump, dumps
 from flask import Flask, request
 from flask_cors import CORS
@@ -20,7 +17,7 @@ from src.auth import auth_passwordreset_request_v1, auth_register_v1, auth_login
 from src.channels import channels_list_v1, channels_listall_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.helper import check_valid_token, get_data, create_session_id, hash_encrypt
-from src.helper import save_database_updates, create_jwt, decode_jwt, create_reset_code
+from src.helper import save_database_updates, create_jwt, decode_jwt
 from src.other import clear_v1
 
 def quit_gracefully(*args):
@@ -88,6 +85,8 @@ def register():
     save_database_updates(database_store)
     register_return['token'] = create_jwt(u_id, session_id)
     return dumps(register_return)
+
+
 
 @APP.route("/auth/login/v2", methods=['POST'])
 def login():
@@ -511,7 +510,7 @@ def change_permission():
     
     return dumps({})
 @APP.route("/auth/passwordreset/request/v1", methods=['POST'])
-def request():
+def reset_request():
     # Retrieve Parameters
     request_data = request.get_json()
     email = request_data['email']
@@ -540,7 +539,7 @@ def reset():
         raise InputError(description = "Error: Invalid code")
 
     for user in db_store['users']:
-        if user['u_id'] == target_decoded['u_id']:
+        if user['u_id'] == target_decoded:
             user['password'] = hash_encrypt(new_password) 
 
     save_database_updates(db_store)
@@ -549,4 +548,4 @@ def reset():
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port, debug = True) # Do not edit this port
+    APP.run(port=config.port) # Do not edit this port

@@ -11,14 +11,17 @@ def test_reset_error():
         "name_first": "abcdefghijklmnop",
         "name_last": "qrstu"
     }
+    resetrequest_body = {
+        "email": "dumbymail11037@gmail.com"
+    }
     requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
-    get_response = requests.post(f"{BASE_URL}/auth/passwordreset/request/v1", json = {register_param['email']})
+    get_response = requests.post(f"{BASE_URL}/auth/passwordreset/request/v1", json = resetrequest_body)
     assert get_response.status_code == 200
     reset_body = {
         "reset_code": "??????",
         "new_password": "new_password"
     }
-    get_response = requests.post(f"{BASE_URL}/auth/passwordreset/request/v1", json = reset_body)
+    get_response = requests.post(f"{BASE_URL}/auth/passwordreset/reset/v1", json = reset_body)
     assert get_response.status_code == 400
 
 def test_reset_short_password():
@@ -29,12 +32,15 @@ def test_reset_short_password():
         "name_first": "abcdefghijklmnop",
         "name_last": "qrstu"
     }
+    resetrequest_body = {
+        "email": "dumbymail11037@gmail.com"
+    }
     requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
-    get_response = requests.post(f"{BASE_URL}/auth/passwordreset/request/v1", json = {register_param['email']})
+    get_response = requests.post(f"{BASE_URL}/auth/passwordreset/request/v1", json = resetrequest_body)
     assert get_response.status_code == 200
     reset_body = {
         "reset_code": "ABCDE1",
         "new_password": "new"
     }
-    get_response = requests.post(f"{BASE_URL}/auth/passwordreset/request/v1", json = reset_body)
+    get_response = requests.post(f"{BASE_URL}/auth/passwordreset/reset/v1", json = reset_body)
     assert get_response.status_code == 400

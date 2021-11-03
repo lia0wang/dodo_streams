@@ -57,7 +57,7 @@ def test_reset_request_logged_out():
         'name': 'league',
         'is_public': True
     }
-    create = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json()
+    create = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
     assert create.status_code == 403
 
 def test_no_error_when_invalid_email():
