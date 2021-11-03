@@ -398,6 +398,10 @@ def message_senddm():
     new_dm = message_senddm_v1(token,dm_id,message)
     return dumps(new_dm)
 
+@APP.route("message/pin/v1", methods=['POST'])
+def message_pin():
+    return dumps({})
+
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages_v2():
 
