@@ -127,3 +127,32 @@ def test_msg__invalid_auth_id_http():
 
     response = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program)
     assert response.status_code == 403
+
+def test_msg__invalid_channel_id_http():
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    register_param_1 = {
+        "email": "test1@gmail.com",
+        "password": "abcd1234",
+        "name_first": "John",
+        "name_last": "Smith"
+    }
+    user1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+
+    channel_param = {
+        'token': user1['token'],
+        'name': 'league',
+        'is_public': True
+    }
+    requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json()
+    
+    msg = 'test'
+
+    message_send_program = {
+        'token': user1['token'],
+        'channel_id': -1,
+        'message': msg
+    }
+
+    response = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program)
+    assert response.status_code == 400
