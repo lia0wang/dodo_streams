@@ -11,6 +11,7 @@ from src.user import user_profile_sethandle_v1, users_all_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1, dm_remove_v1
 from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_send_later_v1
+from src.message import message_send_later_dm_v1
 from src.error import InputError, AccessError
 from src import config
 from src.auth import auth_passwordreset_request_v1, auth_register_v1, auth_login_v1
@@ -429,6 +430,23 @@ def message_senddm():
     # Pass parameters
     new_dm = message_senddm_v1(token,dm_id,message)
     return dumps(new_dm)
+
+@APP.route("/message/sendlaterdm/v1", methods=['POST'])
+def message_sendlaterdm():
+    request_data = request.get_json()
+    # Retrieve token
+    token = request_data['token']
+    check_valid_token(token)
+
+    # Retrieve channel id
+    dm_id = request_data['dm_id']
+    # Retrieve message
+    message = request_data['message']
+    # Retrieve time sent
+    time_sent = request_data['time_sent']
+    # Pass parameters
+    new_message = message_send_later_dm_v1(token, dm_id, message, time_sent)
+    return dumps(new_message)
 
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages_v2():
