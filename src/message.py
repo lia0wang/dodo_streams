@@ -323,6 +323,86 @@ def message_senddm_v1(token, dm_id, message):
         'message_id': message_id,
     }
 
+def message_send_later_dm_v1(token, dm_id, message, time_sent):
+    '''
+    Send a message from the authorised user to the channel specified
+    by dm_id automatically at a specified time in the future.
+    Note: Each message should have its own unique ID,
+    i.e. no messages should share an ID with another message, even if
+    that other message is in a different channel.
+    Assumption: returning type message_id is dict contains integer message
+    id
+    Arguments:
+        token - Used to identify the user
+        dm_id - Refers to the channel where message will be sent 
+        message - The message needs to be send
+        time spent - 
+    Exceptions:
+        InputError - dm_id does not refer to a valid channel
+        InputError - the length of message is smaller than 1 or bigger than 1000
+        InputError - when time_sent is in the past
+        AccessError - dm_id is valid and the authorised user is not a
+                      member of the channel
+         Return Value:
+         Return a dictionary containing the message id              
+    '''
+    # Fetch data
+    is_member = False
+    valid_dm = False
+    if(len(message)<1 or len(message)>1000):
+        raise InputError("Error: message too long or too short")
+
+    db_store = get_data()
+    #Get authorised user id 
+    auth_user_id = decode_jwt(token)['u_id']
+    for user in db_store['users']:
+        if user['u_id'] == auth_user_id:
+            targer_user = user    
+
+    #Check if dm_id is not valid
+    for dm in db_store['dms']:
+        if dm['dm_id'] == dm_id:
+            target_dm = dm
+            valid_dm = True
+            if dm['auth_user_id'] == auth_user_id:
+                is_member = True # Check if authorised user is a member of the dm
+            for members in dm_details_v1(auth_user_id, dm_id)['members']:
+                if targer_user['u_id'] == members['u_id']:
+                    is_member = True # Check if authorised user is a member of the dm
+
+    if is_member == False and valid_dm == True:
+        raise AccessError(description="Authorised user is not a member of DM")
+    if valid_dm == False:
+        raise InputError(description="dm_id does not refer to a valid dm id")  
+    if time_sent < time.time():
+        raise InputError(description="Error, time_sent is a time in the past")
+
+    message_id = db_store['message_index']
+    db_store['message_index']+=1
+    
+    message = {
+        'message_id': message_id,
+        'u_id': auth_user_id,
+        'message': message,
+        'dm_id': dm_id,
+        'time_created': time_sent
+    }
+   
+    time_diff = time_sent - time.time()
+    if time_diff < 0:
+        raise InputError(description="Time sent is a time sent in the past")
+
+    param = [target_dm, db_store, message]
+    delayed_msg = threading.Timer(time_diff , delayed_dm_message, param)
+    delayed_msg.start()
+    return {
+        'message_id': message_id,
+    }
+
+def delayed_dm_message(target_dm, db_store, message):
+    target_dm['messages'].append(message)
+    db_store['messages'].append(message)
+    save_database_updates(db_store)
 
 def message_send_later_v1(token, channel_id, message, time_sent):
     '''

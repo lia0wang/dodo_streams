@@ -134,7 +134,7 @@ def test_basic_message_return():
         assert msg_return['messages'][i]['u_id'] == 1
         assert msg_return['messages'][i]['message'] == 'Hi'
         # checks that the time stamp is correct
-        assert abs(msg_return['messages'][i]['time_created'] - expected_timestamp) < 1
+        assert abs(msg_return['messages'][i]['time_created'] - expected_timestamp) < 2
         i+=1
 
     # running second for batch 2 of 50 messages
