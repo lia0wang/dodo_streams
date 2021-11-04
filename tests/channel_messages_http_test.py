@@ -97,6 +97,7 @@ def test_basic_message_return():
     assert msg_return['start'] == 0
     assert msg_return['end'] == 50
 
+
     # create a time stamp right after message being sent to check if time sent
     # is roughly the same
     expected_timestamp = datetime_to_unix_time_stamp()
@@ -201,7 +202,7 @@ def test_total_messages_is_less_than_50():
 
     # 1 user sends 49 messages
     i = 0
-    while i < 40:
+    while i < 50:
         msg = 'Hi'
         message_send_program = {
             'token': user['token'],
@@ -259,6 +260,66 @@ def test_total_messages_is_50():
     assert chan_msg_return.status_code == 200
     assert msg_return['start'] == 0
     assert msg_return['end'] == -1
+
+def test_total_messages_is_51():
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    register_param = {
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
+    }
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+
+    channel_param = {
+        'token': user['token'],
+        'name': 'league',
+        'is_public': True
+    }
+    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
+    channel_return = channel.json()
+
+    channel_messages = {
+        'token': user['token'],
+        'channel_id': channel_return['channel_id'],
+        'start': 0       
+    }
+
+    # 1 user sends over 50 messages        
+    msg = 'Hi'
+    message_send_program = {
+        'token': user['token'],
+        'channel_id': channel_return['channel_id'],
+        'message': msg
+    }
+    i = 0
+    test = []
+    while i < 51:
+        i+=1
+        msg =requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program)
+        send_msg = msg.json()
+        test.append(send_msg['message_id'])
+    test.reverse()
+
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
+    msg_return = chan_msg_return.json()
+    assert chan_msg_return.status_code == 200
+    assert msg_return['start'] == 0
+    assert msg_return['end'] == 50
+    channel_messages = {
+        'token': user['token'],
+        'channel_id': channel_return['channel_id'],
+        'start': 50       
+    }
+
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
+    msg_return = chan_msg_return.json()
+    assert chan_msg_return.status_code == 200
+    assert msg_return['start'] == 50
+    assert msg_return['end'] == -1
+
+    assert [test[-1]] == [m['message_id'] for m in msg_return['messages']] 
 
 def test_invalid_channel_id():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -394,3 +455,80 @@ def test_auth_user_id_not_member_of_channel():
     }
     chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
     assert chan_msg_return.status_code == 403
+
+def test_removal_by_edit_reflected():
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    register_param = {
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
+    }
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+
+    channel_param = {
+        'token': user['token'],
+        'name': 'league',
+        'is_public': True
+    }
+    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
+    channel_return = channel.json()
+
+    channel_messages = {
+        'token': user['token'],
+        'channel_id': channel_return['channel_id'],
+        'start': 0       
+    }
+
+    # 1 user sends 2 messages
+    i = 0
+    while i < 2:
+        msg = 'Hi'
+        message_send_program = {
+            'token': user['token'],
+            'channel_id': channel_return['channel_id'],
+            'message': msg
+        }
+        i+=1
+        requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program)
+
+    # send a third message most recent named target_msg
+    msg = "test"
+
+    message_send_program = {
+        'token': user['token'],
+        'channel_id': channel_return['channel_id'],
+        'message': msg
+    }
+    
+    target_message = requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program)
+    assert target_message.status_code == 200
+    target_msg = target_message.json()
+
+    # editing a message to be empty
+    empty_msg = ''
+
+    message_edit_program = {
+        'token': user['token'],
+        'message_id': target_msg['message_id'],
+        'message': empty_msg
+    }
+
+    response = requests.put(f"{BASE_URL}/message/edit/v1",json = message_edit_program)
+    assert response.status_code == 200
+
+    channel_messages = {
+        'token': user['token'],
+        'channel_id': channel_return['channel_id'],
+        'start': 0       
+    }
+    # check that the the most recent message is not the message that was 
+    # deleted
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
+    chan_msg = chan_msg_return.json()
+    assert chan_msg_return.status_code == 200
+    assert chan_msg['start'] == 0
+    assert chan_msg['end'] == -1
+
+    assert chan_msg['messages'][0]['message_id'] != target_msg['message_id']
+
