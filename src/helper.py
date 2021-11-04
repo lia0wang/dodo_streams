@@ -149,7 +149,10 @@ def seek_target_channel_and_errors(data, auth_user_id, channel_id):
 
 def check_valid_token(token):
     db_store = get_data()
-    decoded_jwt = decode_jwt(token)
+    try:
+        decoded_jwt = decode_jwt(token)
+    except Exception as error:
+        raise AccessError(description="Invalid Token") from error
 
     u_id = decoded_jwt['u_id']
     session_id = decoded_jwt['session_id']
@@ -180,6 +183,10 @@ def datetime_to_unix_time_stamp():
     return timestamp
 
 def create_reset_code():
+    """creates password reset code
+    Returns:
+        Random 6 character alphanumeric string
+    """
     db_store = get_data()
     characters = string.ascii_letters + string.digits
     reset_code = (''.join(random.choice(characters) for i in range(6))).upper()
