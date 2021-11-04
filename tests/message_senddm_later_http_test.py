@@ -126,6 +126,7 @@ def test_dm_invalid_length_too_long():
         'message': invalid_msg,
         'time_sent': future_time
     }
+    time.sleep(1)
     response = requests.post(f"{BASE_URL}/message/sendlaterdm/v1", json = dm_send_program)
     assert response.status_code == 400
 
@@ -174,8 +175,10 @@ def test_dm_invalid_length_too_short():
         'message': invalid_msg,
         'time_sent': future_time
     }
+
     response = requests.post(f"{BASE_URL}/message/sendlaterdm/v1", json = dm_send_program)
     assert response.status_code == 400
+    time.sleep(1)
 
 def test_dm__invalid_auth_id_http():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -235,6 +238,7 @@ def test_dm__invalid_auth_id_http():
 
     response_2 = requests.post(f"{BASE_URL}/message/sendlaterdm/v1",json = dm_send_program_2)
     assert response_2.status_code == 403
+    time.sleep(1)
 
 def test_dm_invalid_dm_http():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -275,13 +279,14 @@ def test_dm_invalid_dm_http():
     assert dm.status_code == 200
     dm_return = dm.json()
     
-    future_time = time.time() - 1
+    future_time = time.time() + 1
     dm_send_program = {
         'token': auth_user['token'],
         'dm_id': dm_return['dm_id'],
         'message': "test",
         'time_sent': future_time
     }
+    time.sleep(1)
     response = requests.post(f"{BASE_URL}/message/sendlaterdm/v1", json = dm_send_program)
     assert response.status_code == 400    
 
