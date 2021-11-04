@@ -9,7 +9,7 @@ from src.channel import channel_leave_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
 from src.user import user_profile_sethandle_v1, users_all_v1
 from src.channels import channels_create_v1
-from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1
+from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1, dm_remove_v1
 from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1
 from src.error import InputError, AccessError
 from src import config
@@ -341,6 +341,19 @@ def dm_details():
     auth_user_id = decoded_jwt['u_id']
     details = dm_details_v1(auth_user_id, dm_id)
     return dumps(details)
+
+@APP.route("/dm/remove/v1", methods=['DELETE'])
+def dm_remove():
+    # Retrieve token
+    request_data = request.get_json()
+    token = request_data['token']
+    check_valid_token(token)
+
+    # Retrieve parameters
+    dm_id = request_data['dm_id']
+
+    # Pass parameters
+    return dumps(dm_remove_v1(token, dm_id))
 
 @APP.route("/message/send/v1", methods=['POST'])
 def message_send():

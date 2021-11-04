@@ -34,8 +34,6 @@ def test_dm_invalid_input_length():
     with pytest.raises(InputError):
         message_senddm_v1(token, dm_id, invalid_msg_2)
 
-
-
 def test_dm_invalid_dm_id():
     '''tests for invalid message length'''
     clear_v1()
