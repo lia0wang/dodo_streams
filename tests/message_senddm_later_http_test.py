@@ -205,7 +205,6 @@ def test_dm__invalid_auth_id_http():
     user3 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_3).json()
 
     u_id2 = user2['auth_user_id']
-    u_id3 = user3['auth_user_id']
 
     u_ids = [u_id2]
     
