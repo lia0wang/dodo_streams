@@ -4,7 +4,7 @@ from src import config
 from src.helper import datetime_to_unix_time_stamp
 
 BASE_URL = config.url
-'''
+
 def test_single_message():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
@@ -326,7 +326,7 @@ def test_total_messages_is_less_than_50():
     assert dm_msg_return.status_code == 200
     assert msg_return3['start'] == 100
     assert msg_return3['end'] == -1
-'''
+
 def test_total_messages_is_51():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
@@ -392,7 +392,7 @@ def test_total_messages_is_51():
     assert msg_return['start'] == 50
     assert msg_return['end'] == -1
     assert [test[-1]] == [m['message_id'] for m in msg_return['messages']] 
-"""
+
 def test_total_messages_is_50():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
@@ -610,4 +610,3 @@ def test_auth_user_id_not_member_of_dm():
     }
     dm_msg_return = requests.get(f"{BASE_URL}/dm/messages/v1",params = dm_messages)
     assert dm_msg_return.status_code == 403
-"""
