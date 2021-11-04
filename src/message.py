@@ -7,6 +7,8 @@ from src.channel import channel_details_v1, channel_messages_v1
 from src.channels import channels_list_v1
 from src.data_store import data_store
 from src.error import InputError, AccessError
+import threading
+import time
 
 def message_send_v1(token, channel_id, message):
     '''
@@ -321,5 +323,90 @@ def message_senddm_v1(token, dm_id, message):
         'message_id': message_id,
     }
 
-         
-         
+
+def message_send_later_v1(token, channel_id, message, time_sent):
+    '''
+    Send a message from the authorised user to the channel specified
+    by channel_id automatically at a specified time in the future.
+    Note: Each message should have its own unique ID,
+    i.e. no messages should share an ID with another message, even if
+    that other message is in a different channel.
+    Assumption: returning type message_id is dict contains integer message
+    id
+    Arguments:
+        token - Used to identify the user
+        channel_id - Refers to the channel where message will be sent 
+        message - The message needs to be send
+        time spent - 
+    Exceptions:
+        InputError - channel_id does not refer to a valid channel
+        InputError - the length of message is smaller than 1 or bigger than 1000
+        InputError - when time_sent is in the past
+        AccessError - channel_id is valid and the authorised user is not a
+                      member of the channel
+         Return Value:
+         Return a dictionary containing the message id              
+    '''
+    is_member = False
+    valid_channel = False
+    
+    # Fetch data
+    if(len(message)<1 or len(message)>1000):
+        raise InputError("Error: message too long or too short")
+
+    db_store = get_data()
+        
+    #Get authorised user id 
+    auth_user_id = decode_jwt(token)['u_id']
+            
+    #Check channel_id is valid
+    #Also check if the authorised user is not a member of the channel
+
+    for chan in db_store['channels']:
+        if chan['channel_id'] == channel_id:
+            target_channel = chan
+            valid_channel = True
+    if valid_channel == False:
+        raise InputError("channel_id does not refer to a valid channel")
+            
+    for user in target_channel['all_members']:
+        if user['u_id'] == auth_user_id:
+            # Check if authorised user is a member of the channel
+            is_member = True 
+            break               
+   
+    if is_member == False:
+        raise AccessError("Authorised user is not a member of the channel")
+   
+    if time_sent < time.time():
+        raise InputError(description="Error, time_sent is a time in the past")
+
+    message_id = db_store['message_index']
+    db_store['message_index']+=1
+    
+    message = {
+        'message_id': message_id,
+        'u_id': auth_user_id,
+        'message': message,
+        'channel_id': channel_id,
+        'time_created': time_sent
+    }
+   
+    time_diff = time_sent - time.time()
+    if time_diff < 0:
+        raise InputError(description="Time sent is a time sent in the past")
+
+    param = [target_channel, db_store, message]
+    delayed_msg = threading.Timer(time_diff , delayed_message, param)
+    delayed_msg.start()
+    return {
+        'message_id': message_id,
+    }
+
+def delayed_message(target_channel, db_store, message):
+    target_channel['messages'].append(message)
+    db_store['messages'].append(message)
+    save_database_updates(db_store)
+
+ 
+
