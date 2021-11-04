@@ -195,6 +195,7 @@ def dm_messages_v1(auth_user_id, dm_id, start):
                     'u_id': message['u_id'],
                     'message': message['message'],
                     'time_created': message['time_created'],
+                    'dm_id': dm_id
             } 
             index+=1
             segment_messages.append(message_content)
@@ -246,3 +247,40 @@ def dm_list_v1(token):
             del new_dm['dm_name']
             dms.append(new_dm)
     return {"dms": dms}
+
+def dm_remove_v1(token, dm_id):
+    '''
+    Remove an existing DM, so all members are no longer in the DM.
+    This can only be done by the original creator of the DM.
+    Arguments:
+        token - Used to identify the user
+        dm_id - Used to identify the dm that has been sent 
+    Exceptions:
+        InputError - dm_id does not refer to a valid DM
+        AccessError - dm_id is valid and the authorised user is not the original DM creator
+    Return Value:
+        N/A
+    
+    '''
+    valid_dm = False
+    auth_request = False
+    db_store = get_data()
+    auth_user_id = decode_jwt(token)['u_id']
+    
+    for dm in db_store['dms']:
+        if dm['dm_id'] == dm_id:
+            valid_dm = True
+            #print('dm_creator',dm['auth_user_id'])
+            #print('auth_user_id', auth_user_id)
+            if dm['auth_user_id'] == auth_user_id:
+                auth_request = True
+    if valid_dm == False:
+         raise InputError("Error: dm_id does not refer to a valid DM")
+    if valid_dm == True and auth_request == False:
+         raise AccessError("Error: dm_id is valid and the authorised user is not \
+                           the original DM creator")
+        
+    for dm in db_store['dms']:
+        if dm['dm_id'] == dm_id:
+            db_store['dms'].remove(dm)
+            save_database_updates(db_store)

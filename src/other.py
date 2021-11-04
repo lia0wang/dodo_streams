@@ -6,6 +6,7 @@ empty = {
     "channels": [],
     "messages": [],
     "dms": [],
+    "reset_tokens": [],
     "message_index": 0
 }
 

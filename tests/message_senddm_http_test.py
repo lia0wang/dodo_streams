@@ -100,7 +100,7 @@ def test_dm_invalid_length_too_short():
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_send_program)
     assert response.status_code == 400
 
-def test_dm_invalid_dm():
+def test_dm_invalid_dm_http():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     register_param_1 = {
@@ -148,7 +148,6 @@ def test_dm_invalid_dm():
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_send_program)
     assert response.status_code == 400
 
-
 def test_dm__invalid_auth_id_http():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
@@ -176,12 +175,10 @@ def test_dm__invalid_auth_id_http():
     }
     user3 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_3).json()
 
-
     u_id2 = user2['auth_user_id']
     u_id3 = user3['auth_user_id']
 
-
-    u_ids = [u_id2,u_id3]
+    u_ids = [u_id2]
     
     dm_param = {
         'token': user1['token'],
@@ -191,12 +188,22 @@ def test_dm__invalid_auth_id_http():
     
     msg = "test"
 
-    dm_send_program = {
+    dm_send_program_1 = {
         'token': user2['token'],
         'dm_id': dm['dm_id'],
         'message': msg
     }
 
-    response = requests.post(f"{BASE_URL}/message/senddm/v1",json = dm_send_program)
-    assert response.status_code == 403
-    
+    response_1 = requests.post(f"{BASE_URL}/message/senddm/v1",json = dm_send_program_1)
+    assert response_1.status_code == 200
+
+    dm_send_program_2 = {
+        'token': user3['token'],
+        'dm_id': dm['dm_id'],
+        'message': msg
+    }
+    print(u_id3)
+    response_2 = requests.post(f"{BASE_URL}/message/senddm/v1",json = dm_send_program_2)
+    assert response_2.status_code == 403
+
+

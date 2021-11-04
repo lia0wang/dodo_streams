@@ -1,6 +1,8 @@
 import jwt
 import json
 import os
+import string
+import random
 import hashlib
 from src.error import InputError, AccessError
 from datetime import date, timezone, datetime
@@ -20,6 +22,21 @@ def create_jwt(u_id, session_id):
     payload = {
         "u_id": u_id,
         "session_id": session_id
+    }
+    return jwt.encode(payload, SECRET, algorithm = 'HS256')
+
+def create_password_reset_jwt(u_id, reset_code):
+    '''
+    Creates token given a handle string and session_id
+    Arguments: 
+        - u_id: user's u_id (int)
+        - reset_code: reset_code (str)
+    Returns:
+        - jwt encoded string
+    '''
+    payload = {
+        "u_id": u_id,
+        "reset_code": reset_code
     }
     return jwt.encode(payload, SECRET, algorithm = 'HS256')
 
@@ -61,7 +78,6 @@ def get_data():
     Returns:
         dictionary in a smilar manner to datastore.get
     '''
-    # Check if database exists
     with open('database.json') as file:
         data = json.load(file)
     file.close()
@@ -133,7 +149,10 @@ def seek_target_channel_and_errors(data, auth_user_id, channel_id):
 
 def check_valid_token(token):
     db_store = get_data()
-    decoded_jwt = decode_jwt(token)
+    try:
+        decoded_jwt = decode_jwt(token)
+    except Exception as error:
+        raise AccessError(description="Invalid Token") from error
 
     u_id = decoded_jwt['u_id']
     session_id = decoded_jwt['session_id']
@@ -162,3 +181,20 @@ def datetime_to_unix_time_stamp():
     timestamp = dt.replace(tzinfo=timezone.utc).timestamp()
     timestamp = int(timestamp)
     return timestamp
+
+def create_reset_code():
+    """creates password reset code
+    Returns:
+        Random 6 character alphanumeric string
+    """
+    db_store = get_data()
+    characters = string.ascii_letters + string.digits
+    reset_code = (''.join(random.choice(characters) for i in range(6))).upper()
+    if len(db_store) != 0:
+        for reset_token in db_store['reset_tokens']:
+            decoded = decode_jwt(reset_token)
+            # Ensure reset_code is not the same as any other active ones
+            while decoded['reset_code'] == reset_code:
+                reset_code = (''.join(random.choice(characters) for i in range(6))).upper()
+    return reset_code
+
