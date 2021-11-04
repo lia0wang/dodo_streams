@@ -50,6 +50,7 @@ def test_invalid_token():
     
     assert response.status_code == ACCESS_ERROR
 
+
 def test_invalid_message_id():
     '''
     Testing if the function identifies invalid message ids
@@ -100,6 +101,7 @@ def test_invalid_message_id():
     }
     response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
     assert response.status_code == INPUT_ERROR
+
 
 def test_message_already_pinned():
     '''
@@ -211,7 +213,6 @@ def test_non_owner_permissions():
     assert response.status_code == ACCESS_ERROR
 
 
-
 def test_valid():
     '''
     Testing if the function works properly
@@ -255,6 +256,16 @@ def test_valid():
     }
     
     message = requests.post(f"{BASE_URL}/message/send/v1", json = message_info).json()
+
+    messages_info = {
+        'token': auth_user['token'],
+        'channel_id': channel_1['channel_id'],
+        'start': 0,
+    }
+
+    messages = requests.get(f"{BASE_URL}/channel/messages/v2", json = messages_info).json()
+
+    assert messages['messages'][0]['is_pinned'] == False
     
     message_pin = {
         'token': auth_user['token'],
@@ -262,6 +273,16 @@ def test_valid():
     }
     response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
     response.status_code == OK
+
+    messages_info = {
+        'token': auth_user['token'],
+        'channel_id': channel_1['channel_id'],
+        'start': 0,
+    }
+
+    messages = requests.get(f"{BASE_URL}/channel/messages/v2", json = messages_info).json()
+
+    assert messages['messages'][0]['is_pinned'] == True
 
     message_info = {
         'token': user_1['token'],
@@ -285,3 +306,13 @@ def test_valid():
     }
     response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
     response.status_code == OK
+
+    messages_info = {
+        'token': auth_user['token'],
+        'channel_id': channel_1['channel_id'],
+        'start': 0,
+    }
+
+    messages = requests.get(f"{BASE_URL}/channel/messages/v2", json = messages_info).json()
+
+    assert messages['messages'][1]['is_pinned'] == True

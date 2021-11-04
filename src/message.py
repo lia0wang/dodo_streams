@@ -70,7 +70,8 @@ def message_send_v1(token, channel_id, message):
         'u_id': auth_user_id,
         'message': message,
         'channel_id': channel_id,
-        'time_created': timestamp
+        'time_created': timestamp,
+        'is_pinned': False
     }
 
     target_channel['messages'].append(message)  
@@ -255,7 +256,7 @@ def message_remove_v1(token, message_id):
                     save_database_updates(db_store)               
 
     if valid_dm == False and valid_channel_message == False:
-        raise InputError("Error: message_id oes not refer to a valid message within \
+        raise InputError("Error: message_id does not refer to a valid message within \
                          a channel /DM that the authorised user has joined")
                   
     
@@ -313,7 +314,8 @@ def message_senddm_v1(token, dm_id, message):
         'u_id': auth_user_id,
         'message': message,
         'dm_id':dm_id,
-        'time_created': timestamp
+        'time_created': timestamp,
+        'is_pinned': False
     }
 
     target_dm['messages'].append(dm_message)
@@ -323,5 +325,86 @@ def message_senddm_v1(token, dm_id, message):
         'message_id': message_id,
     }
 
-         
-         
+
+def message_pin_v1(token, message_id):
+    store = get_data()
+
+    u_id = decode_jwt(token)['u_id']
+
+    if store['message_index'] <= message_id:
+        raise InputError(description="Error: message_id does not refer to a valid message")
+
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            targer_user = user
+    
+    in_channel_dm = False
+    is_pinned = False
+    owner_permission = False
+
+    #Checking in channels       
+    for channel in store['channels']:
+        for message in channel['messages']:
+            if message['message_id'] == message_id:
+                if message['is_pinned']:
+                    is_pinned = True
+                for users in channel['all_members']:
+                    if u_id == users['u_id']:
+                        in_channel_dm = True
+                for users in channel['owner_members']:
+                    if u_id == users['u_id']:
+                        owner_permission = True
+                if targer_user['permission_id'] == 1:
+                    owner_permission = True
+
+                if not in_channel_dm:
+                    raise InputError(description="Authorised user is not a member of the channel")
+
+                if not owner_permission:
+                    raise AccessError(description="Authorised user does not have owner permissions")
+
+                if is_pinned:
+                    raise InputError(description="Message is already pinned")
+                
+    if in_channel_dm and owner_permission:
+        for channel in store['channels']:
+            for message in channel['messages']:
+                if message['message_id'] == message_id:
+                    message['is_pinned'] = True
+                    save_database_updates(store)
+
+    in_channel_dm = False
+    owner_permission = False
+
+    #Checking in dms
+    for dm in store['dms']:
+        for message in dm['messages']:
+            if message['message_id'] == message_id:
+                if message['is_pinned']:
+                    is_pinned = True
+                for users in channel['all_members']:
+                    if u_id == users['u_id']:
+                        in_channel_dm = True
+                for users in channel['owner_members']:
+                    if u_id == users['u_id']:
+                        owner_permission = True
+                if targer_user['permission_id'] == 1:
+                    owner_permission = True
+
+                if not in_channel_dm:
+                    raise InputError(description="Authorised user is not a member of the channel")
+
+                if not owner_permission:
+                    raise AccessError(description="Authorised user does not have owner permissions")
+
+                if is_pinned:
+                    raise InputError(description="Message is already pinned")
+                
+    if in_channel_dm and owner_permission:
+        for dm in store['dms']:
+            for message in dm['messages']:
+                if message['message_id'] == message_id:
+                    message['is_pinned'] = True
+                    save_database_updates(store)
+
+    return {}
