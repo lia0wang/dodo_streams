@@ -48,7 +48,7 @@ def test_single_message():
     assert msg_return['messages'][0]['message_id'] == 0
     assert msg_return['messages'][0]['u_id'] == 1
     assert msg_return['messages'][0]['message'] == 'Hi'
-    assert abs(msg_return['messages'][0]['time_created'] - expected_timestamp) < 1
+    assert abs(msg_return['messages'][0]['time_created'] - expected_timestamp) < 2
     assert chan_msg_return.status_code == 200
     assert msg_return['start'] == 0
     assert msg_return['end'] == -1
@@ -116,7 +116,7 @@ def test_basic_message_return():
         assert msg_return['messages'][i]['u_id'] == 1
         assert msg_return['messages'][i]['message'] == 'Hi'
         # checks that the time stamp is correct
-        assert abs(msg_return['messages'][i]['time_created'] - expected_timestamp) < 1
+        assert abs(msg_return['messages'][i]['time_created'] - expected_timestamp) < 2
         i+=1
 
     # running second for batch 2 of 50 messages

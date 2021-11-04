@@ -6,7 +6,7 @@ import random
 import hashlib
 from src.error import InputError, AccessError
 from datetime import date, timezone, datetime
-
+import time
 SECRET = "DODO"
 SESSION_ID = 0
 
@@ -175,11 +175,7 @@ def hash_encrypt(password_str):
     return hashlib.sha256(password_str.encode()).hexdigest()
 
 def datetime_to_unix_time_stamp():
-    today = date.today()
-    print(f"{today.year}")
-    dt = datetime(today.year, today.month, today.day)
-    timestamp = dt.replace(tzinfo=timezone.utc).timestamp()
-    timestamp = int(timestamp)
+    timestamp = int(time.time())
     return timestamp
 
 def create_reset_code():
