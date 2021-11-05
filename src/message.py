@@ -517,11 +517,12 @@ def message_pin_v1(token, message_id):
                 for users in channel['all_members']:
                     if u_id == users['u_id']:
                         in_channel_dm = True
+                        if targer_user['permission_id'] == 1:
+                            owner_permission = True
                 for users in channel['owner_members']:
                     if u_id == users['u_id']:
                         owner_permission = True
-                if targer_user['permission_id'] == 1:
-                    owner_permission = True
+                
 
                 if not in_channel_dm:
                     raise InputError(description="Authorised user is not a member of the channel")
