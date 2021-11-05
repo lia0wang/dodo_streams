@@ -46,6 +46,8 @@ def test_http_channel_invite_basic():
     response = requests.get(f"{BASE_URL}/notifications/get/v1", params = token)
     assert response.status_code == 200
     notif = response.json()
-    assert notif[0]['channel_id'] == 1
-    assert notif[0]['dm_id'] == -1
-    assert notif[0]['notification_message'] == 'added to a channel/DM: leonliao added you to league'
+    #assert notif[0]['auth_id'] == 11
+    assert notif['notifications'][0]['channel_id'] == 1
+    assert notif['notifications'][0]['dm_id'] == -1
+    assert notif['notifications'][0]['notification_message'] == \
+        'added to a channel/DM: leonliao added you to league'

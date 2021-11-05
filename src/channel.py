@@ -49,6 +49,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     for user in store['users']:
         if user['u_id'] == u_id:
             valid = True
+            tagged_user = user
             invited_user = {
                 'u_id': u_id,
                 'email': user['email'],
@@ -77,6 +78,17 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     for index, channel in enumerate(store['channels']):
         if channel['channel_id'] == channel_id:
             store['channels'][index]['all_members'].append(invited_user)
+
+    # create a log history to record the instance of invite
+    channel_invite_log = {
+        'u_id': u_id,
+        'channel_id': target_channel['channel_id'],
+        'handle_str': tagged_user['handle_str'],
+        'channel_name': target_channel['name'],
+        'notif_type': 'channel_invite'
+    }
+    store['log_history'].append(channel_invite_log)
+
     save_database_updates(store)
     return {
     }

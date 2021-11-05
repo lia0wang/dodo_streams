@@ -17,7 +17,6 @@ def test_http_register_basic():
     }
     get_response =  requests.post(f"{BASE_URL}/auth/register/v2", json = register_param)
     assert get_response.status_code == 200
-    
 
 def test_http_register_basic2():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})

@@ -20,6 +20,7 @@ from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.helper import check_valid_token, get_data, create_session_id
 from src.helper import save_database_updates, create_jwt, decode_jwt, hash_encrypt
 from src.other import clear_v1
+from src.notifications import notifications_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -614,6 +615,21 @@ def reset():
             user['password'] = hash_encrypt(new_password) 
     save_database_updates(db_store)
     return dumps({})
+
+@APP.route("/notifications/get/v1", methods=['GET'])
+def notifications_get():
+    # Retrieve token
+    token = request.args.get('token')
+    
+    # Check token and decode
+    check_valid_token(token)
+    decoded_token = decode_jwt(token)
+    auth_user_id = decoded_token['u_id']
+
+    # Pass parameters
+    notifications = notifications_v1(auth_user_id)
+    return dumps({"notifications": notifications})
+
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
