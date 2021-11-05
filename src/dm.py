@@ -174,6 +174,7 @@ def dm_messages_v1(auth_user_id, dm_id, start):
     for message in messages:
         total_messages += 1
 
+    messages.reverse()
     if start > total_messages:
         raise InputError(description="Error: Start must be lower than total_messages")
     if total_messages == 0:
@@ -188,7 +189,7 @@ def dm_messages_v1(auth_user_id, dm_id, start):
         #index = start
         #for message in reversed(messages):
         # [start:] is slicing where i am limiting it from start to the end
-        for index, message in enumerate(reversed(messages[start:]), start):
+        for index, message in enumerate(messages[start:], start):
             message_content = {
                     'message_id': message['message_id'],
                     'u_id': message['u_id'],

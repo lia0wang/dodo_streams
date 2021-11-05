@@ -10,14 +10,15 @@ from src.user import user_profile_v1, user_profile_setname_v1, user_profile_sete
 from src.user import user_profile_sethandle_v1, users_all_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1, dm_remove_v1
-from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_pin_v1
+from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_send_later_v1, message_pin_v1
+from src.message import message_send_later_dm_v1
 from src.error import InputError, AccessError
 from src import config
-from src.auth import auth_register_v1, auth_login_v1
+from src.auth import auth_passwordreset_request_v1, auth_register_v1, auth_login_v1
 from src.channels import channels_list_v1, channels_listall_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.helper import check_valid_token, get_data, create_session_id
-from src.helper import save_database_updates, create_jwt, decode_jwt
+from src.helper import save_database_updates, create_jwt, decode_jwt, hash_encrypt
 from src.other import clear_v1
 
 def quit_gracefully(*args):
@@ -85,6 +86,8 @@ def register():
     save_database_updates(database_store)
     register_return['token'] = create_jwt(u_id, session_id)
     return dumps(register_return)
+
+
 
 @APP.route("/auth/login/v2", methods=['POST'])
 def login():
@@ -368,6 +371,23 @@ def message_send():
     new_message = message_send_v1(token,channel_id,message)
     return dumps(new_message)
 
+@APP.route("/message/sendlater/v1", methods=['POST'])
+def message_sendlater():
+    request_data = request.get_json()
+    # Retrieve token
+    token = request_data['token']
+    check_valid_token(token)
+
+    # Retrieve channel id
+    channel_id = request_data['channel_id']
+    # Retrieve message
+    message = request_data['message']
+    # Retrieve time sent
+    time_sent = request_data['time_sent']
+    # Pass parameters
+    new_message = message_send_later_v1(token,channel_id,message, time_sent)
+    return dumps(new_message)
+
 @APP.route("/message/edit/v1", methods=['PUT'])
 def message_edit():
     request_data = request.get_json()
@@ -426,6 +446,23 @@ def message_pin():
     message_pin_v1(token, message_id)
 
     return dumps({})
+
+@APP.route("/message/sendlaterdm/v1", methods=['POST'])
+def message_sendlaterdm():
+    request_data = request.get_json()
+    # Retrieve token
+    token = request_data['token']
+    check_valid_token(token)
+
+    # Retrieve channel id
+    dm_id = request_data['dm_id']
+    # Retrieve message
+    message = request_data['message']
+    # Retrieve time sent
+    time_sent = request_data['time_sent']
+    # Pass parameters
+    new_message = message_send_later_dm_v1(token, dm_id, message, time_sent)
+    return dumps(new_message)
 
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages_v2():
@@ -535,6 +572,63 @@ def change_permission():
 
     admin_userpermission_change_v1(token, u_id, permission_id)
     
+    return dumps({})
+
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def reset_request():
+    # Retrieve email
+    request_data = request.get_json()
+    email = request_data['email']
+    auth_passwordreset_request_v1(email)
+    return dumps({})
+
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def reset():
+    '''
+    Given a reset code for a user, set that user's new password 
+    to the password provided.
+
+    Arguments:
+        reset_code (string) - code sent to user's email in auth/passwordreset/request/v1
+        new_password (string) - new passsword that user wants to change to
+
+    Exceptions:
+        InputError - occurs when email is being used by another user
+        InputError - occurs when reset_code is not a valid reset code
+
+    Return Value:
+        Returns empty dictionary
+    '''
+    # Retrieve reset code and new_password
+    request_data = request.get_json()
+    reset_code = request_data['reset_code']
+    new_password = request_data['new_password']
+
+    # Raise error if new password is less than 6 characters
+    if len(new_password) < 6:
+        raise InputError(description = "Error: Invalid new password")
+
+    # Fetch data
+    db_store = get_data()
+    is_valid_code = False
+    # See if the reset_code matches any reset_token in database.
+    for reset_token in db_store['reset_tokens']:
+        decoded = decode_jwt(reset_token)
+        if decoded['reset_code'] == reset_code:
+            is_valid_code = True
+            target_u_id = decoded['u_id']
+            # remove reset token after use
+            db_store['reset_tokens'].remove(reset_token)
+
+    # Raise error if reset code does not match any reset token
+    if is_valid_code == False:
+        raise InputError(description = "Error: Invalid code")
+
+    # Find user in database and change their password
+    for user in db_store['users']:
+        if user['u_id'] == target_u_id:
+            user['password'] = hash_encrypt(new_password) 
+    save_database_updates(db_store)
     return dumps({})
 
 #### NO NEED TO MODIFY BELOW THIS POINT
