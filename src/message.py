@@ -532,7 +532,8 @@ def message_pin_v1(token, message_id):
 
                 if is_pinned:
                     raise InputError(description="Message is already pinned")
-                
+    
+    # Pinning in channel  
     if in_channel_dm and owner_permission:
         for channel in store['channels']:
             for message in channel['messages']:
@@ -564,6 +565,7 @@ def message_pin_v1(token, message_id):
                 if is_pinned:
                     raise InputError(description="Message is already pinned")
                 
+    # Pinning in dm
     if in_channel_dm and owner_permission:
         for dm in store['dms']:
             for message in dm['messages']:
