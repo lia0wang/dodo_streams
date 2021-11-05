@@ -38,7 +38,7 @@ def test_invalid_token():
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
     permission_info = {
         'token': invalid['token'], # Invalid Token
