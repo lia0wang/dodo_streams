@@ -464,6 +464,10 @@ def message_pin():
 
     return dumps({})
 
+@APP.route("/message/unpin/v1", methods=['POST'])
+def message_unpin():
+    return dumps({})
+
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages_v2():
 
