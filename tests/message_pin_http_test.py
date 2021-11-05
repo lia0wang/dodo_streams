@@ -446,7 +446,7 @@ def test_valid():
         'start': 0,
     }
     messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info_param).json()
-    assert messages['messages'][1]['is_pinned'] == True
+    assert messages['messages'][0]['is_pinned'] == True
 
     # Creating dm
     dm_param_1 = {

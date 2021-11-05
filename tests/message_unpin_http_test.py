@@ -471,14 +471,14 @@ def test_valid():
     response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
     assert response.status_code == OK
 
-    # Checking if message was pinned
+    # Checking if message is unpinned
     messages_info_param = {
         'token': auth_user['token'],
         'channel_id': channel_1['channel_id'],
         'start': 0,
     }
     messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info_param).json()
-    assert messages['messages'][1]['is_pinned'] == True
+    assert messages['messages'][0]['is_pinned'] == True
     
     # Second user unpinning message
     message_unpin_json = {
@@ -495,7 +495,7 @@ def test_valid():
         'start': 0,
     }
     messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info_param).json()
-    assert messages['messages'][1]['is_pinned'] == False
+    assert messages['messages'][0]['is_pinned'] == False
 
     # Creating dm
     dm_param_1 = {
