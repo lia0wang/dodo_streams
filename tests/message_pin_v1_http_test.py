@@ -42,8 +42,7 @@ def test_invalid_token():
     
     permission_info = {
         'token': invalid['token'], # Invalid Token
-        'u_id': user_1['auth_user_id'],
-        'permission_id': 2
+        'message_id': 12,
     }
 
     response = requests.post(f"{BASE_URL}/message/pin/v1", json = permission_info)
@@ -160,6 +159,33 @@ def test_message_already_pinned():
     response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
     assert response.status_code == INPUT_ERROR
 
+    dm_param_1 = {
+        'token': auth_user['token'],
+        'u_ids': [user_1['auth_user_id']],
+    }
+    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param_1).json()
+
+    dm_message = {
+        'token': auth_user['token'],
+        'dm_id': dm['dm_id'],
+        'message': "Hi"
+    }
+    
+    dm_message = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message).json()
+
+    message_pin = {
+        'token': auth_user['token'],
+        'message_id': dm_message['message_id']
+    }
+    requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
+
+    message_pin = {
+        'token': auth_user['token'],
+        'message_id': dm_message['message_id']
+    }
+    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
+    assert response.status_code == INPUT_ERROR
+
 
 def test_non_owner_permissions():
     '''
@@ -212,6 +238,89 @@ def test_non_owner_permissions():
     response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
     assert response.status_code == ACCESS_ERROR
 
+    dm_param_1 = {
+        'token': auth_user['token'],
+        'u_ids': [user_1['auth_user_id']],
+    }
+    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param_1).json()
+
+    dm_message = {
+        'token': auth_user['token'],
+        'dm_id': dm['dm_id'],
+        'message': "Hi"
+    }
+    
+    dm_message = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message).json()
+
+    message_pin = {
+        'token': user_1['token'],
+        'message_id': dm_message['message_id']
+    }
+    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
+    assert response.status_code == ACCESS_ERROR
+
+
+def test_not_member():
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    register_param_1 = {
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
+    }
+    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+
+    register_param_2 = {
+        "email": "bob123@gmail.com",
+        "password": "bobahe",
+        "name_first": "Bob",
+        "name_last": "Marley"
+    }
+    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    
+    channel_param_1 = {
+        'token': auth_user['token'],
+        'name': 'league1',
+        'is_public': True
+    }
+    channel_1 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param_1).json()
+
+    message_info = {
+        'token': auth_user['token'],
+        'channel_id': channel_1['channel_id'],
+        'message': "Hello"
+    }
+    
+    message = requests.post(f"{BASE_URL}/message/send/v1", json = message_info).json()
+    
+    message_pin = {
+        'token': user_1['token'],
+        'message_id': message['message_id']
+    }
+    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
+    assert response.status_code == INPUT_ERROR
+
+    dm_param_1 = {
+        'token': auth_user['token'],
+        'u_ids': [],
+    }
+    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param_1).json()
+
+    dm_message = {
+        'token': auth_user['token'],
+        'dm_id': dm['dm_id'],
+        'message': "Hi"
+    }
+    
+    dm_message = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message).json()
+
+    message_pin = {
+        'token': user_1['token'],
+        'message_id': dm_message['message_id']
+    }
+    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
+    assert response.status_code == INPUT_ERROR
 
 def test_valid():
     '''
@@ -263,7 +372,7 @@ def test_valid():
         'start': 0,
     }
 
-    messages = requests.get(f"{BASE_URL}/channel/messages/v2", json = messages_info).json()
+    messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info).json()
 
     assert messages['messages'][0]['is_pinned'] == False
     
@@ -280,7 +389,7 @@ def test_valid():
         'start': 0,
     }
 
-    messages = requests.get(f"{BASE_URL}/channel/messages/v2", json = messages_info).json()
+    messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info).json()
 
     assert messages['messages'][0]['is_pinned'] == True
 
@@ -305,7 +414,7 @@ def test_valid():
         'message_id': message_1['message_id']
     }
     response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
-    response.status_code == OK
+    assert response.status_code == OK
 
     messages_info = {
         'token': auth_user['token'],
@@ -313,6 +422,35 @@ def test_valid():
         'start': 0,
     }
 
-    messages = requests.get(f"{BASE_URL}/channel/messages/v2", json = messages_info).json()
-
+    messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info).json()
     assert messages['messages'][1]['is_pinned'] == True
+
+    dm_param_1 = {
+        'token': auth_user['token'],
+        'u_ids': [user_1['auth_user_id']],
+    }
+    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_param_1).json()
+
+    dm_message = {
+        'token': auth_user['token'],
+        'dm_id': dm['dm_id'],
+        'message': "Hi"
+    }
+    
+    dm_message = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message).json()
+
+    message_pin = {
+        'token': auth_user['token'],
+        'message_id': dm_message['message_id']
+    }
+    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
+    assert response.status_code == OK
+    
+    messages_info = {
+        'token': auth_user['token'],
+        'dm_id': dm['dm_id'],
+        'start': 0,
+    }
+
+    messages = requests.get(f"{BASE_URL}/dm/messages/v1", params = messages_info).json()
+    assert messages['messages'][0]['is_pinned'] == True

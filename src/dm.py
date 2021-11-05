@@ -194,7 +194,8 @@ def dm_messages_v1(auth_user_id, dm_id, start):
                     'u_id': message['u_id'],
                     'message': message['message'],
                     'time_created': message['time_created'],
-                    'dm_id': dm_id
+                    'dm_id': dm_id,
+                    'is_pinned': message['is_pinned']
             } 
             index+=1
             segment_messages.append(message_content)

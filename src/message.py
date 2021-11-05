@@ -380,17 +380,14 @@ def message_pin_v1(token, message_id):
             if message['message_id'] == message_id:
                 if message['is_pinned']:
                     is_pinned = True
-                for users in channel['all_members']:
-                    if u_id == users['u_id']:
-                        in_channel_dm = True
-                for users in channel['owner_members']:
-                    if u_id == users['u_id']:
-                        owner_permission = True
-                if targer_user['permission_id'] == 1:
+                if u_id == dm['auth_user_id']:
                     owner_permission = True
+                for user in dm['u_ids']:
+                    if u_id == user:
+                        in_channel_dm = True
 
                 if not in_channel_dm:
-                    raise InputError(description="Authorised user is not a member of the channel")
+                    raise InputError(description="Authorised user is not a member of the dm")
 
                 if not owner_permission:
                     raise AccessError(description="Authorised user does not have owner permissions")
