@@ -750,10 +750,6 @@ def message_react_v1(token, message_id, react_id):
 
     if react_id != 1:
         raise InputError(description="Error: react_id is invalid")
-
-    for user in store['users']:
-        if user['u_id'] == u_id:
-            targer_user = user
     
     in_channel_dm = False
     reacted = False
