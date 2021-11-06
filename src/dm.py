@@ -190,10 +190,6 @@ def dm_messages_v1(auth_user_id, dm_id, start):
         #for message in reversed(messages):
         # [start:] is slicing where i am limiting it from start to the end
         for index, message in enumerate(messages[start:], start):
-            # for u_id in message['reacts'][0]['u_ids']:
-            #     if u_id == auth_user_id:
-            #         message['reacts'][0]['is_this_user_reacted'] = True
-            
             for react in message['reacts']:
                 if auth_user_id in react['u_ids']:
                     react['is_this_user_reacted'] = True
