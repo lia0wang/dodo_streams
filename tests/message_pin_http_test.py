@@ -278,6 +278,9 @@ def test_non_owner_permissions():
 
 
 def test_not_member():
+    '''
+    Checking if the function checks whether the user is a member
+    '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
     # Creating users
@@ -400,11 +403,11 @@ def test_valid():
     assert messages['messages'][0]['is_pinned'] == False
     
     # Pinning message and checking if pinned
-    message_pin = {
+    message_pin_json = {
         'token': auth_user['token'],
         'message_id': message['message_id']
     }
-    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin)
+    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
     response.status_code == OK
 
     messages_info_param = {

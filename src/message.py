@@ -493,6 +493,24 @@ def delayed_message(target_channel, db_store, message):
     save_database_updates(db_store)
 
 def message_pin_v1(token, message_id):
+    '''
+    A function that pins a message within a channel or dm given
+    that the user pinning the message has owner permissions in
+    that channel/dm.
+    
+    Arguments:
+        token - token of member with owner permission in the channel/dm
+        message_id - id of the message to be pinned
+    
+    Exceptions:
+        InputError  - message_id is not a valid message within a channel/dm the
+                      user has joined
+        InputError  - the message is already pinned
+        AccessError - user does not have owner permissions in the channel/dm
+    
+    Return Value:
+        Nothing is returned
+    '''
     store = get_data()
 
     u_id = decode_jwt(token)['u_id']
@@ -576,6 +594,24 @@ def message_pin_v1(token, message_id):
     return {}
 
 def message_unpin_v1(token, message_id):
+    '''
+    A function that unpins a message within a channel or dm given
+    that the user unpinning the message has owner permissions in
+    that channel/dm.
+    
+    Arguments:
+        token - token of member with owner permission in the channel/dm
+        message_id - id of the message to be unpinned
+    
+    Exceptions:
+        InputError  - message_id is not a valid message within a channel/dm the
+                      user has joined
+        InputError  - the message is not pinned
+        AccessError - user does not have owner permissions in the channel/dm
+    
+    Return Value:
+        Nothing is returned
+    '''
     store = get_data()
 
     u_id = decode_jwt(token)['u_id']
