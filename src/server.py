@@ -480,6 +480,10 @@ def message_unpin():
 
     return dumps({})
 
+@APP.route("/message/react/v1", methods=['POST'])
+def message_react():
+    return dumps({})
+
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages_v2():
 
