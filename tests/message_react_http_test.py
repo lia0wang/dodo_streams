@@ -425,7 +425,7 @@ def test_valid():
 
     # Checking if message was reacted to
     messages_info_param = {
-        'token': auth_user['token'],
+        'token': user_2['token'],
         'channel_id': channel_1['channel_id'],
         'start': 0,
     }

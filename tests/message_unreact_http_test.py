@@ -428,7 +428,7 @@ def test_valid():
 
     # Checking if message was reacted to
     messages_info_param = {
-        'token': auth_user['token'],
+        'token': user_2['token'],
         'channel_id': channel_1['channel_id'],
         'start': 0,
     }
@@ -531,11 +531,11 @@ def test_valid():
     response = requests.post(f"{BASE_URL}/message/unreact/v1", json = message_unreact_json)
     assert response.status_code == OK
     
-    # Checking if message is reacted to
+    # Checking if message is unreacted to
     messages_info_json = {
         'token': user_2['token'],
         'dm_id': dm['dm_id'],
         'start': 0,
     }
     messages = requests.get(f"{BASE_URL}/dm/messages/v1", params = messages_info_json).json()
-    assert messages['messages'][0]['reacts'][0]['is_this_user_reacted'] == True
+    assert messages['messages'][0]['reacts'][0]['is_this_user_reacted'] == False

@@ -807,3 +807,89 @@ def message_react_v1(token, message_id, react_id):
                     save_database_updates(store)
                     
     return {}
+
+def message_unreact_v1(token, message_id, react_id):
+    '''
+    A function that unreacts to a message within a channel or dm given
+    that the user unreacting is in that channel/dm.
+    
+    Arguments:
+        token      - token of member in the channel/dm
+        message_id - id of the message to be unreacted to
+        react_id   - reaction to be unreacted for the message
+    
+    Exceptions:
+        InputError  - message_id is not a valid message within a channel/dm the
+                      user has joined
+        InputError  - react_id is invalid
+        InputError  - user hasn't used the same react on the message
+    
+    Return Value:
+        Nothing is returned
+    '''
+    store = get_data()
+
+    u_id = decode_jwt(token)['u_id']
+
+    if store['message_index'] <= message_id:
+        raise InputError(description="Error: message_id does not refer to a valid message")
+
+    if react_id != 1:
+        raise InputError(description="Error: react_id is invalid")
+    
+    in_channel_dm = False
+    reacted = False
+    
+    # Checking in channels       
+    for channel in store['channels']:
+        for message in channel['messages']:
+            if message['message_id'] == message_id:
+                for users in channel['all_members']:
+                    if u_id == users['u_id']:
+                        in_channel_dm = True
+                    for user_id in message['reacts'][react_id - 1]['u_ids']:
+                        if u_id == user_id:
+                            reacted = True                
+
+                if not in_channel_dm:
+                    raise InputError(description="Authorised user is not a member of the channel")
+
+                if not reacted:
+                    raise InputError(description="Message is not reacted to")
+    
+    # Reacting to message in channel  
+    if in_channel_dm:
+        for channel in store['channels']:
+            for message in channel['messages']:
+                if message['message_id'] == message_id:
+                    message['reacts'][react_id - 1]['u_ids'].remove(u_id)
+                    save_database_updates(store)
+                    
+    in_channel_dm = False
+    
+    # Checking in dms       
+    for dm in store['dms']:
+        for message in dm['messages']:
+            if message['message_id'] == message_id:
+                for user in dm['u_ids']:
+                    if u_id == user:
+                        in_channel_dm = True
+                    for user_id in message['reacts'][react_id - 1]['u_ids']:
+                        if u_id == user_id:
+                            reacted = True                
+
+                if not in_channel_dm:
+                    raise InputError(description="Authorised user is not a member of the dm")
+
+                if not reacted:
+                    raise InputError(description="Message is not reacted to")
+    
+    # Reacting to message in dms  
+    if in_channel_dm:
+        for dm in store['dms']:
+            for message in dm['messages']:
+                if message['message_id'] == message_id:
+                    message['reacts'][react_id - 1]['u_ids'].remove(u_id)
+                    save_database_updates(store)
+                    
+    return {}
