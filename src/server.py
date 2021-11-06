@@ -497,6 +497,10 @@ def message_react():
     
     return dumps({})
 
+@APP.route("/message/unreact/v1", methods=['POST'])
+def message_unreact():
+    return dumps({})
+
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages_v2():
 
