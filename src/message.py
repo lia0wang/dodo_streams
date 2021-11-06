@@ -493,6 +493,24 @@ def delayed_message(target_channel, db_store, message):
     save_database_updates(db_store)
 
 def message_pin_v1(token, message_id):
+    '''
+    A function that pins a message within a channel or dm given
+    that the user pinning the message has owner permissions in
+    that channel/dm.
+    
+    Arguments:
+        token - token of member with owner permission in the channel/dm
+        message_id - id of the message to be pinned
+    
+    Exceptions:
+        InputError  - message_id is not a valid message within a channel/dm the
+                      user has joined
+        InputError  - the message is already pinned
+        AccessError - user does not have owner permissions in the channel/dm
+    
+    Return Value:
+        Nothing is returned
+    '''
     store = get_data()
 
     u_id = decode_jwt(token)['u_id']
@@ -571,6 +589,107 @@ def message_pin_v1(token, message_id):
             for message in dm['messages']:
                 if message['message_id'] == message_id:
                     message['is_pinned'] = True
+                    save_database_updates(store)
+
+    return {}
+
+def message_unpin_v1(token, message_id):
+    '''
+    A function that unpins a message within a channel or dm given
+    that the user unpinning the message has owner permissions in
+    that channel/dm.
+    
+    Arguments:
+        token - token of member with owner permission in the channel/dm
+        message_id - id of the message to be unpinned
+    
+    Exceptions:
+        InputError  - message_id is not a valid message within a channel/dm the
+                      user has joined
+        InputError  - the message is not pinned
+        AccessError - user does not have owner permissions in the channel/dm
+    
+    Return Value:
+        Nothing is returned
+    '''
+    store = get_data()
+
+    u_id = decode_jwt(token)['u_id']
+
+    if store['message_index'] <= message_id:
+        raise InputError(description="Error: message_id does not refer to a valid message")
+
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            targer_user = user
+    
+    in_channel_dm = False
+    is_pinned = False
+    owner_permission = False
+
+    #Checking in channels       
+    for channel in store['channels']:
+        for message in channel['messages']:
+            if message['message_id'] == message_id:
+                if message['is_pinned']:
+                    is_pinned = True
+                for users in channel['all_members']:
+                    if u_id == users['u_id']:
+                        in_channel_dm = True
+                        if targer_user['permission_id'] == 1:
+                            owner_permission = True
+                for users in channel['owner_members']:
+                    if u_id == users['u_id']:
+                        owner_permission = True
+                
+
+                if not in_channel_dm:
+                    raise InputError(description="Authorised user is not a member of the channel")
+
+                if not owner_permission:
+                    raise AccessError(description="Authorised user does not have owner permissions")
+
+                if not is_pinned:
+                    raise InputError(description="Message is already unpinned")
+    
+    # Unpinning in channel  
+    if in_channel_dm and owner_permission:
+        for channel in store['channels']:
+            for message in channel['messages']:
+                if message['message_id'] == message_id:
+                    message['is_pinned'] = False
+                    save_database_updates(store)
+
+    in_channel_dm = False
+    owner_permission = False
+
+    #Checking in dms
+    for dm in store['dms']:
+        for message in dm['messages']:
+            if message['message_id'] == message_id:
+                if message['is_pinned']:
+                    is_pinned = True
+                if u_id == dm['auth_user_id']:
+                    owner_permission = True
+                for user in dm['u_ids']:
+                    if u_id == user:
+                        in_channel_dm = True
+
+                if not in_channel_dm:
+                    raise InputError(description="Authorised user is not a member of the dm")
+
+                if not owner_permission:
+                    raise AccessError(description="Authorised user does not have owner permissions")
+
+                if not is_pinned:
+                    raise InputError(description="Message is already unpinned")
+                
+    # Pinning in dm
+    if in_channel_dm and owner_permission:
+        for dm in store['dms']:
+            for message in dm['messages']:
+                if message['message_id'] == message_id:
+                    message['is_pinned'] = False
                     save_database_updates(store)
 
     return {}

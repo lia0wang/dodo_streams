@@ -45,12 +45,12 @@ def test_invalid_token():
     
     # Using invalid user token
     
-    message_pin_json = {
+    message_unpin_json = {
         'token': invalid_user['token'], # Invalid Token
         'message_id': 12,
     }
 
-    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
+    response = requests.post(f"{BASE_URL}/message/unpin/v1", json = message_unpin_json)
     
     assert response.status_code == ACCESS_ERROR
 
@@ -102,17 +102,17 @@ def test_invalid_message_id():
     message = requests.post(f"{BASE_URL}/message/send/v1", json = message_info_json).json()
     
     # Calling wrong message
-    message_pin_json = {
+    message_unpin_json = {
         'token': auth_user['token'],
         'message_id': message['message_id'] + 35
     }
-    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
+    response = requests.post(f"{BASE_URL}/message/unpin/v1", json = message_unpin_json)
     assert response.status_code == INPUT_ERROR
 
 
-def test_message_already_pinned():
+def test_message_not_pinned():
     '''
-    Testing if the function checks if the message is already pinned
+    Testing if the function checks if the message is not pinned
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
@@ -156,18 +156,12 @@ def test_message_already_pinned():
     
     message = requests.post(f"{BASE_URL}/message/send/v1", json = message_info_json).json()
     
-    # Pinning the same message twice
-    message_pin_json = {
+    # Unpinning an unpinned message
+    message_unpin_json = {
         'token': auth_user['token'],
         'message_id': message['message_id']
     }
-    requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
-
-    message_pin_json = {
-        'token': auth_user['token'],
-        'message_id': message['message_id']
-    }
-    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
+    response = requests.post(f"{BASE_URL}/message/unpin/v1", json = message_unpin_json)
     assert response.status_code == INPUT_ERROR
 
     # Creating dm
@@ -185,18 +179,12 @@ def test_message_already_pinned():
     }
     dm_message = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_json).json()
 
-    # Pinning message twice
-    message_pin_json = {
+    # Unpinning an unpinned message
+    message_unpin_json = {
         'token': auth_user['token'],
         'message_id': dm_message['message_id']
     }
-    requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
-
-    message_pin_json = {
-        'token': auth_user['token'],
-        'message_id': dm_message['message_id']
-    }
-    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
+    response = requests.post(f"{BASE_URL}/message/unpin/v1", json = message_unpin_json)
     assert response.status_code == INPUT_ERROR
 
 
@@ -245,12 +233,19 @@ def test_non_owner_permissions():
     }
     message = requests.post(f"{BASE_URL}/message/send/v1", json = message_info_json).json()
     
-    # Unauthorised user pinning message
+    # Pinning message
     message_pin_json = {
+        'token': auth_user['token'],
+        'message_id': message['message_id']
+    }
+    requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
+    
+    # Unauthorised user unpinning message
+    message_unpin_json = {
         'token': user_1['token'],
         'message_id': message['message_id']
     }
-    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
+    response = requests.post(f"{BASE_URL}/message/unpin/v1", json = message_unpin_json)
     assert response.status_code == ACCESS_ERROR
 
     # Creating dm
@@ -268,12 +263,19 @@ def test_non_owner_permissions():
     }
     dm_message = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_json).json()
 
-    # Unauthorised user pinning message
+    # Pinning message
     message_pin_json = {
-        'token': user_1['token'],
+        'token': auth_user['token'],
         'message_id': dm_message['message_id']
     }
     response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
+    
+    # Unauthorised user unpinning message
+    message_unpin_json = {
+        'token': user_1['token'],
+        'message_id': dm_message['message_id']
+    }
+    response = requests.post(f"{BASE_URL}/message/unpin/v1", json = message_unpin_json)
     assert response.status_code == ACCESS_ERROR
 
 
@@ -316,12 +318,19 @@ def test_not_member():
     }
     message = requests.post(f"{BASE_URL}/message/send/v1", json = message_info_json).json()
     
-    # Member not in channel pinning message
+    # Pinning message
     message_pin_json = {
+        'token': auth_user['token'],
+        'message_id': message['message_id']
+    }
+    requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
+    
+    # Unauthorised user unpinning message
+    message_unpin_json = {
         'token': user_1['token'],
         'message_id': message['message_id']
     }
-    response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
+    response = requests.post(f"{BASE_URL}/message/unpin/v1", json = message_unpin_json)
     assert response.status_code == INPUT_ERROR
 
     # Creating dm without second user
@@ -339,12 +348,19 @@ def test_not_member():
     }
     dm_message = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_json).json()
 
-    # Second user pinning message
+    # Pinning message
     message_pin_json = {
-        'token': user_1['token'],
+        'token': auth_user['token'],
         'message_id': dm_message['message_id']
     }
     response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
+    
+    # Non member unpinning message
+    message_unpin_json = {
+        'token': user_1['token'],
+        'message_id': dm_message['message_id']
+    }
+    response = requests.post(f"{BASE_URL}/message/unpin/v1", json = message_unpin_json)
     assert response.status_code == INPUT_ERROR
 
 
@@ -417,6 +433,22 @@ def test_valid():
     }
     messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info_param).json()
     assert messages['messages'][0]['is_pinned'] == True
+    
+    # Unpinning message and checking if unpinned
+    message_unpin_json = {
+        'token': auth_user['token'],
+        'message_id': message['message_id']
+    }
+    response = requests.post(f"{BASE_URL}/message/unpin/v1", json = message_unpin_json)
+    response.status_code == OK
+
+    messages_info_param = {
+        'token': auth_user['token'],
+        'channel_id': channel_1['channel_id'],
+        'start': 0,
+    }
+    messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info_param).json()
+    assert messages['messages'][0]['is_pinned'] == False
 
     # Sending second message
     message_info_json = {
@@ -442,7 +474,7 @@ def test_valid():
     response = requests.post(f"{BASE_URL}/message/pin/v1", json = message_pin_json)
     assert response.status_code == OK
 
-    # Checking if message was pinned
+    # Checking if message is unpinned
     messages_info_param = {
         'token': auth_user['token'],
         'channel_id': channel_1['channel_id'],
@@ -450,6 +482,23 @@ def test_valid():
     }
     messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info_param).json()
     assert messages['messages'][0]['is_pinned'] == True
+    
+    # Second user unpinning message
+    message_unpin_json = {
+        'token': user_2['token'],
+        'message_id': message_1['message_id']
+    }
+    response = requests.post(f"{BASE_URL}/message/unpin/v1", json = message_unpin_json)
+    assert response.status_code == OK
+
+    # Checking if message is unpinned
+    messages_info_param = {
+        'token': auth_user['token'],
+        'channel_id': channel_1['channel_id'],
+        'start': 0,
+    }
+    messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info_param).json()
+    assert messages['messages'][0]['is_pinned'] == False
 
     # Creating dm
     dm_param_1 = {
@@ -482,3 +531,20 @@ def test_valid():
     }
     messages = requests.get(f"{BASE_URL}/dm/messages/v1", params = messages_info_json).json()
     assert messages['messages'][0]['is_pinned'] == True
+    
+    # Unpinning message in dm
+    message_unpin_json = {
+        'token': auth_user['token'],
+        'message_id': dm_message['message_id']
+    }
+    response = requests.post(f"{BASE_URL}/message/unpin/v1", json = message_unpin_json)
+    assert response.status_code == OK
+    
+    # Checking message is pinned
+    messages_info_json = {
+        'token': auth_user['token'],
+        'dm_id': dm['dm_id'],
+        'start': 0,
+    }
+    messages = requests.get(f"{BASE_URL}/dm/messages/v1", params = messages_info_json).json()
+    assert messages['messages'][0]['is_pinned'] == False
