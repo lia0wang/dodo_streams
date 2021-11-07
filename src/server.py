@@ -11,7 +11,7 @@ from src.user import user_profile_sethandle_v1, users_all_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1, dm_remove_v1
 from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_send_later_v1
-from src.message import message_send_later_dm_v1, message_pin_v1, message_unpin_v1
+from src.message import message_send_later_dm_v1, message_pin_v1, message_unpin_v1, message_react_v1
 from src.error import InputError, AccessError
 from src import config
 from src.auth import auth_passwordreset_request_v1, auth_register_v1, auth_login_v1
@@ -478,6 +478,23 @@ def message_unpin():
 
     message_unpin_v1(token, message_id)
 
+    return dumps({})
+
+@APP.route("/message/react/v1", methods=['POST'])
+def message_react():
+    # Retrieve data
+    data = request.get_json()
+    
+    # Retrieving and checking token
+    token = data['token']
+    check_valid_token(token)
+    
+    # Retrieving rest of info
+    message_id = data['message_id']
+    react_id = data['react_id']
+    
+    message_react_v1(token, message_id, react_id)
+    
     return dumps({})
 
 @APP.route("/dm/messages/v1", methods=['GET'])
