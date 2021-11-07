@@ -20,53 +20,53 @@ def test_invalid_token():
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param_0 = {
+    invalid_user_json = {
         "email": "bob123@gmail.com",
         "password": "bobahe",
         "name_first": "Bob",
         "name_last": "Marley"
     }
     
-    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_0).json()
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = invalid_user_json).json()
     
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param = {
+    auth_user_json = {
         "email": "shifanchen@gmail.com",
         "password": "djkadldjsa21",
         "name_first": "shifan",
         "name_last": "chen"
     }
-    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = auth_user_json).json()
 
-    register_param_1 = {
+    user_1_json = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = user_1_json).json()
 
-    register_param_2 = {
+    user_2_json = {
         "email": "z5306312@gmail.com",
         "password": "LeonLiao123",
         "name_first": "Leon",
         "name_last": "Liao"
     }
-    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = user_2_json).json()
 
-    dm_create_param = {
+    dm_create_json = {
         "token": auth_user["token"],
         "u_ids": [user_1["auth_user_id"], user_2["auth_user_id"]]
     }
 
-    requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param).json()
+    requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_json).json()
     
-    token = {
+    token_params = {
         "token": invalid['token'] # Invalid token
     }
     
-    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token)
+    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token_params)
     
     assert response.status_code == ACCESS_ERROR
 
@@ -76,42 +76,42 @@ def test_no_dms():
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param = {
+    auth_user_json = {
         "email": "shifanchen@gmail.com",
         "password": "djkadldjsa21",
         "name_first": "shifan",
         "name_last": "chen"
     }
-    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = auth_user_json).json()
 
-    register_param_1 = {
+    user_1_json = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = user_1_json).json()
 
-    register_param_2 = {
+    user_2_json = {
         "email": "z5306312@gmail.com",
         "password": "LeonLiao123",
         "name_first": "Leon",
         "name_last": "Liao"
     }
-    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = user_2_json).json()
 
-    dm_create_param_1 = {
+    dm_create_json = {
         "token": auth_user["token"],
         "u_ids": [user_1["auth_user_id"]]
     }
     
-    requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param_1).json()
+    requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_json).json()
     
-    token = {
+    token_params = {
         "token": user_2["token"]
     }
     
-    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token)
+    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token_params)
     dm_list = response.json()
     
     assert response.status_code == OK
@@ -123,34 +123,34 @@ def test_basic():
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param = {
+    auth_user_json = {
         "email": "shifanchen@gmail.com",
         "password": "djkadldjsa21",
         "name_first": "shifan",
         "name_last": "chen"
     }
-    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = auth_user_json).json()
 
-    register_param_1 = {
+    user_1_json = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = user_1_json).json()
 
-    dm_create_param = {
+    dm_create_json = {
         "token": auth_user["token"],
         "u_ids": [user_1["auth_user_id"]]
     }
 
-    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param).json()
+    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_json).json()
     
-    token = {
+    token_params = {
         "token": auth_user["token"]
     }
     
-    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token)
+    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token_params)
     dm_list = response.json()
     
     assert response.status_code == OK
@@ -162,49 +162,49 @@ def test_multiple_dms():
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param = {
+    auth_user_json = {
         "email": "shifanchen@gmail.com",
         "password": "djkadldjsa21",
         "name_first": "shifan",
         "name_last": "chen"
     }
-    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = auth_user_json).json()
 
-    register_param_1 = {
+    user_1_json = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = user_1_json).json()
 
-    register_param_2 = {
+    user_2_json = {
         "email": "z5306312@gmail.com",
         "password": "LeonLiao123",
         "name_first": "Leon",
         "name_last": "Liao"
     }
-    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = user_2_json).json()
 
-    dm_create_param_1 = {
+    dm_create_1_json = {
         "token": auth_user["token"],
         "u_ids": [user_1["auth_user_id"]]
     }
     
-    dm_1 = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param_1).json()
+    dm_1 = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_1_json).json()
     
-    dm_create_param_2 = {
+    dm_create_2_json = {
         "token": auth_user["token"],
         "u_ids":[user_2["auth_user_id"]]
     }
 
-    dm_2 = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param_2).json()
+    dm_2 = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_2_json).json()
     
-    token = {
+    token_params = {
         "token": auth_user["token"]
     }
     
-    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token)
+    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token_params)
     dm_list = response.json()
     
     assert response.status_code == OK
