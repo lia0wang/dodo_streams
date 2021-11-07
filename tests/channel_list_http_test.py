@@ -16,26 +16,26 @@ def test_http_list_basic():
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json={})
     
-    register_param = {
+    user_1_json = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = user_1_json).json()
 
-    channel_param = {
+    channel_json = {
         'token': user['token'],
         'name': 'league',
         'is_public': True
     }
-    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json()
+    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_json).json()
     
-    token = {
+    token_param = {
         'token': user['token']
     }
     
-    response = requests.get(f"{BASE_URL}/channels/list/v2", params = token)
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params = token_param)
     
     assert response.status_code == OK
     channel_list = response.json()
@@ -48,37 +48,37 @@ def test_http_invalid_token():
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param_0 = {
+    invalid_user_json = {
         "email": "bob123@gmail.com",
         "password": "bobahe",
         "name_first": "Bob",
         "name_last": "Marley"
     }
     
-    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_0).json()
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = invalid_user_json).json()
     
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param = {
+    user_0_json = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = user_0_json).json()
 
-    channel_param = {
+    channel_json = {
         'token': user['token'],
         'name': 'league',
         'is_public': True
     }
-    requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json()
+    requests.post(f"{BASE_URL}/channels/create/v2", json = channel_json).json()
     
-    token = {
+    token_params = {
         'token': invalid['token']  # Incorrect token
     }
     
-    response = requests.get(f"{BASE_URL}/channels/list/v2", params = token)
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params = token_params)
     
     assert response.status_code == ACCESS_ERROR
 
@@ -88,34 +88,34 @@ def test_http_list_multiple():
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param = {
+    user_0_json = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = user_0_json).json()
 
-    channel_param_1 = {
+    channel_1_json = {
         'token': user['token'],
         'name': 'league1',
         'is_public': True
     }
 
-    channel_param_2 = {
+    channel_2_json = {
         'token': user['token'],
         'name': 'league2',
         'is_public': False
     }
 
-    channel_1 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param_1).json()
-    channel_2 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param_2).json()
+    channel_1 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_1_json).json()
+    channel_2 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_2_json).json()
     
-    token = {
+    token_params = {
         'token': user['token']
     }
     
-    response = requests.get(f"{BASE_URL}/channels/list/v2", params = token)
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params = token_params)
     
     assert response.status_code == OK
     channel_list = response.json()

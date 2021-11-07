@@ -7,7 +7,8 @@ from flask_cors import CORS
 from src.channel import channel_addowner_v1, channel_invite_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1, channel_messages_v1
 from src.channel import channel_leave_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
-from src.user import user_profile_sethandle_v1, users_all_v1
+from src.user import user_profile_sethandle_v1
+from src.users import users_all_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1, dm_remove_v1
 from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_send_later_v1
@@ -322,6 +323,7 @@ def dm_leave():
     
     save_database_updates(store)
     return dumps({}) 
+
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list():
     # retrieve token
@@ -454,11 +456,11 @@ def message_pin():
     data = request.get_json()
 
     # Retrieving and checking token
-    token = data['token']
+    token = data.get('token')
     check_valid_token(token)
 
     # Retrieving message id
-    message_id = data['message_id']
+    message_id = data.get('message_id')
 
     message_pin_v1(token, message_id)
 
@@ -470,11 +472,11 @@ def message_unpin():
     data = request.get_json()
 
     # Retrieving and checking token
-    token = data['token']
+    token = data.get('token')
     check_valid_token(token)
 
     # Retrieving message id
-    message_id = data['message_id']
+    message_id = data.get('message_id')
 
     message_unpin_v1(token, message_id)
 
@@ -486,12 +488,12 @@ def message_react():
     data = request.get_json()
     
     # Retrieving and checking token
-    token = data['token']
+    token = data.get('token')
     check_valid_token(token)
     
     # Retrieving rest of info
-    message_id = data['message_id']
-    react_id = data['react_id']
+    message_id = data.get('message_id')
+    react_id = data.get('react_id')
     
     message_react_v1(token, message_id, react_id)
     
@@ -503,12 +505,12 @@ def message_unreact():
     data = request.get_json()
     
     # Retrieving and checking token
-    token = data['token']
+    token = data.get('token')
     check_valid_token(token)
     
     # Retrieving rest of info
-    message_id = data['message_id']
-    react_id = data['react_id']
+    message_id = data.get('message_id')
+    react_id = data.get('react_id')
     
     message_unreact_v1(token, message_id, react_id)
     
@@ -593,7 +595,6 @@ def set_handle():
 def list_users():
     # Retrieve token
     token = request.args.get('token')
-    # token = data['token']
     
     # Check if token is valid token
     check_valid_token(token)
@@ -601,12 +602,12 @@ def list_users():
     users = users_all_v1()
     return dumps(users)
 
-@APP.route("/admin/user/remove/v1", methods=["DELETE"])
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def remove_user():
     #Retrieve data
     data = request.get_json()
-    token = data['token']
-    u_id = data['u_id']
+    token = data.get('token')
+    u_id = data.get('u_id')
     
     admin_user_remove_v1(token, u_id)
     
@@ -616,9 +617,9 @@ def remove_user():
 def change_permission():
     # Retrieve data
     data = request.get_json()
-    token = data['token']
-    u_id = data['u_id']
-    permission_id = data['permission_id']
+    token = data.get('token')
+    u_id = data.get('u_id')
+    permission_id = data.get('permission_id')
 
     admin_userpermission_change_v1(token, u_id, permission_id)
     
