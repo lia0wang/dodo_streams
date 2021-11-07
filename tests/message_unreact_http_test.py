@@ -45,13 +45,13 @@ def test_invalid_token():
     
     # Using invalid user token
     
-    message_react_json = {
+    message_unreact_json = {
         'token': invalid_user['token'], # Invalid Token
         'message_id': 12,
         'react_id': 1
     }
 
-    response = requests.post(f"{BASE_URL}/message/react/v1", json = message_react_json)
+    response = requests.post(f"{BASE_URL}/message/unreact/v1", json = message_unreact_json)
     
     assert response.status_code == ACCESS_ERROR
 
@@ -103,12 +103,12 @@ def test_invalid_message_id():
     message = requests.post(f"{BASE_URL}/message/send/v1", json = message_info_json).json()
     
     # Calling wrong message
-    message_react_json = {
+    message_unreact_json = {
         'token': auth_user['token'],
         'message_id': message['message_id'] + 35,
         'react_id': 1,
     }
-    response = requests.post(f"{BASE_URL}/message/react/v1", json = message_react_json)
+    response = requests.post(f"{BASE_URL}/message/unreact/v1", json = message_unreact_json)
     assert response.status_code == INPUT_ERROR
 
 
@@ -175,19 +175,19 @@ def test_not_member():
     }
     dm_message = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_json).json()
 
-    # Second user reacting to message
-    message_react_json = {
+    # Second user unreacting to message
+    message_unreact_json = {
         'token': user_1['token'],
         'message_id': dm_message['message_id'],
         'react_id': 1,
     }
-    response = requests.post(f"{BASE_URL}/message/react/v1", json = message_react_json)
+    response = requests.post(f"{BASE_URL}/message/unreact/v1", json = message_unreact_json)
     assert response.status_code == INPUT_ERROR
 
 
-def test_invalid_react():
+def test_invalid_unreact():
     '''
-    Checking if the function identifies invalid reacts
+    Checking if the function identifies invalid unreacts
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
@@ -240,19 +240,19 @@ def test_invalid_react():
     }
     dm_message = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_json).json()
 
-    # Using wrong react on message
-    message_react_json = {
+    # Using wrong unreact on message
+    message_unreact_json = {
         'token': auth_user['token'],
         'message_id': dm_message['message_id'],
         'react_id': 3,
     }
-    response = requests.post(f"{BASE_URL}/message/react/v1", json = message_react_json)
+    response = requests.post(f"{BASE_URL}/message/unreact/v1", json = message_unreact_json)
     assert response.status_code == INPUT_ERROR
 
 
-def test_message_already_reacted():
+def test_message_not_reacted():
     '''
-    Testing if the function checks if the message is already reacted
+    Testing if the function checks if the message is not reacted
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
@@ -295,20 +295,13 @@ def test_message_already_reacted():
     }
     message = requests.post(f"{BASE_URL}/message/send/v1", json = message_info_json).json()
     
-    # Reacting to the same message twice
-    message_react_json = {
+    # Unreacting to a message without a reaction
+    message_unreact_json = {
         'token': auth_user['token'],
         'message_id': message['message_id'],
         'react_id': 1,
     }
-    requests.post(f"{BASE_URL}/message/react/v1", json = message_react_json)
-
-    message_react_json = {
-        'token': auth_user['token'],
-        'message_id': message['message_id'],
-        'react_id': 1,
-    }
-    response = requests.post(f"{BASE_URL}/message/react/v1", json = message_react_json)
+    response = requests.post(f"{BASE_URL}/message/unreact/v1", json = message_unreact_json)
     assert response.status_code == INPUT_ERROR
 
     # Creating dm
@@ -326,20 +319,13 @@ def test_message_already_reacted():
     }
     dm_message = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_message_json).json()
 
-    # Reacting to same message twice
-    message_react_json = {
+    # Unreacting to a message without a reaction
+    message_unreact_json = {
         'token': auth_user['token'],
         'message_id': dm_message['message_id'],
         'react_id': 1,
     }
-    requests.post(f"{BASE_URL}/message/react/v1", json = message_react_json)
-
-    message_react_json = {
-        'token': auth_user['token'],
-        'message_id': dm_message['message_id'],
-        'react_id': 1,
-    }
-    response = requests.post(f"{BASE_URL}/message/react/v1", json = message_react_json)
+    response = requests.post(f"{BASE_URL}/message/unreact/v1", json = message_unreact_json)
     assert response.status_code == INPUT_ERROR
 
 
@@ -413,6 +399,23 @@ def test_valid():
     }
     messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info_param).json()
     assert messages['messages'][0]['reacts'][0]['is_this_user_reacted'] == True
+    
+    # Unreacting to message and checking if unreacted to
+    message_unreact_json = {
+        'token': auth_user['token'],
+        'message_id': message['message_id'],
+        'react_id': 1,
+    }
+    response = requests.post(f"{BASE_URL}/message/unreact/v1", json = message_unreact_json)
+    response.status_code == OK
+
+    messages_info_param = {
+        'token': auth_user['token'],
+        'channel_id': channel_1['channel_id'],
+        'start': 0,
+    }
+    messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info_param).json()
+    assert messages['messages'][0]['reacts'][0]['is_this_user_reacted'] == False
 
     # Second user reacting to message
     message_react_json = {
@@ -431,6 +434,24 @@ def test_valid():
     }
     messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info_param).json()
     assert messages['messages'][0]['reacts'][0]['is_this_user_reacted'] == True
+
+    # Second user unreacting to message
+    message_unreact_json = {
+        'token': user_2['token'],
+        'message_id': message['message_id'],
+        'react_id': 1,
+    }
+    response = requests.post(f"{BASE_URL}/message/unreact/v1", json = message_unreact_json)
+    assert response.status_code == OK
+
+    # Checking if message was unreacted to
+    messages_info_param = {
+        'token': auth_user['token'],
+        'channel_id': channel_1['channel_id'],
+        'start': 0,
+    }
+    messages = requests.get(f"{BASE_URL}/channel/messages/v2", params = messages_info_param).json()
+    assert messages['messages'][0]['reacts'][0]['is_this_user_reacted'] == False
 
     # Creating dm
     dm_param_1 = {
@@ -465,6 +486,24 @@ def test_valid():
     messages = requests.get(f"{BASE_URL}/dm/messages/v1", params = messages_info_json).json()
     assert messages['messages'][0]['reacts'][0]['is_this_user_reacted'] == True
     
+    # Unreacting to message in dm
+    message_unreact_json = {
+        'token': auth_user['token'],
+        'message_id': dm_message['message_id'],
+        'react_id': 1,
+    }
+    response = requests.post(f"{BASE_URL}/message/unreact/v1", json = message_unreact_json)
+    assert response.status_code == OK
+    
+    # Checking if message is unreacted to
+    messages_info_json = {
+        'token': auth_user['token'],
+        'dm_id': dm['dm_id'],
+        'start': 0,
+    }
+    messages = requests.get(f"{BASE_URL}/dm/messages/v1", params = messages_info_json).json()
+    assert messages['messages'][0]['reacts'][0]['is_this_user_reacted'] == False
+    
     # Reacting to message in dm
     message_react_json = {
         'token': user_2['token'],
@@ -482,3 +521,21 @@ def test_valid():
     }
     messages = requests.get(f"{BASE_URL}/dm/messages/v1", params = messages_info_json).json()
     assert messages['messages'][0]['reacts'][0]['is_this_user_reacted'] == True
+    
+    # Unreacting to message in dm
+    message_unreact_json = {
+        'token': user_2['token'],
+        'message_id': dm_message['message_id'],
+        'react_id': 1,
+    }
+    response = requests.post(f"{BASE_URL}/message/unreact/v1", json = message_unreact_json)
+    assert response.status_code == OK
+    
+    # Checking if message is unreacted to
+    messages_info_json = {
+        'token': user_2['token'],
+        'dm_id': dm['dm_id'],
+        'start': 0,
+    }
+    messages = requests.get(f"{BASE_URL}/dm/messages/v1", params = messages_info_json).json()
+    assert messages['messages'][0]['reacts'][0]['is_this_user_reacted'] == False
