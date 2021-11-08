@@ -8,6 +8,7 @@ import requests
 import urllib.request
 from PIL import Image
 from src import config
+import time
 BASE_URL = config.url
 
 def user_profile_v1(u_id):
