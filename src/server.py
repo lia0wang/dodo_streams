@@ -715,7 +715,7 @@ def standup_send():
     channel_id = request_data['channel_id']
     message = request_data['message']
     
-    standup_send_v1(decode_token['u_id'], channel_id, message)
+    standup_send_v1(int(decode_token['u_id']), channel_id, message)
     return dumps({})
 
 #### NO NEED TO MODIFY BELOW THIS POINT

@@ -88,7 +88,7 @@ def test_http_invalid_token():
     message = "frontend alot fun?"
 
     standup_send_praram = {
-        'token': owner['token'] + 'fadas',
+        'token': owner['token'] + '999',
         'channel_id': channel['channel_id'],
         'message': message
     }
