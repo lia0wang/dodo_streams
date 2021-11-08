@@ -12,30 +12,30 @@ def test_invalid_token():
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param_0 = {
+    invalid_user_json = {
         "email": "bob123@gmail.com",
         "password": "bobahe",
         "name_first": "Bob",
         "name_last": "Marley"
     }
     
-    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_0).json()
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = invalid_user_json).json()
     
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param = {
+    user_1_json = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    requests.post(f"{BASE_URL}/auth/register/v2", json = user_1_json).json()
     
-    token = {
+    token_params = {
         'token': invalid['token'] # Incorrect token
     }
     
-    response = requests.get(f"{BASE_URL}/users/all/v1", params = token)
+    response = requests.get(f"{BASE_URL}/users/all/v1", params = token_params)
     
     assert response.status_code == ACCESS_ERROR
     
@@ -45,19 +45,19 @@ def test_single_user():
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param = {
+    user_json = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = user_json).json()
     
-    token = {
+    token_params = {
         'token': user['token']
     }
     
-    response = requests.get(f"{BASE_URL}/users/all/v1", params = token)
+    response = requests.get(f"{BASE_URL}/users/all/v1", params = token_params)
     
     assert response.status_code == OK
     
@@ -75,28 +75,32 @@ def test_multiple_users():
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
-    register_param_1 = {
+    user_1_json = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = user_1_json).json()
 
 
-    register_param_2 = {
+    user_2_json = {
         "email": "bob123@gmail.com",
         "password": "qwerty",
         "name_first": "Bob",
         "name_last": "Marley"
     }
+<<<<<<< HEAD:tests/users_all_v1_http_test.py
     user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+=======
+    requests.post(f"{BASE_URL}/auth/register/v2", json = user_2_json).json()
+>>>>>>> master:tests/http_tests/user/users_all_v1_http_test.py
     
-    token = {
+    token_params = {
         'token': user_1['token']
     }
     
-    response = requests.get(f"{BASE_URL}/users/all/v1", params = token)
+    response = requests.get(f"{BASE_URL}/users/all/v1", params = token_params)
     
     assert response.status_code == OK
     

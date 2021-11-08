@@ -180,7 +180,6 @@ def user_profile_sethandle_v1(u_id, handle_str):
     save_database_updates(db_store)
     return {}
 
-
 def users_all_v1():
     '''
     Returns all users

@@ -190,12 +190,18 @@ def dm_messages_v1(auth_user_id, dm_id, start):
         #for message in reversed(messages):
         # [start:] is slicing where i am limiting it from start to the end
         for index, message in enumerate(messages[start:], start):
+            for react in message['reacts']:
+                if auth_user_id in react['u_ids']:
+                    react['is_this_user_reacted'] = True
+            
             message_content = {
                     'message_id': message['message_id'],
                     'u_id': message['u_id'],
                     'message': message['message'],
                     'time_created': message['time_created'],
-                    'dm_id': dm_id
+                    'dm_id': dm_id,
+                    'is_pinned': message['is_pinned'],
+                    'reacts': message['reacts'],
             } 
             index+=1
             segment_messages.append(message_content)
