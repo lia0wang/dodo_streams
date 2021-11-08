@@ -273,7 +273,7 @@ def user_stats_v1(token):
     for joined_channel in channel_list:
         num_channels_joined += 1
         for channel in db_store['channels']:
-            if channel['channel_id'] = joined_channel['channel_id']:
+            if channel['channel_id'] == joined_channel['channel_id']:
                 for message in channel['messages']:
                     if message['u_id'] == auth_user_id:
                         num_msgs_sent += 1
@@ -281,7 +281,7 @@ def user_stats_v1(token):
     for joined_dm in dm_list:
         num_dms_joined += 1
         for dm in db_store['dms']:
-             if dm['dm_id'] = joined_dm['dm_id']:
+             if dm['dm_id'] == joined_dm['dm_id']:
                  for message in dm['messages']:
                      if message['u_id'] == auth_user_id:
                          num_msgs_sent +=1
