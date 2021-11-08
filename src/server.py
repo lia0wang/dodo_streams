@@ -12,7 +12,7 @@ from src.user import user_profile_sethandle_v1
 from src.users import users_all_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1, dm_remove_v1
-from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_send_later_v1
+from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_send_later_v1, message_share_v1
 from src.message import message_send_later_dm_v1, message_pin_v1, message_unpin_v1, message_react_v1, message_unreact_v1
 from src.standup import standup_send_v1
 from src.error import InputError, AccessError
@@ -515,6 +515,25 @@ def message_unreact():
     react_id = data.get('react_id')
     
     message_unreact_v1(token, message_id, react_id)
+    
+    return dumps({})
+
+@APP.route("/message/share/v1", methods=['POST'])
+def message_share():
+    # Retrieve data
+    data = request.get_json()
+    
+    # Retrieving and checking token
+    token = data.get('token')
+    check_valid_token(token)
+    
+    # Retrieving rest of info
+    og_message_id = data.get('og_message_id')
+    message = data.get('message')
+    channel_id = data.get('channel_id')
+    dm_id = data.get('dm_id')
+    
+    message_share_v1(token, og_message_id, message, channel_id, dm_id)
     
     return dumps({})
 
