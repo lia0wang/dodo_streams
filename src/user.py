@@ -263,3 +263,48 @@ def user_stats_v1(token):
     auth_user_id = decode_jwt(token)['u_id']
     channel_list = channels_list_v1(auth_user_id)
     dm_list = dm_list_v1(token)
+    timestamp = datetime_to_unix_time_stamp()
+    num_channels = 0
+    num_joined_channels = 0
+    num_dms = 0
+    num_joined_dms = 0
+    num_msgs = 0
+    num_sent_msgs = 0
+    for joined_channel in channel_list:
+        num_joined_channels += 1
+        for channel in db_store['channels']:
+            if channel['channel_id'] = joined_channel['channel_id']:
+                for message in channel['messages']:
+                    if message['u_id'] == auth_user_id:
+                        num_sent_msgs += 1
+                        
+    for joined_dm in dm_list:
+        num_joined_dms += 1
+        for dm in db_store['dms']:
+             if dm['dm_id'] = joined_dm['dm_id']:
+                 for message in dm['messages']:
+                     if message['u_id'] == auth_user_id:
+                         num_sent_msgs +=1
+                         
+    for channel in db_store['channels']:
+        num_channels += 1
+        for message in channel['messages']:
+            num_msgs += 1
+    for dm in db_store['dms']:
+        num_dms += 1
+        for message in dm['messages']:
+            num_msgs += 1
+
+    involvement_rate = (num_joined_channels + num_joined_dms + num_sent_msgs) / (num_channels + num_dms + num_msgs)
+
+    user_stats = {
+        'channels_joined': num_joined_channels,
+        'dms_joined': num_joined_dms,
+        'messages_sent': num_sent_msgs,
+        'involvement_rate': involvement_rate
+        }
+    
+    return user_stats
+        
+                 
+    
