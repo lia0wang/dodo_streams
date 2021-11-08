@@ -35,14 +35,10 @@ def standup_send_v1(auth_user_id, channel_id, message):
     '''
     store = get_data()
 
-    # Check if the auth_user_id is valid
-    valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             auth_user = user
             valid = True
-    if not valid:
-        raise AccessError(description="Invalid token!")
 
     # Check if the channel_id is valid
     valid = False
