@@ -304,9 +304,9 @@ def user_stats_v1(token):
         involvement_rate = involved/_all
 
     user_stats = {
-        'channels_joined': {num_channels_joined,timestamp}
-        'dms_joined': {num_dms_joined,timestamp}
-        'messages_sent': {num_msgs_sent,timestamp}
+        'channels_joined': {num_channels_joined,timestamp},
+        'dms_joined': {num_dms_joined,timestamp},
+        'messages_sent': {num_msgs_sent,timestamp},
         'involvement_rate': {involvement_rate,timestamp}
         }
     
