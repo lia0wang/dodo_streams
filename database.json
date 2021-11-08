@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
     "users": [
         {
@@ -50,3 +51,6 @@
     "reset_tokens": [],
     "message_index": 0
 }
+=======
+{"users": [{"u_id": 1, "email": "AgentSmith@hotmail.com", "password": "e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae", "name_first": "Agent", "name_last": "Smith", "handle_str": "agentsmith", "permission_id": 1}, {"u_id": 2, "email": "JohnSmith@hotmail.com", "password": "e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae", "name_first": "John", "name_last": "Smith", "handle_str": "johnsmith", "permission_id": 2}, {"u_id": 3, "email": "AgentJohnson@hotmail.com", "password": "e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae", "name_first": "Agent", "name_last": "Johnson", "handle_str": "agentjohnson", "permission_id": 2}], "channels": [{"channel_id": 1, "name": "comp1531", "is_public": true, "owner_members": [{"u_id": 1, "email": "AgentSmith@hotmail.com", "name_first": "Agent", "name_last": "Smith", "handle_str": "agentsmith", "permission_id": 1}], "all_members": [{"u_id": 1, "email": "AgentSmith@hotmail.com", "name_first": "Agent", "name_last": "Smith", "handle_str": "agentsmith", "permission_id": 1}], "messages": [{"message_id": 0, "u_id": 1, "message": ",", "channel_id": 1, "time_created": 1636299380, "is_pinned": false, "reacts": [{"react_id": 1, "u_ids": [], "is_this_user_reacted": false}]}]}], "messages": [], "dms": [{"dm_id": 1, "dm_name": "agentjohnson, johnsmith", "auth_user_id": 3, "u_ids": [3, 2], "messages": []}], "reset_tokens": [], "message_index": 1}
+>>>>>>> message/share/v1
