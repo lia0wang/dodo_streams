@@ -648,6 +648,7 @@ def list_users():
 @APP.route("/user/stats/v1", methods=['GET'])
 def user_stats():
     token = request.args.get('token')
+    check_valid_token(token)
     stats = user_stats_v1(token)
     return dumps(stats)
 
