@@ -1,13 +1,16 @@
 import sys
 import signal
 import re
+import requests
+import urllib.request
+from PIL import Image
 from json import dump, dumps
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 from src.channel import channel_addowner_v1, channel_invite_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1, channel_messages_v1
 from src.channel import channel_leave_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
-from src.user import user_profile_sethandle_v1, users_all_v1
+from src.user import user_profile_sethandle_v1, users_all_v1, user_profile_uploadphoto_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1, dm_remove_v1
 from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_send_later_v1
@@ -20,6 +23,8 @@ from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.helper import check_valid_token, get_data, create_session_id
 from src.helper import save_database_updates, create_jwt, decode_jwt, hash_encrypt
 from src.other import clear_v1
+from src import config
+BASE_URL = config.url
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -522,6 +527,25 @@ def set_handle():
     user_profile_sethandle_v1(decoded_jwt['u_id'], handle_str)
 
     return dumps({})
+
+@APP.route("/user/profile/uploadphoto/v1", methods=['POST'])
+def uploadphoto():
+    request_data = request.get_json()
+    check_valid_token(request_data['token'])
+    decoded_token = decode_jwt(request_data['token'])
+    u_id = decoded_token["u_id"]
+    img_url = request_data["img_url"] 
+    x_start = request_data["x_start"] 
+    y_start = request_data["y_start"] 
+    x_end = request_data["x_end"] 
+    y_end = request_data["y_end"]
+    user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end)
+    return dumps({})
+
+@APP.route('/static/<path:path>')
+def send_js(path):
+    return send_from_directory('src/static', path)
+
 
 @APP.route("/users/all/v1", methods=['GET'])
 def list_users():
