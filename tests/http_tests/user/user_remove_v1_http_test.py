@@ -200,28 +200,16 @@ def test_basic():
     token_params = {
         'token': auth_user['token']
     }
-<<<<<<< HEAD:tests/user_remove_v1_http_test.py
-    user_list = requests.get(f"{BASE_URL}/users/all/v1", params = token).json()
+    user_list = requests.get(f"{BASE_URL}/users/all/v1", params = token_params).json()
     assert len(user_list['users']) == 1
 
-=======
-    user_list = requests.get(f"{BASE_URL}/users/all/v1", params = token_params).json()
-    assert user_list == {"users": [{'u_id': 1, 'email': auth_user_json['email'], 'name_first': auth_user_json['name_first'], 
-                          'name_last': auth_user_json['name_last'], 'handle_str': "shifanchen", 'permission_id': 1}]}
-    
->>>>>>> master:tests/http_tests/user/user_remove_v1_http_test.py
     # Removed from channels
     channel_details_param = {
         'token': auth_user['token'],
         'channel_id': channel['channel_id']
     }
     channel_details = requests.get(f"{BASE_URL}/channel/details/v2", params = channel_details_param).json()
-<<<<<<< HEAD:tests/user_remove_v1_http_test.py
     assert len(channel_details['all_members']) == 1 
-=======
-    assert channel_details['all_members'] == [{'u_id': 1, 'email': auth_user_json['email'], 'name_first': auth_user_json['name_first'], 
-                                              'name_last': auth_user_json['name_last'], 'handle_str': "shifanchen"}]
->>>>>>> master:tests/http_tests/user/user_remove_v1_http_test.py
     
     # Removed from dms
     dm_details_param = {
@@ -229,12 +217,7 @@ def test_basic():
         'dm_id': dm['dm_id']
     }
     dm_details = requests.get(f"{BASE_URL}/dm/details/v1", params = dm_details_param).json()
-<<<<<<< HEAD:tests/user_remove_v1_http_test.py
     assert len(dm_details['members']) == 1 
-=======
-    assert dm_details['members'] == [{'u_id': 1, 'email': auth_user_json['email'], 'name_first': auth_user_json['name_first'], 
-                                       'name_last': auth_user_json['name_last'], 'handle_str': "shifanchen"}]
->>>>>>> master:tests/http_tests/user/user_remove_v1_http_test.py
     
     # Retrieve profile
     user_profile_param = {

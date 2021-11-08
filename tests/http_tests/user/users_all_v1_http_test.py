@@ -90,11 +90,7 @@ def test_multiple_users():
         "name_first": "Bob",
         "name_last": "Marley"
     }
-<<<<<<< HEAD:tests/users_all_v1_http_test.py
-    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
-=======
-    requests.post(f"{BASE_URL}/auth/register/v2", json = user_2_json).json()
->>>>>>> master:tests/http_tests/user/users_all_v1_http_test.py
+    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = user_2_json).json()
     
     token_params = {
         'token': user_1['token']

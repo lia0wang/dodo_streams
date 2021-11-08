@@ -227,8 +227,7 @@ def test_basic():
         'token': user_1['token']
     }
     
-<<<<<<< HEAD:tests/user_permission_change_v1_http_test.py
-    user_list = requests.get(f"{BASE_URL}/users/all/v1", params = token).json()
+    user_list = requests.get(f"{BASE_URL}/users/all/v1", params = token_params).json()
     assert user_list["users"][0]['u_id'] == auth_user['auth_user_id']
     assert user_list["users"][0]['email'] == "11037.666@gmail.com"
     assert user_list["users"][0]['name_first'] == "Hopeful"
@@ -240,13 +239,6 @@ def test_basic():
     assert user_list["users"][1]['name_first'] == "Bob"
     assert user_list["users"][1]['name_last'] == "Marley"
     assert user_list["users"][1]['handle_str'] == "bobmarley"
-=======
-    user_list = requests.get(f"{BASE_URL}/users/all/v1", params = token_params).json()
-    assert user_list == {"users": [{"u_id": 1,"email": "11037.666@gmail.com", "name_first": "Hopeful", 
-                          "name_last": "Boyyy", "handle_str": "hopefulboyyy", "permission_id": 1},
-                         {"u_id": 2,"email": "bob123@gmail.com", "name_first": "Bob", 
-                          "name_last": "Marley", "handle_str": "bobmarley", "permission_id": 1}]}
->>>>>>> master:tests/http_tests/user/user_permission_change_v1_http_test.py
 
     message_info_json = {
         'token': auth_user['token'],
