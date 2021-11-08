@@ -17,6 +17,48 @@ def standup_start_v1():
         Return a dictionary containing a valid channel_id.
     '''
 
+def standup_active_v1(auth_user_id, channel_id):
+    '''
+    Return whether a standuo is active in a channel.
+    And the what time it finishes.
+    Return None for inactive standup.
+    Arguments:
+        auth_user_id (int)  - The ID of the valid user.
+        channel_id (int)    - The id of the channel.
+    Exceptions:
+        InputError          - channel_id invalid
+        AccessError         - channel_id valid but the auth user is not a member of the channel
+    Return Value:
+        {
+            is_active,
+            time_finish
+        }
+    '''
+    store = get_data()
+
+    # Check if the channel_id is valid
+    valid = False
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            target_channel = channel
+            valid = True
+    if not valid:
+        raise InputError(description="Invalid channel ID!")
+
+    # Check if the auth user is not a member of the channel
+    auth_is_member = False
+    for member in target_channel['all_members']:
+        if member['u_id'] == auth_user_id:
+            auth_is_member = True
+    if not auth_is_member:
+            raise AccessError(description="The authorized user is not a member of the channel.")
+
+    return{
+        'is_active': target_channel['standup']['is_active'],
+        'time_finish': target_channel['standup']['time_finish']
+    }
+
+
 def standup_send_v1(auth_user_id, channel_id, message):
     '''
     Send a message to get buffered in the standup queue.
