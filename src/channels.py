@@ -142,7 +142,8 @@ def channels_create_v1(auth_user_id, name, is_public):
         'messages': [],
         'standup': {
             'is_active': False,
-            'buffer': []
+            'buffer': [],
+            'time_finish': None
         }
     }
 
