@@ -1,7 +1,12 @@
 import re
-from src.helper import get_data, save_database_updates
+import os
+from src.helper import get_data, save_database_updates, decode_jwt
 from src.error import InputError
-
+import requests
+import urllib.request
+from PIL import Image
+from src import config
+BASE_URL = config.url
 
 def user_profile_v1(u_id):
     """
@@ -42,7 +47,8 @@ def user_profile_v1(u_id):
         'email': target_user['email'],
         'name_first': target_user['name_first'],
         'name_last': target_user['name_last'],
-        'handle_str': target_user['handle_str']
+        'handle_str': target_user['handle_str'], 
+        'profile_img_url': target_user['profile_img_url']
     }
     return user_return
 
@@ -174,7 +180,6 @@ def user_profile_sethandle_v1(u_id, handle_str):
     save_database_updates(db_store)
     return {}
 
-
 def users_all_v1():
     '''
     Returns all users
@@ -206,3 +211,47 @@ def users_all_v1():
             del new_user['session_list']
             users.append(new_user)
     return {"users": users}
+
+def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
+
+    # Check if image url is valid
+    response = requests.get(img_url)
+    if response.status_code != 200:
+        raise InputError(description="Error: Invalid Image url")
+
+    # Check if image url is a jpg or jpeg
+    r_image = re.compile(r".*\.(jpg|jpeg)$") 
+    if not r_image.match(img_url):
+        raise InputError(description="Error: Image not a JPG")
+
+    # Create image filename and path string
+    imgfile_list = os.listdir("src/static/")
+    img_file = "profile_img" + str(len(imgfile_list)) + ".jpg"
+    img_file_path = "src/static/" + img_file
+
+    # Download image
+    urllib.request.urlretrieve(img_url, img_file_path)
+    imageObject = Image.open(img_file_path)
+    width, height = imageObject.size
+
+    # Check if dimensions are valid
+    if x_end not in range(width + 1) or y_end not in range(height + 1):
+        raise InputError(description="Error: Image dimensions out of range")
+    if x_start not in range(width + 1) or y_start not in range(height + 1):
+        raise InputError(description="Error: Image dimensions out of range")
+    if x_end < x_start or y_end < y_start:
+        raise InputError(description="Error: end value less than start value")
+    
+    # Crop image
+    cropped = imageObject.crop((x_start, y_start, x_end, y_end))
+    cropped.save(img_file_path)
+
+    # Save url of uploaded image
+    profile_img_url = BASE_URL + "static/" + img_file
+    db_store = get_data()
+    for user in db_store["users"]:
+        if user["u_id"] == u_id:
+            user["profile_img_url"] = profile_img_url
+        
+    save_database_updates(db_store)
+    return {}

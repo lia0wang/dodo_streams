@@ -6,6 +6,9 @@ from src.helper import create_reset_code, create_password_reset_jwt, decode_jwt
 from src.data_store import data_store
 from src.error import InputError
 from src.other import clear_v1
+from src import config
+BASE_URL = config.url
+
 
 def auth_login_v1(email, password):
     """
@@ -113,7 +116,8 @@ def auth_register_v1(email, password, name_first, name_last):
         'name_first': name_first,
         'name_last': name_last,
         'handle_str': handle_str,
-        'permission_id': permission_id
+        'permission_id': permission_id,
+        'profile_img_url': f"{BASE_URL}static/default-profile.jpg"
     }
     store['users'].append(user)
     save_database_updates(store)

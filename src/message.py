@@ -5,6 +5,7 @@ from src.helper import get_data, check_valid_token,\
      decode_jwt,save_database_updates, datetime_to_unix_time_stamp
 from src.channel import channel_details_v1, channel_messages_v1
 from src.channels import channels_list_v1
+from src.dm import dm_list_v1, dm_details_v1
 from src.data_store import data_store
 from src.error import InputError, AccessError
 import threading
@@ -73,7 +74,14 @@ def message_send_v1(token, channel_id, message):
         'message': message,
         'channel_id': channel_id,
         'time_created': timestamp,
-        'is_pinned': False
+        'is_pinned': False,
+        'reacts': [
+            {
+                'react_id': 1,
+                'u_ids': [],
+                'is_this_user_reacted': False
+            }
+        ],
     }
 
     target_channel['messages'].append(message)  
@@ -316,6 +324,13 @@ def message_senddm_v1(token, dm_id, message):
         'dm_id':dm_id,
         'time_created': timestamp,
         'is_pinned': False,
+        'reacts': [
+            {
+                'react_id': 1,
+                'u_ids': [],
+                'is_this_user_reacted': False
+            }
+        ],
     }
 
     target_dm['messages'].append(dm_message)
@@ -389,6 +404,13 @@ def message_send_later_dm_v1(token, dm_id, message, time_sent):
         'dm_id': dm_id,
         'time_created': time_sent,
         'is_pinned': False,
+        'reacts': [
+            {
+                'react_id': 1,
+                'u_ids': [],
+                'is_this_user_reacted': False
+            }
+        ],
     }
    
     time_diff = time_sent - time.time()
@@ -474,6 +496,13 @@ def message_send_later_v1(token, channel_id, message, time_sent):
         'channel_id': channel_id,
         'time_created': time_sent,
         'is_pinned': False,
+        'reacts': [
+            {
+                'react_id': 1,
+                'u_ids': [],
+                'is_this_user_reacted': False
+            }
+        ],
     }
    
     time_diff = time_sent - time.time()
@@ -627,7 +656,7 @@ def message_unpin_v1(token, message_id):
     is_pinned = False
     owner_permission = False
 
-    #Checking in channels       
+    # Checking in channels       
     for channel in store['channels']:
         for message in channel['messages']:
             if message['message_id'] == message_id:
@@ -693,3 +722,279 @@ def message_unpin_v1(token, message_id):
                     save_database_updates(store)
 
     return {}
+
+def message_react_v1(token, message_id, react_id):
+    '''
+    A function that reacts to a message within a channel or dm given
+    that the user reacting is in that channel/dm.
+    
+    Arguments:
+        token      - token of member in the channel/dm
+        message_id - id of the message to be reacted to
+        react_id   - reaction to be used for the message
+    
+    Exceptions:
+        InputError  - message_id is not a valid message within a channel/dm the
+                      user has joined
+        InputError  - react_id is invalid
+        InputError  - user has already used the same react on the message
+    
+    Return Value:
+        Nothing is returned
+    '''
+    store = get_data()
+
+    u_id = decode_jwt(token)['u_id']
+
+    if store['message_index'] <= message_id:
+        raise InputError(description="Error: message_id does not refer to a valid message")
+
+    if react_id != 1:
+        raise InputError(description="Error: react_id is invalid")
+    
+    in_channel_dm = False
+    reacted = False
+    
+    # Checking in channels       
+    for channel in store['channels']:
+        for message in channel['messages']:
+            if message['message_id'] == message_id:
+                for users in channel['all_members']:
+                    if u_id == users['u_id']:
+                        in_channel_dm = True
+                    for user_id in message['reacts'][react_id - 1]['u_ids']:
+                        if u_id == user_id:
+                            reacted = True                
+
+                if not in_channel_dm:
+                    raise InputError(description="Authorised user is not a member of the channel")
+
+                if reacted:
+                    raise InputError(description="Message is already reacted to")
+    
+    # Reacting to message in channel  
+    if in_channel_dm:
+        for channel in store['channels']:
+            for message in channel['messages']:
+                if message['message_id'] == message_id:
+                    message['reacts'][react_id - 1]['u_ids'].append(u_id)
+                    save_database_updates(store)
+                    
+    in_channel_dm = False
+    
+    # Checking in dms       
+    for dm in store['dms']:
+        for message in dm['messages']:
+            if message['message_id'] == message_id:
+                for user in dm['u_ids']:
+                    if u_id == user:
+                        in_channel_dm = True
+                    for user_id in message['reacts'][react_id - 1]['u_ids']:
+                        if u_id == user_id:
+                            reacted = True                
+
+                if not in_channel_dm:
+                    raise InputError(description="Authorised user is not a member of the dm")
+
+                if reacted:
+                    raise InputError(description="Message is already reacted to")
+    
+    # Reacting to message in dms  
+    if in_channel_dm:
+        for dm in store['dms']:
+            for message in dm['messages']:
+                if message['message_id'] == message_id:
+                    message['reacts'][react_id - 1]['u_ids'].append(u_id)
+                    save_database_updates(store)
+                    
+    return {}
+
+def message_unreact_v1(token, message_id, react_id):
+    '''
+    A function that unreacts to a message within a channel or dm given
+    that the user unreacting is in that channel/dm.
+    
+    Arguments:
+        token      - token of member in the channel/dm
+        message_id - id of the message to be unreacted to
+        react_id   - reaction to be unreacted for the message
+    
+    Exceptions:
+        InputError  - message_id is not a valid message within a channel/dm the
+                      user has joined
+        InputError  - react_id is invalid
+        InputError  - user hasn't used the same react on the message
+    
+    Return Value:
+        Nothing is returned
+    '''
+    store = get_data()
+
+    u_id = decode_jwt(token)['u_id']
+
+    if store['message_index'] <= message_id:
+        raise InputError(description="Error: message_id does not refer to a valid message")
+
+    if react_id != 1:
+        raise InputError(description="Error: react_id is invalid")
+    
+    in_channel_dm = False
+    reacted = False
+    
+    # Checking in channels       
+    for channel in store['channels']:
+        for message in channel['messages']:
+            if message['message_id'] == message_id:
+                for users in channel['all_members']:
+                    if u_id == users['u_id']:
+                        in_channel_dm = True
+                    for user_id in message['reacts'][react_id - 1]['u_ids']:
+                        if u_id == user_id:
+                            reacted = True                
+
+                if not in_channel_dm:
+                    raise InputError(description="Authorised user is not a member of the channel")
+
+                if not reacted:
+                    raise InputError(description="Message is not reacted to")
+    
+    # Reacting to message in channel  
+    if in_channel_dm:
+        for channel in store['channels']:
+            for message in channel['messages']:
+                if message['message_id'] == message_id:
+                    message['reacts'][react_id - 1]['u_ids'].remove(u_id)
+                    save_database_updates(store)
+                    
+    in_channel_dm = False
+    
+    # Checking in dms       
+    for dm in store['dms']:
+        for message in dm['messages']:
+            if message['message_id'] == message_id:
+                for user in dm['u_ids']:
+                    if u_id == user:
+                        in_channel_dm = True
+                    for user_id in message['reacts'][react_id - 1]['u_ids']:
+                        if u_id == user_id:
+                            reacted = True                
+
+                if not in_channel_dm:
+                    raise InputError(description="Authorised user is not a member of the dm")
+
+                if not reacted:
+                    raise InputError(description="Message is not reacted to")
+    
+    # Reacting to message in dms  
+    if in_channel_dm:
+        for dm in store['dms']:
+            for message in dm['messages']:
+                if message['message_id'] == message_id:
+                    message['reacts'][react_id - 1]['u_ids'].remove(u_id)
+                    save_database_updates(store)
+                    
+    return {}
+
+def message_share_v1(token, og_message_id, message, channel_id, dm_id):
+    '''
+    '''
+    if channel_id != -1 and dm_id != -1:
+        raise InputError(description="Neither channel_id nor dm_id are -1")
+    if channel_id == -1 and dm_id == -1:
+        raise InputError(description="No forwarding direction")
+    
+    is_source_member = False
+    is_sharing_member = False
+    valid_channel = False
+    valid_channel_message = False
+    valid_dm = False
+    valid_dm_message = False
+
+    if len(message)>1000:
+        raise InputError("Error: message too long")
+
+    db_store = get_data()
+        
+    #Get authorised user id 
+    auth_user_id = decode_jwt(token)['u_id']
+    
+    #Check message_id is valid
+    #Also check if the authorised user is not an owner member of the channel
+
+    if dm_id == -1: # Share message from a DM to a channel
+        for dm in db_store['dms']:  
+            for message in dm['messages']:
+                if message['message_id'] == og_message_id:
+                    source_dm = dm
+                    source_dm_msg = message
+                    valid_dm_message = True
+            if not valid_dm_message:
+                raise InputError(description="No such dm message")
+            #source_dm_id = source_dm['dm_id']
+            for u_id in source_dm['u_ids']:
+                if u_id == auth_user_id:
+                    is_source_member = True
+            if not is_source_member:
+                raise InputError(description="User is not a member of the source DM")
+            for chan in db_store['channels']:
+                if chan['channel_id'] == channel_id:
+                    target_channel = chan
+                    valid_channel = True
+                    for user in target_channel['all_members']:
+                        if user['u_id'] == auth_user_id:
+                            is_sharing_member = True
+                    if not is_sharing_member:
+                        raise AccessError(description="User is not a member of target channel")
+            og_message = source_dm_msg['message']
+            print('og_message: ',og_message)
+            print('message: ', message)
+            shared_message = "Forwarded message: \n" + \
+                             message['message'] + '\n"""\n' + "Original message: \n" + \
+                             og_message + '\n"""\n'
+            shared_message_id = message_send_v1(token, channel_id, shared_message)
+            return {
+                'shared_message_id': shared_message_id,
+                }
+
+    elif channel_id == -1: # Share message from a channel to a DM
+        for channel in db_store['channels']:  
+            for message in channel['messages']:
+                if message['message_id'] == og_message_id:
+                    source_channel = channel
+                    source_channel_msg = message
+                    valid_channel_message = True
+            if not valid_channel_message:
+                raise InputError(description="No such channel message")
+            #source_channel_id = source_channel['channel_id']
+            for user in source_channel['all_members']:
+                if user['u_id']== auth_user_id:
+                    is_source_member = True
+            if not is_source_member:
+                raise InputError(description="User is not a member of the source channel")
+            for dm in db_store['dms']:
+                if dm['dm_id'] == dm_id:
+                    target_dm = dm
+                    valid_dm = True
+                    for u_id in target_dm['u_ids']:
+                        if u_id == auth_user_id:
+                            is_sharing_member = True
+                    if not is_sharing_member:
+                        raise AccessError(description="User is not a member of target channel")
+            og_message = source_channel_msg['message']
+            print('og_message: ',og_message)
+            print('message: ', message)
+            shared_message = "Forwarded message: \n" + \
+                             message['message'] + '\n"""\n' + "Original message: \n" + \
+                             og_message + '\n"""\n'
+            shared_message_id = message_senddm_v1(token, dm_id, shared_message)
+            return {
+                'shared_message_id': shared_message_id,
+                }
+                    
+
+    if not valid_dm and not valid_channel:
+        raise InputError(description="Both channel_id and dm_id are invalid")
+        
+
+
+

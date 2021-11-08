@@ -139,7 +139,12 @@ def channels_create_v1(auth_user_id, name, is_public):
         'is_public': is_public, # is either a public or private channel.
         'owner_members': [user_info],
         'all_members': [user_info], # Since members are many, it supposed to be a dict type.
-        'messages': []
+        'messages': [],
+        'standup': {
+            'is_active': False,
+            'buffer': [],
+            'time_finish': None
+        }
     }
 
     # Append the created channel to channels database

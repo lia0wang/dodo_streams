@@ -1,17 +1,23 @@
 import sys
 import signal
 import re
+import requests
+import urllib.request
+from PIL import Image
 from json import dump, dumps
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_cors import CORS
+from src import message
 from src.channel import channel_addowner_v1, channel_invite_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1, channel_messages_v1
 from src.channel import channel_leave_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
-from src.user import user_profile_sethandle_v1, users_all_v1
+from src.user import user_profile_sethandle_v1, users_all_v1, user_profile_uploadphoto_v1
+from src.users import users_all_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1, dm_remove_v1
-from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_send_later_v1
-from src.message import message_send_later_dm_v1, message_pin_v1, message_unpin_v1
+from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_send_later_v1, message_share_v1
+from src.message import message_send_later_dm_v1, message_pin_v1, message_unpin_v1, message_react_v1, message_unreact_v1
+from src.standup import standup_send_v1, standup_active_v1
 from src.error import InputError, AccessError
 from src import config
 from src.auth import auth_passwordreset_request_v1, auth_register_v1, auth_login_v1
@@ -21,6 +27,8 @@ from src.helper import check_valid_token, get_data, create_session_id
 from src.helper import save_database_updates, create_jwt, decode_jwt, hash_encrypt
 from src.other import clear_v1
 from src.notifications import notifications_v1
+from src import config
+BASE_URL = config.url
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -87,8 +95,6 @@ def register():
     save_database_updates(database_store)
     register_return['token'] = create_jwt(u_id, session_id)
     return dumps(register_return)
-
-
 
 @APP.route("/auth/login/v2", methods=['POST'])
 def login():
@@ -323,6 +329,7 @@ def dm_leave():
     
     save_database_updates(store)
     return dumps({}) 
+
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list():
     # retrieve token
@@ -455,11 +462,11 @@ def message_pin():
     data = request.get_json()
 
     # Retrieving and checking token
-    token = data['token']
+    token = data.get('token')
     check_valid_token(token)
 
     # Retrieving message id
-    message_id = data['message_id']
+    message_id = data.get('message_id')
 
     message_pin_v1(token, message_id)
 
@@ -471,14 +478,67 @@ def message_unpin():
     data = request.get_json()
 
     # Retrieving and checking token
-    token = data['token']
+    token = data.get('token')
     check_valid_token(token)
 
     # Retrieving message id
-    message_id = data['message_id']
+    message_id = data.get('message_id')
 
     message_unpin_v1(token, message_id)
 
+    return dumps({})
+
+@APP.route("/message/react/v1", methods=['POST'])
+def message_react():
+    # Retrieve data
+    data = request.get_json()
+    
+    # Retrieving and checking token
+    token = data.get('token')
+    check_valid_token(token)
+    
+    # Retrieving rest of info
+    message_id = data.get('message_id')
+    react_id = data.get('react_id')
+    
+    message_react_v1(token, message_id, react_id)
+    
+    return dumps({})
+
+@APP.route("/message/unreact/v1", methods=['POST'])
+def message_unreact():
+    # Retrieve data
+    data = request.get_json()
+    
+    # Retrieving and checking token
+    token = data.get('token')
+    check_valid_token(token)
+    
+    # Retrieving rest of info
+    message_id = data.get('message_id')
+    react_id = data.get('react_id')
+    
+    message_unreact_v1(token, message_id, react_id)
+    
+    return dumps({})
+
+@APP.route("/message/share/v1", methods=['POST'])
+def message_share():
+    # Retrieve data
+    data = request.get_json()
+    
+    # Retrieving and checking token
+    token = data.get('token')
+    check_valid_token(token)
+    
+    # Retrieving rest of info
+    og_message_id = data.get('og_message_id')
+    message = data.get('message')
+    channel_id = data.get('channel_id')
+    dm_id = data.get('dm_id')
+    
+    message_share_v1(token, og_message_id, message, channel_id, dm_id)
+    
     return dumps({})
 
 @APP.route("/dm/messages/v1", methods=['GET'])
@@ -556,11 +616,29 @@ def set_handle():
 
     return dumps({})
 
+@APP.route("/user/profile/uploadphoto/v1", methods=['POST'])
+def uploadphoto():
+    request_data = request.get_json()
+    check_valid_token(request_data['token'])
+    decoded_token = decode_jwt(request_data['token'])
+    u_id = decoded_token["u_id"]
+    img_url = request_data["img_url"] 
+    x_start = request_data["x_start"] 
+    y_start = request_data["y_start"] 
+    x_end = request_data["x_end"] 
+    y_end = request_data["y_end"]
+    user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end)
+    return dumps({})
+
+@APP.route('/static/<path:path>')
+def send_js(path):
+    return send_from_directory('src/static', path)
+
+
 @APP.route("/users/all/v1", methods=['GET'])
 def list_users():
     # Retrieve token
     token = request.args.get('token')
-    # token = data['token']
     
     # Check if token is valid token
     check_valid_token(token)
@@ -568,12 +646,12 @@ def list_users():
     users = users_all_v1()
     return dumps(users)
 
-@APP.route("/admin/user/remove/v1", methods=["DELETE"])
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def remove_user():
     #Retrieve data
     data = request.get_json()
-    token = data['token']
-    u_id = data['u_id']
+    token = data.get('token')
+    u_id = data.get('u_id')
     
     admin_user_remove_v1(token, u_id)
     
@@ -583,9 +661,9 @@ def remove_user():
 def change_permission():
     # Retrieve data
     data = request.get_json()
-    token = data['token']
-    u_id = data['u_id']
-    permission_id = data['permission_id']
+    token = data.get('token')
+    u_id = data.get('u_id')
+    permission_id = data.get('permission_id')
 
     admin_userpermission_change_v1(token, u_id, permission_id)
     
@@ -662,6 +740,34 @@ def notifications_get():
     notifications = notifications_v1(auth_user_id)
     return dumps({"notifications": notifications})
 
+@APP.route("/standup/send/v1", methods=['POST'])
+def standup_send():
+    # Retrieve token
+    request_data = request.get_json()
+    token = request_data['token']
+    check_valid_token(token)
+
+    # Decode token, retrieve parameters
+    decode_token = decode_jwt(token)
+    channel_id = request_data['channel_id']
+    message = request_data['message']
+    
+    standup_send_v1(int(decode_token['u_id']), channel_id, message)
+    return dumps({})
+
+@APP.route("/standup/active/v1", methods=['GET'])
+def standup_active():
+    # Retrieve token
+    request_data = request.args
+    token = request_data['token']
+    check_valid_token(token)
+
+    decode_token = decode_jwt(token)
+    channel_id = request_data['channel_id']
+
+    standup_stat = standup_active_v1(decode_token['u_id'], int(channel_id))
+
+    return dumps(standup_stat)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
