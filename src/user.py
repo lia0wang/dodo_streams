@@ -2,6 +2,8 @@ import re
 import os
 from src.helper import get_data, save_database_updates, decode_jwt
 from src.error import InputError
+from src.channels import channels_list_v1
+from src.dm import dm_list_v1
 import requests
 import urllib.request
 from PIL import Image
@@ -255,3 +257,9 @@ def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
         
     save_database_updates(db_store)
     return {}
+
+def user_stats_v1(token):
+    db_store = get_data()
+    auth_user_id = decode_jwt(token)['u_id']
+    channel_list = channels_list_v1(auth_user_id)
+    dm_list = dm_list_v1(token)
