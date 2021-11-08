@@ -294,8 +294,14 @@ def user_stats_v1(token):
         num_dms += 1
         for message in dm['messages']:
             num_msgs += 1
-
-    involvement_rate = (num_channels_joined + num_dms_joined + num_msgs_sent) / (num_channels + num_dms + num_msgs)
+            
+    involved = num_channels_joined + num_dms_joined + num_msgs_sent
+    _all = num_channels + num_dms + num_msgs
+    involvement_rate = 0
+    if _all == 0:
+        involvement_rate = 0
+    else:
+        involvement_rate = involved/_all
 
     user_stats = {
         'channels_joined': {num_channels_joined,timestamp}
