@@ -10,7 +10,7 @@ from flask_cors import CORS
 from src import message
 from src.channel import channel_addowner_v1, channel_invite_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1, channel_messages_v1
 from src.channel import channel_leave_v1
-from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1
+from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_stats_v1
 from src.user import user_profile_sethandle_v1, users_all_v1, user_profile_uploadphoto_v1
 from src.users import users_all_v1
 from src.channels import channels_create_v1
@@ -644,6 +644,15 @@ def list_users():
     
     users = users_all_v1()
     return dumps(users)
+
+@APP.route("/user/stats/v1", methods=['GET'])
+def user_stats():
+    #token = request.args.get('token')
+    data = request.get_json()
+    token = data.get('token')
+    print('server token: ', token)
+    stats = user_stats_v1(token)
+    return dumps(stats)
 
 @APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def remove_user():
