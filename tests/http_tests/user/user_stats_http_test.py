@@ -174,9 +174,6 @@ def test_user_basic_dm_msgs_http():
     token_params = {
         "token": user_1["token"]
     }
-    
-    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token_params)
-
 
     msg_1 = 'test'
     
