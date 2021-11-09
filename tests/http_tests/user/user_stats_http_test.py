@@ -176,7 +176,7 @@ def test_user_basic_dm_msgs_http():
     }
     
     response = requests.get(f"{BASE_URL}/dm/list/v1", params = token_params)
-    dm_list = response.json()
+
 
     msg_1 = 'test'
     
@@ -186,8 +186,7 @@ def test_user_basic_dm_msgs_http():
         'message': msg_1
     }
     dm_send = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_send_program)
-    assert dm_send.status_code == 200
-    senddm_return = dm_send.json()    
+    assert dm_send.status_code == 200   
     
     user_1_stats = requests.get(f"{BASE_URL}/user/stats/v1", json = token_params)
     assert user_1_stats.status_code == 200
