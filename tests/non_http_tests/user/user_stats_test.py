@@ -9,7 +9,7 @@ from src.user import user_stats_v1
 from src.helper import create_jwt, create_session_id
 from src.data_store import data_store
 from src.error import InputError, AccessError
-
+'''
 def test_one_hundred_percent():
     clear_v1()
     session_id = create_session_id()
@@ -30,4 +30,5 @@ def test_one_hundred_percent():
     message_send_v1(token_1, channel_id, msg_1)['message_id']
     message_senddm_v1(token_1, dm_id, msg_1)
     
-    user_stats_v1(token_1)
+    assert user_stats_v1(token_1)['involvement_rate'][0] == 1
+'''

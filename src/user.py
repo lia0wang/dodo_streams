@@ -1,7 +1,7 @@
 import re
 import os
 from src.helper import get_data, save_database_updates, decode_jwt, \
-     datetime_to_unix_time_stamp
+     datetime_to_unix_time_stamp, check_valid_token
 from src.error import InputError
 from src.channels import channels_list_v1
 from src.dm import dm_list_v1
@@ -261,7 +261,12 @@ def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
     return {}
 
 def user_stats_v1(token):
+    '''
+    '''
     db_store = get_data()
+    print('token: ', token)
+    check_valid_token(token)
+    
     auth_user_id = decode_jwt(token)['u_id']
     channel_list = channels_list_v1(auth_user_id)
     dm_list = dm_list_v1(token)
@@ -272,46 +277,63 @@ def user_stats_v1(token):
     num_dms_joined = 0
     num_msgs = 0
     num_msgs_sent = 0
-    for joined_channel in channel_list:
-        num_channels_joined += 1
+
+    if channel_list['channels'] != []:
+        print("channel_list['channels']: ", channel_list['channels'])
+        num_channels_joined = len(channel_list)  
+        for joined_channel in channel_list['channels']:
+            for channel in db_store['channels']:
+                print("channel['channel_id']",channel['channel_id'])
+                print("joined_channel",joined_channel)
+                if channel['channel_id'] == joined_channel['channel_id']:
+                    for message in channel['messages']:
+                        if message['u_id'] == auth_user_id:
+                            num_msgs_sent += 1
+
+    if dm_list['dms'] != []:
+        num_dms_joined = len(dm_list)
+        for joined_dm in dm_list['dms']:
+            for dm in db_store['dms']:
+                print("db_store['dms']",db_store['dms'])
+                if dm['dm_id'] == joined_dm['dm_id']:
+                    for message in dm['messages']:
+                        if message['u_id'] == auth_user_id:
+                            num_msgs_sent +=1
+
+    if db_store['channels'] != None:
+        num_channels = len(db_store['channels'])
         for channel in db_store['channels']:
-            if channel['channel_id'] == joined_channel['channel_id']:
-                for message in channel['messages']:
-                    if message['u_id'] == auth_user_id:
-                        num_msgs_sent += 1
-                        
-    for joined_dm in dm_list:
-        num_dms_joined += 1
+            for message in channel['messages']:
+                num_msgs += 1
+
+    if db_store['dms'] != None:
+        num_dms = len(db_store['dms'])
         for dm in db_store['dms']:
-             if dm['dm_id'] == joined_dm['dm_id']:
-                 for message in dm['messages']:
-                     if message['u_id'] == auth_user_id:
-                         num_msgs_sent +=1
-                         
-    for channel in db_store['channels']:
-        num_channels += 1
-        for message in channel['messages']:
-            num_msgs += 1
-    for dm in db_store['dms']:
-        num_dms += 1
-        for message in dm['messages']:
-            num_msgs += 1
-            
+            for message in dm['messages']:
+                num_msgs += 1
+    print('num_channels: ', num_channels)
+    print('num_dms: ', num_dms)
+    print('num_msgs: ', num_msgs)
+
+    print('num_channels_joined: ', num_channels_joined)
+    print('num_dms_joined: ', num_dms_joined)
+    print('num_msgs_sent: ', num_msgs_sent)
+    
     involved = num_channels_joined + num_dms_joined + num_msgs_sent
     _all = num_channels + num_dms + num_msgs
-    '''
+    print('involved: ', involved)
+    print('all: ', _all)
     involvement_rate = 0
     if _all == 0:
         involvement_rate = 0
     else:
         involvement_rate = involved/_all
-    '''
-    involvement_rate = involved/_all
+    
     user_stats = {
-        'channels_joined': {num_channels_joined,timestamp},
-        'dms_joined': {num_dms_joined,timestamp},
-        'messages_sent': {num_msgs_sent,timestamp},
-        'involvement_rate': {involvement_rate,timestamp}
+        'channels_joined': [num_channels_joined,timestamp],
+        'dms_joined': [num_dms_joined,timestamp],
+        'messages_sent': [num_msgs_sent,timestamp],
+        'involvement_rate': [involvement_rate,timestamp]
         }
     
     return user_stats
