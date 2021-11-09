@@ -233,7 +233,7 @@ def dm_list_v1(token):
         Dictionary of list of dms (dm_id, dm_name)
     '''
     # Checking and decoding token
-    #check_valid_token(token)
+    check_valid_token(token)
     decoded_jwt = decode_jwt(token)
     u_id = decoded_jwt['u_id']
     
