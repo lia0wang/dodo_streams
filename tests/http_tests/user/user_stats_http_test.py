@@ -88,7 +88,7 @@ def test_user_basic_channels_http():
         'name': 'league',
         'is_public': True
     }
-    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json()
+    requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json()
     
     token_params = {
         "token": user_1["token"]
@@ -144,3 +144,56 @@ def test_user_basic_msgs_http():
     assert user_1_stats['dms_joined'][0] == 0
     assert user_1_stats['messages_sent'][0] == 1
     assert user_1_stats['involvement_rate'][0] == 1   
+
+def test_user_basic_dm_msgs_http():
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    user_param_1 = {
+        "email": "test1@gmail.com",
+        "password": "abcd1234",
+        "name_first": "John",
+        "name_last": "Smith"
+    }
+    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = user_param_1).json()
+
+    user_param_2= {
+        "email": "test2@gmail.com",
+        "password": "abcd1234",
+        "name_first": "Agent",
+        "name_last": "Smith"
+    }
+    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = user_param_2).json()
+
+    dm_create_json = {
+        "token": user_1["token"],
+        "u_ids": [user_2["auth_user_id"]]
+    }
+
+    dm_return = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_json).json()
+    
+    token_params = {
+        "token": user_1["token"]
+    }
+    
+    response = requests.get(f"{BASE_URL}/dm/list/v1", params = token_params)
+    dm_list = response.json()
+
+    msg_1 = 'test'
+    
+    dm_send_program = {
+        'token': user_1['token'],
+        'dm_id': dm_return['dm_id'],
+        'message': msg_1
+    }
+    dm_send = requests.post(f"{BASE_URL}/message/senddm/v1", json = dm_send_program)
+    assert dm_send.status_code == 200
+    senddm_return = dm_send.json()    
+    
+    user_1_stats = requests.get(f"{BASE_URL}/user/stats/v1", json = token_params)
+    assert user_1_stats.status_code == 200
+    user_1_stats = user_1_stats.json()
+
+    assert user_1_stats['channels_joined'][0] == 0
+    assert user_1_stats['dms_joined'][0] == 1
+    assert user_1_stats['messages_sent'][0] == 1
+    assert user_1_stats['involvement_rate'][0] == 1
