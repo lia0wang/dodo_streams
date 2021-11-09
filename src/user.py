@@ -1,6 +1,7 @@
 import re
 import os
-from src.helper import get_data, save_database_updates, decode_jwt
+from src.helper import get_data, save_database_updates, decode_jwt, \
+     datetime_to_unix_time_stamp
 from src.error import InputError
 from src.channels import channels_list_v1
 from src.dm import dm_list_v1
