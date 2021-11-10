@@ -1,7 +1,7 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
 from src.helper import get_data, seek_target_channel_and_errors, save_database_updates
-
+from src.helper import store_log_notif
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
     Invites a user with ID u_id to join a channel with ID channel_id.
@@ -77,7 +77,12 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     for index, channel in enumerate(store['channels']):
         if channel['channel_id'] == channel_id:
             store['channels'][index]['all_members'].append(invited_user)
+
     save_database_updates(store)
+
+    store_log_notif(u_id, target_channel['channel_id'], -1, auth_user,\
+        target_channel['name'], 'channel_invite')
+ 
     return {
     }
     

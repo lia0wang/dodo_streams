@@ -1,8 +1,11 @@
 import re
 import os
+
+from requests.api import get
 from src.dm import dm_create_v1, dm_details_v1
 from src.helper import get_data, check_valid_token,\
-     decode_jwt,save_database_updates, datetime_to_unix_time_stamp
+     decode_jwt,save_database_updates, datetime_to_unix_time_stamp,\
+         store_log_notif, chan_check_tag, dm_check_tag
 from src.channel import channel_details_v1, channel_messages_v1
 from src.channels import channels_list_v1
 from src.dm import dm_list_v1, dm_details_v1
@@ -10,6 +13,7 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 import threading
 import time
+
 
 def message_send_v1(token, channel_id, message):
     '''
@@ -33,6 +37,8 @@ def message_send_v1(token, channel_id, message):
     '''
     is_member = False
     valid_channel = False
+    # to temp store message since, message is losst
+    message_content = message
     
     # Fetch data
     if(len(message)<1 or len(message)>1000):
@@ -56,12 +62,14 @@ def message_send_v1(token, channel_id, message):
     for user in target_channel['all_members']:
         if user['u_id'] == auth_user_id:
             # Check if authorised user is a member of the channel
+            target_user = user
             is_member = True 
             break               
    
     if is_member == False:
         raise AccessError("Authorised user is not a member of the channel")
-   
+    
+
     message_id = db_store['message_index']
     db_store['message_index']+=1
     
@@ -86,6 +94,8 @@ def message_send_v1(token, channel_id, message):
 
     target_channel['messages'].append(message)  
     save_database_updates(db_store)
+
+    chan_check_tag(target_user, message_content, target_channel)
 
     return {
         'message_id': message_id,
@@ -152,8 +162,10 @@ def message_edit_v1(token, message_id, new_message):
         for channel in db_store['channels']:
             for msg in channel['messages']:
                 if msg['message_id'] == message_id:
+                    target_channel = channel
                     msg['message'] = new_message
                     save_database_updates(db_store)
+                    chan_check_tag(targer_user, new_message, target_channel)
  
     for dm in db_store['dms']:
         for message in dm['messages']:
@@ -175,12 +187,16 @@ def message_edit_v1(token, message_id, new_message):
         for dm in db_store['dms']:
             for message in dm['messages']:
                 if message['message_id'] == message_id:
+                    target_dm = dm
                     message['message'] = new_message
                     save_database_updates(db_store)
+                    dm_check_tag(targer_user, new_message, target_dm)
+
                     
     if valid_dm == False and valid_channel_message == False:
         raise InputError("Error: message_id oes not refer to a valid message within \
                          a channel /DM that the authorised user has joined")   
+
 
 def message_remove_v1(token, message_id):
     '''
@@ -335,7 +351,9 @@ def message_senddm_v1(token, dm_id, message):
 
     target_dm['messages'].append(dm_message)
     save_database_updates(db_store)
-       
+
+    dm_check_tag(targer_user, message, target_dm)
+
     return {
         'message_id': message_id,
     }
@@ -363,6 +381,7 @@ def message_send_later_dm_v1(token, dm_id, message, time_sent):
          Return Value:
          Return a dictionary containing the message id              
     '''
+    message_content = message
     # Fetch data
     is_member = False
     valid_dm = False
@@ -417,17 +436,20 @@ def message_send_later_dm_v1(token, dm_id, message, time_sent):
     if time_diff < 0:
         raise InputError(description="Time sent is a time sent in the past")
 
-    param = [target_dm, db_store, message]
+    param = [target_dm, db_store, message, targer_user, message_content]
     delayed_msg = threading.Timer(time_diff , delayed_dm_message, param)
     delayed_msg.start()
+    
     return {
         'message_id': message_id,
     }
 
-def delayed_dm_message(target_dm, db_store, message):
+def delayed_dm_message(target_dm, db_store, message, targer_user, message_content):
     target_dm['messages'].append(message)
     db_store['messages'].append(message)
     save_database_updates(db_store)
+    dm_check_tag(targer_user, message_content, target_dm)
+
 
 def message_send_later_v1(token, channel_id, message, time_sent):
     '''
@@ -452,6 +474,7 @@ def message_send_later_v1(token, channel_id, message, time_sent):
          Return Value:
          Return a dictionary containing the message id              
     '''
+    message_content =  message
     is_member = False
     valid_channel = False
     
@@ -463,7 +486,7 @@ def message_send_later_v1(token, channel_id, message, time_sent):
         
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
-            
+        
     #Check channel_id is valid
     #Also check if the authorised user is not a member of the channel
 
@@ -477,6 +500,7 @@ def message_send_later_v1(token, channel_id, message, time_sent):
     for user in target_channel['all_members']:
         if user['u_id'] == auth_user_id:
             # Check if authorised user is a member of the channel
+            target_user = user
             is_member = True 
             break               
    
@@ -509,17 +533,19 @@ def message_send_later_v1(token, channel_id, message, time_sent):
     if time_diff < 0:
         raise InputError(description="Time sent is a time sent in the past")
 
-    param = [target_channel, db_store, message]
+    param = [target_channel, db_store, message, target_user, message_content]
     delayed_msg = threading.Timer(time_diff , delayed_message, param)
     delayed_msg.start()
     return {
         'message_id': message_id,
     }
 
-def delayed_message(target_channel, db_store, message):
+def delayed_message(target_channel, db_store, message, target_user, message_content):
     target_channel['messages'].append(message)
     db_store['messages'].append(message)
     save_database_updates(db_store)
+    chan_check_tag(target_user, message_content, target_channel)
+
 
 def message_pin_v1(token, message_id):
     '''
@@ -744,7 +770,9 @@ def message_react_v1(token, message_id, react_id):
     '''
     store = get_data()
 
-    u_id = decode_jwt(token)['u_id']
+    auth_user = decode_jwt(token)
+
+    u_id = auth_user['u_id']
 
     if store['message_index'] <= message_id:
         raise InputError(description="Error: message_id does not refer to a valid message")
@@ -752,9 +780,12 @@ def message_react_v1(token, message_id, react_id):
     if react_id != 1:
         raise InputError(description="Error: react_id is invalid")
     
+
+    channel_id = -1
+    dm_id = -1    
     in_channel_dm = False
     reacted = False
-    
+
     # Checking in channels       
     for channel in store['channels']:
         for message in channel['messages']:
@@ -771,13 +802,17 @@ def message_react_v1(token, message_id, react_id):
 
                 if reacted:
                     raise InputError(description="Message is already reacted to")
-    
+
     # Reacting to message in channel  
     if in_channel_dm:
         for channel in store['channels']:
             for message in channel['messages']:
                 if message['message_id'] == message_id:
                     message['reacts'][react_id - 1]['u_ids'].append(u_id)
+                    # assigns the owner u_id of the message being reacted
+                    notified_user_id = message['u_id']
+                    channel_id = channel['channel_id']
+                    dm_name = channel['name']
                     save_database_updates(store)
                     
     in_channel_dm = False
@@ -805,9 +840,21 @@ def message_react_v1(token, message_id, react_id):
             for message in dm['messages']:
                 if message['message_id'] == message_id:
                     message['reacts'][react_id - 1]['u_ids'].append(u_id)
+                    notified_user_id = message['u_id']
+                    dm_id = dm['dm_id']
+                    dm_name = dm['dm_name']
                     save_database_updates(store)
-                    
+
+    # find the user who reacted
+    for user in store['users']:
+        if user['u_id'] == auth_user['u_id']:
+            auth_user = user # catch the user who does the action
+            
+    store_log_notif(notified_user_id, channel_id, dm_id, auth_user,\
+    dm_name, 'message_react')
+
     return {}
+
 
 def message_unreact_v1(token, message_id, react_id):
     '''
