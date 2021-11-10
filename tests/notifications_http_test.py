@@ -47,8 +47,6 @@ def test_channel_invite_notif():
     response = requests.get(f"{BASE_URL}/notifications/get/v1", params = token)
     assert response.status_code == 200
     notif = response.json()
-    #assert notif[0]['auth_id'] == 11
-    store = get_data()
     assert notif['notifications'][0]['channel_id'] == 1
     assert notif['notifications'][0]['dm_id'] == -1
     assert notif['notifications'][0]['notification_message'] == \
@@ -86,7 +84,7 @@ def test_dm_create_notif():
         "u_ids": [user_1["auth_user_id"], user_2["auth_user_id"]]
     }
 
-    response1 = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param)
+    requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param)
 
 
     token = {
@@ -143,13 +141,6 @@ def test_react_notif():
     }
     message = requests.post(f"{BASE_URL}/message/send/v1", json = message_info_json).json()
 
-    # Checking if message has been reacted to
-    messages_info_param = {
-        'token': auth_user['token'],
-        'channel_id': channel_1['channel_id'],
-        'start': 0,
-    }
-  
     # Reacting to message and checking if reacted to
     message_react_json = {
         'token': auth_user['token'],
