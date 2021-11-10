@@ -1,5 +1,5 @@
 from src.error import AccessError, InputError
-from src.helper import get_data, save_database_updates, check_valid_token, decode_jwt
+from src.helper import get_data, save_database_updates, check_valid_token, decode_jwt, store_log_notif
 from src.data_store import data_store
 
 def dm_create_v1(auth_user_id, u_ids):
@@ -28,6 +28,7 @@ def dm_create_v1(auth_user_id, u_ids):
     valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
+            auth_user = user
             valid = True
     if not valid:
         raise InputError(description="Invalid authorized user ID!")
@@ -58,7 +59,7 @@ def dm_create_v1(auth_user_id, u_ids):
                 dm_name.append(user['handle_str'])
     dm_name.sort()
     dm_name = ', '.join(dm_name)
-    
+
     # Create a new dm
     dm = {
         'dm_id': dm_id,
@@ -71,9 +72,13 @@ def dm_create_v1(auth_user_id, u_ids):
     # Append the created dm to dms database
     store['dms'].append(dm)
 
+
     save_database_updates(store)
 
-    
+    for u_id in u_ids:
+        store_log_notif(u_id, -1, dm_id, auth_user,\
+        dm_name, 'dm_create')   
+
     return {
         'dm_id': dm_id,
     }
