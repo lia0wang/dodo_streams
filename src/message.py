@@ -451,7 +451,6 @@ def delayed_dm_message(target_dm, db_store, message, targer_user, message_conten
     dm_check_tag(targer_user, message_content, target_dm)
 
 
-
 def message_send_later_v1(token, channel_id, message, time_sent):
     '''
     Send a message from the authorised user to the channel specified

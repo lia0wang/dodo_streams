@@ -1,8 +1,6 @@
 import requests
-import pytest
 import time
 from src import config
-from src.helper import get_data
 
 BASE_URL = config.url
 
