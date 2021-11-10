@@ -1,11 +1,15 @@
 import re
 import os
-from src.helper import get_data, save_database_updates, decode_jwt
+from src.helper import get_data, save_database_updates, decode_jwt, \
+     datetime_to_unix_time_stamp, check_valid_token
 from src.error import InputError
+from src.channels import channels_list_v1
+from src.dm import dm_list_v1
 import requests
 import urllib.request
 from PIL import Image
 from src import config
+import time
 BASE_URL = config.url
 
 def user_profile_v1(u_id):
@@ -180,40 +184,27 @@ def user_profile_sethandle_v1(u_id, handle_str):
     save_database_updates(db_store)
     return {}
 
-def users_all_v1():
+def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
     '''
-    Returns all users
+    Given a u_id, an http image_url, and dimensions x_start, y_start, x_end, y_end
+    downloads an image, crops it and serves it/makes it accessible to the frontend
     
     Arguments:
-        token - an encrypted value containing u_id and session_id of a user
-
+        u_id (int) - u_id of user who is having their profile image changed
+        img_url (str) - url of image being downloaded and cropped
+        x_start and y_start (int) - togther define coordinates of upper left hand 
+                                    corner of the cropped image
+        x_end and y_end (int) - determines the height and width of the cropped image
     Exceptions:
-        AccessError - token is invalid
+        InputError
+            - image_url does not refer to existing image
+            - image_rl is not a jpg or jpeg
+            - image dimensions determined by start and end are out of range
+            - end values are less than or equal to start values
     
     Return Value:
-        Returns a list of user dictionaries with their associated details.
-        Each dictionary contains:
-            u_id (int)
-            email (string)
-            name_first (string)
-            name_last (string)
-            handle_str (string)
+        empty dictionary
     '''
-    # Fetching data
-    store = get_data()
-       
-    # Create list and add users to the list
-    users = []
-    for user in store['users']:
-        if len(user['email']) != 0:
-            new_user = user
-            del new_user['password']
-            del new_user['session_list']
-            users.append(new_user)
-    return {"users": users}
-
-def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
-
     # Check if image url is valid
     response = requests.get(img_url)
     if response.status_code != 200:
@@ -222,7 +213,7 @@ def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
     # Check if image url is a jpg or jpeg
     r_image = re.compile(r".*\.(jpg|jpeg)$") 
     if not r_image.match(img_url):
-        raise InputError(description="Error: Image not a JPG")
+        raise InputError(description="Error: Image not a JPG or JPEG")
 
     # Create image filename and path string
     imgfile_list = os.listdir("src/static/")
@@ -239,14 +230,14 @@ def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
         raise InputError(description="Error: Image dimensions out of range")
     if x_start not in range(width + 1) or y_start not in range(height + 1):
         raise InputError(description="Error: Image dimensions out of range")
-    if x_end < x_start or y_end < y_start:
+    if x_end <= x_start or y_end <= y_start:
         raise InputError(description="Error: end value less than start value")
     
     # Crop image
     cropped = imageObject.crop((x_start, y_start, x_end, y_end))
     cropped.save(img_file_path)
 
-    # Save url of uploaded image
+    # Save served url of uploaded image
     profile_img_url = BASE_URL + "static/" + img_file
     db_store = get_data()
     for user in db_store["users"]:
@@ -255,3 +246,84 @@ def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
         
     save_database_updates(db_store)
     return {}
+
+def user_stats_v1(token):
+    '''
+    '''
+    db_store = get_data()
+    print('token: ', token)
+    check_valid_token(token)
+    
+    auth_user_id = decode_jwt(token)['u_id']
+    channel_list = channels_list_v1(auth_user_id)
+    dm_list = dm_list_v1(token)
+    timestamp = datetime_to_unix_time_stamp()
+    num_channels = 0
+    num_channels_joined = 0
+    num_dms = 0
+    num_dms_joined = 0
+    num_msgs = 0
+    num_msgs_sent = 0
+
+    if channel_list['channels'] != []:
+        print("channel_list['channels']: ", channel_list['channels'])
+        num_channels_joined = len(channel_list)  
+        for joined_channel in channel_list['channels']:
+            for channel in db_store['channels']:
+                print("channel['channel_id']",channel['channel_id'])
+                print("joined_channel",joined_channel)
+                if channel['channel_id'] == joined_channel['channel_id']:
+                    for message in channel['messages']:
+                        if message['u_id'] == auth_user_id:
+                            num_msgs_sent += 1
+
+    if dm_list['dms'] != []:
+        num_dms_joined = len(dm_list)
+        for joined_dm in dm_list['dms']:
+            for dm in db_store['dms']:
+                print("db_store['dms']",db_store['dms'])
+                if dm['dm_id'] == joined_dm['dm_id']:
+                    for message in dm['messages']:
+                        if message['u_id'] == auth_user_id:
+                            num_msgs_sent +=1
+
+    if db_store['channels'] != None:
+        num_channels = len(db_store['channels'])
+        for channel in db_store['channels']:
+            for message in channel['messages']:
+                num_msgs += 1
+
+    if db_store['dms'] != None:
+        num_dms = len(db_store['dms'])
+        for dm in db_store['dms']:
+            for message in dm['messages']:
+                num_msgs += 1
+    print('num_channels: ', num_channels)
+    print('num_dms: ', num_dms)
+    print('num_msgs: ', num_msgs)
+
+    print('num_channels_joined: ', num_channels_joined)
+    print('num_dms_joined: ', num_dms_joined)
+    print('num_msgs_sent: ', num_msgs_sent)
+    
+    involved = num_channels_joined + num_dms_joined + num_msgs_sent
+    _all = num_channels + num_dms + num_msgs
+    print('involved: ', involved)
+    print('all: ', _all)
+    involvement_rate = 0
+    if _all == 0:
+        involvement_rate = 0
+    else:
+        involvement_rate = involved/_all
+    
+    user_stats = {
+        'channels_joined': [num_channels_joined,timestamp],
+        'dms_joined': [num_dms_joined,timestamp],
+        'messages_sent': [num_msgs_sent,timestamp],
+        'involvement_rate': [involvement_rate,timestamp]
+        }
+    
+    return user_stats
+        
+                 
+    
