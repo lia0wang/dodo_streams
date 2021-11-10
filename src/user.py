@@ -184,40 +184,27 @@ def user_profile_sethandle_v1(u_id, handle_str):
     save_database_updates(db_store)
     return {}
 
-def users_all_v1():
+def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
     '''
-    Returns all users
+    Given a u_id, an http image_url, and dimensions x_start, y_start, x_end, y_end
+    downloads an image, crops it and serves it/makes it accessible to the frontend
     
     Arguments:
-        token - an encrypted value containing u_id and session_id of a user
-
+        u_id (int) - u_id of user who is having their profile image changed
+        img_url (str) - url of image being downloaded and cropped
+        x_start and y_start (int) - togther define coordinates of upper left hand 
+                                    corner of the cropped image
+        x_end and y_end (int) - determines the height and width of the cropped image
     Exceptions:
-        AccessError - token is invalid
+        InputError
+            - image_url does not refer to existing image
+            - image_rl is not a jpg or jpeg
+            - image dimensions determined by start and end are out of range
+            - end values are less than or equal to start values
     
     Return Value:
-        Returns a list of user dictionaries with their associated details.
-        Each dictionary contains:
-            u_id (int)
-            email (string)
-            name_first (string)
-            name_last (string)
-            handle_str (string)
+        empty dictionary
     '''
-    # Fetching data
-    store = get_data()
-       
-    # Create list and add users to the list
-    users = []
-    for user in store['users']:
-        if len(user['email']) != 0:
-            new_user = user
-            del new_user['password']
-            del new_user['session_list']
-            users.append(new_user)
-    return {"users": users}
-
-def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
-
     # Check if image url is valid
     response = requests.get(img_url)
     if response.status_code != 200:
@@ -226,7 +213,7 @@ def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
     # Check if image url is a jpg or jpeg
     r_image = re.compile(r".*\.(jpg|jpeg)$") 
     if not r_image.match(img_url):
-        raise InputError(description="Error: Image not a JPG")
+        raise InputError(description="Error: Image not a JPG or JPEG")
 
     # Create image filename and path string
     imgfile_list = os.listdir("src/static/")
@@ -243,14 +230,14 @@ def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
         raise InputError(description="Error: Image dimensions out of range")
     if x_start not in range(width + 1) or y_start not in range(height + 1):
         raise InputError(description="Error: Image dimensions out of range")
-    if x_end < x_start or y_end < y_start:
+    if x_end <= x_start or y_end <= y_start:
         raise InputError(description="Error: end value less than start value")
     
     # Crop image
     cropped = imageObject.crop((x_start, y_start, x_end, y_end))
     cropped.save(img_file_path)
 
-    # Save url of uploaded image
+    # Save served url of uploaded image
     profile_img_url = BASE_URL + "static/" + img_file
     db_store = get_data()
     for user in db_store["users"]:

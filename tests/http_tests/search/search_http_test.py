@@ -42,13 +42,30 @@ def message_strings():
     messages.append("Zageruzemu")
     return messages
 
+def test_search_one_message(users_json, channel_json, message_strings):
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = users_json[0]).json()
+    channel_json["token"] = auth_user["token"]
+    channel1 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_json).json()
+    message_send_json = {
+        'token': auth_user['token'],
+        'channel_id': channel1['channel_id'],
+        'message': message_strings[0]
+    }
+    requests.post(f"{BASE_URL}/message/send/v1", json = message_send_json)
+    search_params = {
+        "token": auth_user['token'],
+        "query_str": "za"
+    }
+    search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
+    assert len(search_get["messages"]) == 1
+    assert search_get["messages"][0]["message"] == "Zakeru"
+
 def test_search_multi_channels_messages(users_json, channel_json, message_strings):
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
-    
     auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = users_json[0]).json()
     user1 = requests.post(f"{BASE_URL}/auth/register/v2", json = users_json[1]).json()
     user2 = requests.post(f"{BASE_URL}/auth/register/v2", json = users_json[2]).json()
-
     channel_json["token"] = auth_user["token"]
     channel1 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_json).json()
     channel_json["name"] = "The Real Monsters"
@@ -92,10 +109,7 @@ def test_search_multi_channels_messages(users_json, channel_json, message_string
         "query_str": "za"
     }
     search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
-    print(search_get)
     assert len(search_get["messages"]) == 2
-    assert search_get["messages"][0]["message"] == "Teozakeru"
-    assert search_get["messages"][1]["message"]  == "Zakeru"
     search_params["query_str"] = "te"
     search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
     assert len(search_get["messages"]) == 1
@@ -150,8 +164,6 @@ def test_search_multi_dms_messages(users_json, message_strings):
     }
     search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
     assert len(search_get["messages"]) == 2
-    assert search_get["messages"][0]["message"] == "Teozakeru"
-    assert search_get["messages"][1]["message"]  == "Zakeru"
     search_params["query_str"] = "te"
     search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
     assert len(search_get["messages"]) == 1
@@ -210,8 +222,6 @@ def test_search_channels_and_dms_messages(users_json, channel_json, message_stri
     }
     search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
     assert len(search_get["messages"]) == 2
-    assert search_get["messages"][0]["message"] == "Zakeru"
-    assert search_get["messages"][1]["message"]  == "Teozakeru"
     search_params["query_str"] = "te"
     search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
     assert len(search_get["messages"]) == 1
@@ -244,3 +254,6 @@ def test_search_invalid_query_str(users_json, channel_json, message_strings):
     search_params["query_str"] = ""
     search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params)
     assert search_get.status_code == 400
+    search_params["query_str"] = "i" * 1000
+    search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params)
+    assert search_get.status_code == 200

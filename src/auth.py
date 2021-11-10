@@ -3,7 +3,6 @@ import os
 import smtplib, ssl
 from src.helper import get_data, create_handle, create_permission_id, hash_encrypt, save_database_updates
 from src.helper import create_reset_code, create_password_reset_jwt, decode_jwt
-from src.data_store import data_store
 from src.error import InputError
 from src.other import clear_v1
 from src import config
@@ -181,4 +180,47 @@ Streams Co."""
             with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
                 server.login(sender_email, password)
                 server.sendmail(sender_email, receiver_email, message)
+    return {}
+
+def auth_passwordreset_reset_v1(reset_code, new_password):
+    '''
+    Given a reset code for a user, set that user's new password 
+    to the password provided.
+
+    Arguments:
+        reset_code (string) - code sent to user's email in auth/passwordreset/request/v1
+        new_password (string) - new passsword that user wants to change to
+
+    Exceptions:
+        InputError - occurs when email is being used by another user
+        InputError - occurs when reset_code is not a valid reset code
+
+    Return Value:
+        Returns empty dictionary
+    '''
+    # Raise error if new password is less than 6 characters
+    if len(new_password) < 6:
+        raise InputError(description = "Error: Invalid new password")
+
+    # Fetch data
+    db_store = get_data()
+    is_valid_code = False
+    # See if the reset_code matches any reset_token in database.
+    for reset_token in db_store['reset_tokens']:
+        decoded = decode_jwt(reset_token)
+        if decoded['reset_code'] == reset_code:
+            is_valid_code = True
+            target_u_id = decoded['u_id']
+            # remove reset token after use
+            db_store['reset_tokens'].remove(reset_token)
+
+    # Raise error if reset code does not match any reset token
+    if is_valid_code == False:
+        raise InputError(description = "Error: Invalid code")
+
+    # Find user in database and change their password
+    for user in db_store['users']:
+        if user['u_id'] == target_u_id:
+            user['password'] = hash_encrypt(new_password) 
+    save_database_updates(db_store)
     return {}
