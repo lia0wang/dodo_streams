@@ -11,20 +11,21 @@ from src import message
 from src.channel import channel_addowner_v1, channel_invite_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1, channel_messages_v1
 from src.channel import channel_leave_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_stats_v1
-from src.user import user_profile_sethandle_v1, users_all_v1, user_profile_uploadphoto_v1
+from src.user import user_profile_sethandle_v1, user_profile_uploadphoto_v1
 from src.users import users_all_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1, dm_remove_v1
 from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_send_later_v1, message_share_v1
 from src.message import message_send_later_dm_v1, message_pin_v1, message_unpin_v1, message_react_v1, message_unreact_v1
 from src.standup import standup_send_v1, standup_active_v1
+from src.search import search_v1
 from src.error import InputError, AccessError
 from src import config
-from src.auth import auth_passwordreset_request_v1, auth_register_v1, auth_login_v1
+from src.auth import auth_passwordreset_request_v1, auth_register_v1, auth_login_v1, auth_passwordreset_reset_v1
 from src.channels import channels_list_v1, channels_listall_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.helper import check_valid_token, get_data, create_session_id
-from src.helper import save_database_updates, create_jwt, decode_jwt, hash_encrypt
+from src.helper import save_database_updates, create_jwt, decode_jwt
 from src.other import clear_v1
 from src import config
 BASE_URL = config.url
@@ -687,51 +688,11 @@ def reset_request():
 
 @APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
 def reset():
-    '''
-    Given a reset code for a user, set that user's new password 
-    to the password provided.
-
-    Arguments:
-        reset_code (string) - code sent to user's email in auth/passwordreset/request/v1
-        new_password (string) - new passsword that user wants to change to
-
-    Exceptions:
-        InputError - occurs when email is being used by another user
-        InputError - occurs when reset_code is not a valid reset code
-
-    Return Value:
-        Returns empty dictionary
-    '''
     # Retrieve reset code and new_password
     request_data = request.get_json()
     reset_code = request_data['reset_code']
     new_password = request_data['new_password']
-
-    # Raise error if new password is less than 6 characters
-    if len(new_password) < 6:
-        raise InputError(description = "Error: Invalid new password")
-
-    # Fetch data
-    db_store = get_data()
-    is_valid_code = False
-    # See if the reset_code matches any reset_token in database.
-    for reset_token in db_store['reset_tokens']:
-        decoded = decode_jwt(reset_token)
-        if decoded['reset_code'] == reset_code:
-            is_valid_code = True
-            target_u_id = decoded['u_id']
-            # remove reset token after use
-            db_store['reset_tokens'].remove(reset_token)
-
-    # Raise error if reset code does not match any reset token
-    if is_valid_code == False:
-        raise InputError(description = "Error: Invalid code")
-
-    # Find user in database and change their password
-    for user in db_store['users']:
-        if user['u_id'] == target_u_id:
-            user['password'] = hash_encrypt(new_password) 
-    save_database_updates(db_store)
+    auth_passwordreset_reset_v1(reset_code, new_password)
     return dumps({})
 
 @APP.route("/standup/send/v1", methods=['POST'])
@@ -762,6 +723,15 @@ def standup_active():
     standup_stat = standup_active_v1(decode_token['u_id'], int(channel_id))
 
     return dumps(standup_stat)
+
+@APP.route("/search/v1", methods=['GET'])
+def search():
+    token = request.args.get("token")
+    query_str = request.args.get("query_str")
+    check_valid_token(token)
+    decoded_token = decode_jwt(token)
+    messages = search_v1(decoded_token["u_id"], query_str)
+    return dumps({"messages": messages})
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

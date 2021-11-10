@@ -194,3 +194,33 @@ def create_reset_code():
                 reset_code = (''.join(random.choice(characters) for i in range(6))).upper()
     return reset_code
 
+def search_channel_messages(u_id, channel, query_str):
+    '''
+    Given u_id, channel and query_str, returns list of messages with that query_str
+    '''
+    is_member = False
+    messages = []
+    for member in channel["all_members"]:
+        if member["u_id"] == u_id:
+            is_member = True
+    if is_member:
+        for message in channel["messages"]:
+            if message["u_id"] == u_id and query_str.lower() in message["message"].lower():
+                target_message = message
+                del target_message['channel_id']
+                messages.append(target_message)
+    return messages
+
+def search_dm_messages(u_id, dm, query_str):
+    '''
+    Given u_id, dm and query_str, returns list of messages with that query_str
+    '''
+    messages = []
+    if u_id in dm["u_ids"]:
+        for message in dm["messages"]:
+            if message["u_id"] == u_id and query_str.lower() in message["message"].lower():
+                target_message = message
+                del target_message['dm_id']
+                messages.append(target_message)
+    return messages
+
