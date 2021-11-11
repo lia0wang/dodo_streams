@@ -163,3 +163,65 @@ def test_http_standup_active():
     }
     response = requests.post(f"{BASE_URL}/standup/send/v1", json = standup_send_praram)
     assert response.status_code == 400
+
+def test_http_standup_basic():
+    '''Test if the send working'''
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+
+    register_param = {
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
+    }
+    owner = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+
+    channel_param = {
+        'token': owner['token'],
+        'name': 'league',
+        'is_public': True
+    }
+    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json() 
+
+    standup_start_praram = {
+        'token': owner['token'],
+        'channel_id': channel['channel_id'],
+        'length': 3
+    }
+    response = requests.post(f"{BASE_URL}/standup/start/v1", json = standup_start_praram)
+    assert response.status_code == 200
+
+    message = "frontend alot fun?"
+    standup_send_praram = {
+        'token': owner['token'],
+        'channel_id': channel['channel_id'],
+        'message': message
+    }
+    response = requests.post(f"{BASE_URL}/standup/send/v1", json = standup_send_praram)
+
+    message = "frontend alot fun!"
+    standup_send_praram = {
+        'token': owner['token'],
+        'channel_id': channel['channel_id'],
+        'message': message
+    }
+    response = requests.post(f"{BASE_URL}/standup/send/v1", json = standup_send_praram)
+
+    message = "frontend alot fun."
+    standup_send_praram = {
+        'token': owner['token'],
+        'channel_id': channel['channel_id'],
+        'message': message
+    }
+    response = requests.post(f"{BASE_URL}/standup/send/v1", json = standup_send_praram)
+
+    assert response.status_code == 200
+
+    standup_active_praram = {
+        'token': owner['token'],
+        'channel_id': channel['channel_id'],
+    }
+    response = requests.get(f"{BASE_URL}/standup/active/v1", params = standup_active_praram)
+
+    assert response.status_code == 200
+    assert response.json()['is_active'] == True and response.json()['time_finish'] != 0
