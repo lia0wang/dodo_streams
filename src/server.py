@@ -12,7 +12,7 @@ from src.channel import channel_addowner_v1, channel_invite_v1, channel_join_v1,
 from src.channel import channel_leave_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_stats_v1
 from src.user import user_profile_sethandle_v1, user_profile_uploadphoto_v1
-from src.users import users_all_v1
+from src.users import users_all_v1, users_stats_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1, dm_remove_v1
 from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_send_later_v1, message_share_v1
@@ -649,11 +649,16 @@ def list_users():
 
 @APP.route("/user/stats/v1", methods=['GET'])
 def user_stats():
-    #token = request.args.get('token')
-    data = request.get_json()
-    token = data.get('token')
-    print('server token: ', token)
+    token = request.args.get('token')
+    check_valid_token(token)
     stats = user_stats_v1(token)
+    return dumps(stats)
+
+@APP.route("/users/stats/v1", methods=['GET'])
+def users_stats():
+    token = request.args.get('token')
+    check_valid_token(token)
+    stats = users_stats_v1(token)
     return dumps(stats)
 
 @APP.route("/admin/user/remove/v1", methods=['DELETE'])

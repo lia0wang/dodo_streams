@@ -1,5 +1,5 @@
 from src.error import AccessError, InputError
-from src.helper import get_data, save_database_updates, check_valid_token, decode_jwt, store_log_notif
+from src.helper import get_data, save_database_updates, check_valid_token, decode_jwt, store_log_notif, datetime_to_unix_time_stamp
 from src.data_store import data_store
 
 def dm_create_v1(auth_user_id, u_ids):
@@ -50,6 +50,9 @@ def dm_create_v1(auth_user_id, u_ids):
     # Generate dm_id
     dm_id = len(store['dms']) + 1
 
+    # Get the current time stamp
+    timestamp = datetime_to_unix_time_stamp()
+
     # Generate dm_name based on the list of dm members
     member_ids = [auth_user_id] + u_ids
     dm_name = []
@@ -57,6 +60,12 @@ def dm_create_v1(auth_user_id, u_ids):
         for user in store['users']:
             if user['u_id'] == member_id:
                 dm_name.append(user['handle_str'])
+                # Update the user stats       
+                num = user['dms_joined']
+                new_dict = {'num_dms_joined':num+1,'timestamp':timestamp}
+                user['user_stats']['dms_joined'].append(new_dict)
+                user['dms_joined'] += 1 
+
     dm_name.sort()
     dm_name = ', '.join(dm_name)
 
@@ -71,7 +80,6 @@ def dm_create_v1(auth_user_id, u_ids):
 
     # Append the created dm to dms database
     store['dms'].append(dm)
-
 
     save_database_updates(store)
 
@@ -294,4 +302,15 @@ def dm_remove_v1(token, dm_id):
     for dm in db_store['dms']:
         if dm['dm_id'] == dm_id:
             db_store['dms'].remove(dm)
-            save_database_updates(db_store)
+            
+    # Get the current time stamp
+    timestamp = datetime_to_unix_time_stamp()
+     
+    for user in db_store['users']:
+        if user['u_id'] == auth_user_id:
+            num = user['dms_joined']
+            new_dict = {'num_dms_joined':num-1,'timestamp':timestamp}
+            user['user_stats']['dms_joined'].append(new_dict)
+            user['dms_joined'] -= 1   
+
+    save_database_updates(db_store)

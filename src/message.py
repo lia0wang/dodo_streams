@@ -5,7 +5,8 @@ from requests.api import get
 from src.dm import dm_create_v1, dm_details_v1
 from src.helper import get_data, check_valid_token,\
      decode_jwt,save_database_updates, datetime_to_unix_time_stamp,\
-         store_log_notif, chan_check_tag, dm_check_tag
+         store_log_notif, chan_check_tag, dm_check_tag,\
+         seek_target_channel_and_errors
 from src.channel import channel_details_v1, channel_messages_v1
 from src.channels import channels_list_v1
 from src.dm import dm_list_v1, dm_details_v1
@@ -13,7 +14,6 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 import threading
 import time
-
 
 def message_send_v1(token, channel_id, message):
     '''
@@ -90,7 +90,14 @@ def message_send_v1(token, channel_id, message):
                 'is_this_user_reacted': False
             }
         ],
-    }
+    }        
+    # Update the user stats
+    for user in db_store['users']:
+        if user['u_id'] == auth_user_id:
+            num = user['messages_sent']
+            new_dict = {'num_msgs_sent':num+1,'timestamp':timestamp}
+            user['user_stats']['messages_sent'].append(new_dict)
+            user['messages_sent']+=1     
 
     target_channel['messages'].append(message)  
     save_database_updates(db_store)
@@ -141,7 +148,7 @@ def message_edit_v1(token, message_id, new_message):
     #Also check if the authorised user is not an owner member of the channel
     for user in db_store['users']:
         if user['u_id'] == auth_user_id:
-            targer_user = user
+            target_user = user
             
     for channel in db_store['channels']:
         for message in channel['messages']:
@@ -152,7 +159,7 @@ def message_edit_v1(token, message_id, new_message):
                 for users in channel['owner_members']:
                     if auth_user_id == users['u_id']:
                         has_owner_permission = True
-                if targer_user['permission_id'] == 1:
+                if target_user['permission_id'] == 1:
                     has_owner_permission = True
                 if has_owner_permission == False and auth_request == False:
                     raise AccessError("Authorised user does not have owner permisson \
@@ -165,7 +172,7 @@ def message_edit_v1(token, message_id, new_message):
                     target_channel = channel
                     msg['message'] = new_message
                     save_database_updates(db_store)
-                    chan_check_tag(targer_user, new_message, target_channel)
+                    chan_check_tag(target_user, new_message, target_channel)
  
     for dm in db_store['dms']:
         for message in dm['messages']:
@@ -190,7 +197,7 @@ def message_edit_v1(token, message_id, new_message):
                     target_dm = dm
                     message['message'] = new_message
                     save_database_updates(db_store)
-                    dm_check_tag(targer_user, new_message, target_dm)
+                    dm_check_tag(target_user, new_message, target_dm)
 
                     
     if valid_dm == False and valid_channel_message == False:
@@ -226,12 +233,12 @@ def message_remove_v1(token, message_id):
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
             
-    #Check message_id is valid
-    #Also check if the authorised user is not an owner member of the channel
+    # Check message_id is valid
+    # Also check if the authorised user is not an owner member of the channel
     for user in db_store['users']:
         if user['u_id'] == auth_user_id:
-            targer_user = user
-            
+            target_user = user
+
     #Remove channel messages       
     for channel in db_store['channels']:
         for message in channel['messages']:
@@ -242,7 +249,7 @@ def message_remove_v1(token, message_id):
                 for users in channel['owner_members']:
                     if auth_user_id == users['u_id']:
                         has_owner_permission = True
-                if targer_user['permission_id'] == 1:
+                if target_user['permission_id'] == 1:
                     has_owner_permission = True
                 if has_owner_permission == False and auth_request == False:
                     raise AccessError("Authorised user does not have owner permisson \
@@ -253,10 +260,10 @@ def message_remove_v1(token, message_id):
         for channel in db_store['channels']:
             for message in channel['messages']:
                 if message['message_id'] == message_id:
-                    channel['messages'].remove(message)
+                    channel['messages'].remove(message) 
                     save_database_updates(db_store)
         
-    #Remove dm messages
+    # Remove dm messages
     for dm in db_store['dms']:
         for message in dm['messages']:
             if message['message_id'] == message_id:
@@ -277,13 +284,20 @@ def message_remove_v1(token, message_id):
             for message in dm['messages']:
                 if message['message_id'] == message_id:
                     dm['messages'].remove(message)
-                    save_database_updates(db_store)               
+                    save_database_updates(db_store)
+
+    # Update user stats
+    timestamp = datetime_to_unix_time_stamp()
+    num = target_user['messages_sent']
+    new_dict = {'num_msgs_sent':num-1,'timestamp':timestamp}
+    target_user['user_stats']['messages_sent'].append(new_dict)
+    target_user['messages_sent']-=1
+    save_database_updates(db_store)  
 
     if valid_dm == False and valid_channel_message == False:
         raise InputError("Error: message_id oes not refer to a valid message within \
                          a channel /DM that the authorised user has joined")
-                  
-    
+
 def message_senddm_v1(token, dm_id, message):
     '''
     Send a message from authorised_user to the DM specified by dm_id.
@@ -299,34 +313,23 @@ def message_senddm_v1(token, dm_id, message):
          Return a dictionary containing the message id of the dm message     
     '''
     # Fetch data
-    is_member = False
-    valid_dm = False
     if(len(message)<1 or len(message)>1000):
         raise InputError("Error: message too long or too short")
 
     db_store = get_data()
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
-    for user in db_store['users']:
-        if user['u_id'] == auth_user_id:
-            targer_user = user    
-
+    
     #Check if dm_id is not valid
+    dm_details_v1(auth_user_id, dm_id) #This will check if user or dm_id is not valid    
+    
     for dm in db_store['dms']:
         if dm['dm_id'] == dm_id:
             target_dm = dm
-            valid_dm = True
-            if dm['auth_user_id'] == auth_user_id:
-                is_member = True # Check if authorised user is a member of the dm
-            for members in dm_details_v1(auth_user_id, dm_id)['members']:
-                if targer_user['u_id'] == members['u_id']:
-                    is_member = True # Check if authorised user is a member of the dm
+    for user in db_store['users']:
+        if user['u_id'] == auth_user_id:
+            target_user = user
 
-    if is_member == False and valid_dm == True:
-        raise AccessError(description="Authorised user is not a member of DM")
-    if valid_dm == False:
-        raise InputError(description="dm_id does not refer to a valid dm id")
-   
     message_id = db_store['message_index']
     db_store['message_index']+=1
 
@@ -348,11 +351,16 @@ def message_senddm_v1(token, dm_id, message):
             }
         ],
     }
-
+     # Update the user stats
+    num = target_user['messages_sent']
+    new_dict = {'num_msgs_sent':num+1,'timestamp':timestamp}
+    target_user['user_stats']['messages_sent'].append(new_dict)
+    target_user['messages_sent']+=1      
+      
     target_dm['messages'].append(dm_message)
     save_database_updates(db_store)
 
-    dm_check_tag(targer_user, message, target_dm)
+    dm_check_tag(target_user, message, target_dm)
 
     return {
         'message_id': message_id,
@@ -383,33 +391,23 @@ def message_send_later_dm_v1(token, dm_id, message, time_sent):
     '''
     message_content = message
     # Fetch data
-    is_member = False
-    valid_dm = False
     if(len(message)<1 or len(message)>1000):
         raise InputError("Error: message too long or too short")
 
     db_store = get_data()
     #Get authorised user id 
-    auth_user_id = decode_jwt(token)['u_id']
-    for user in db_store['users']:
-        if user['u_id'] == auth_user_id:
-            targer_user = user    
+    auth_user_id = decode_jwt(token)['u_id']  
 
-    #Check if dm_id is not valid
+    #Check if dm_id or user_id is not valid
+    dm_details_v1(auth_user_id, dm_id) #This will check if user or dm_id is not valid
+    
     for dm in db_store['dms']:
         if dm['dm_id'] == dm_id:
             target_dm = dm
-            valid_dm = True
-            if dm['auth_user_id'] == auth_user_id:
-                is_member = True # Check if authorised user is a member of the dm
-            for members in dm_details_v1(auth_user_id, dm_id)['members']:
-                if targer_user['u_id'] == members['u_id']:
-                    is_member = True # Check if authorised user is a member of the dm
-
-    if is_member == False and valid_dm == True:
-        raise AccessError(description="Authorised user is not a member of DM")
-    if valid_dm == False:
-        raise InputError(description="dm_id does not refer to a valid dm id")  
+    for user in db_store['users']:
+        if user['u_id'] == auth_user_id:
+            target_user = user
+            
     if time_sent < time.time():
         raise InputError(description="Error, time_sent is a time in the past")
 
@@ -433,22 +431,27 @@ def message_send_later_dm_v1(token, dm_id, message, time_sent):
     }
    
     time_diff = time_sent - time.time()
-    if time_diff < 0:
-        raise InputError(description="Time sent is a time sent in the past")
 
-    param = [target_dm, db_store, message, targer_user, message_content]
+    param = [target_dm, db_store, message, target_user, message_content]
     delayed_msg = threading.Timer(time_diff , delayed_dm_message, param)
     delayed_msg.start()
     
+     # Update the user stats
+    timestamp = datetime_to_unix_time_stamp()
+    num = target_user['messages_sent']
+    new_dict = {'num_msgs_sent':num+1,'timestamp':timestamp}
+    target_user['user_stats']['messages_sent'].append(new_dict)
+    target_user['messages_sent']+=1   
+            
     return {
         'message_id': message_id,
     }
 
-def delayed_dm_message(target_dm, db_store, message, targer_user, message_content):
+def delayed_dm_message(target_dm, db_store, message, target_user, message_content):
     target_dm['messages'].append(message)
     db_store['messages'].append(message)
     save_database_updates(db_store)
-    dm_check_tag(targer_user, message_content, target_dm)
+    dm_check_tag(target_user, message_content, target_dm)
 
 
 def message_send_later_v1(token, channel_id, message, time_sent):
@@ -528,14 +531,22 @@ def message_send_later_v1(token, channel_id, message, time_sent):
             }
         ],
     }
-   
+
+     # Update the user stats
+    timestamp = datetime_to_unix_time_stamp()
+    for user in db_store['users']:
+        if user['u_id'] == auth_user_id:
+            num = user['messages_sent']
+            new_dict = {'num_msgs_sent':num+1,'timestamp':timestamp}
+            user['user_stats']['messages_sent'].append(new_dict)
+            user['messages_sent']+=1     
+            
     time_diff = time_sent - time.time()
-    if time_diff < 0:
-        raise InputError(description="Time sent is a time sent in the past")
 
     param = [target_channel, db_store, message, target_user, message_content]
     delayed_msg = threading.Timer(time_diff , delayed_message, param)
     delayed_msg.start()
+            
     return {
         'message_id': message_id,
     }
@@ -575,7 +586,7 @@ def message_pin_v1(token, message_id):
 
     for user in store['users']:
         if user['u_id'] == u_id:
-            targer_user = user
+            target_user = user
     
     in_channel_dm = False
     is_pinned = False
@@ -590,7 +601,7 @@ def message_pin_v1(token, message_id):
                 for users in channel['all_members']:
                     if u_id == users['u_id']:
                         in_channel_dm = True
-                        if targer_user['permission_id'] == 1:
+                        if target_user['permission_id'] == 1:
                             owner_permission = True
                 for users in channel['owner_members']:
                     if u_id == users['u_id']:
@@ -676,7 +687,7 @@ def message_unpin_v1(token, message_id):
 
     for user in store['users']:
         if user['u_id'] == u_id:
-            targer_user = user
+            target_user = user
     
     in_channel_dm = False
     is_pinned = False
@@ -691,7 +702,7 @@ def message_unpin_v1(token, message_id):
                 for users in channel['all_members']:
                     if u_id == users['u_id']:
                         in_channel_dm = True
-                        if targer_user['permission_id'] == 1:
+                        if target_user['permission_id'] == 1:
                             owner_permission = True
                 for users in channel['owner_members']:
                     if u_id == users['u_id']:
@@ -952,9 +963,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     
     is_source_member = False
     is_sharing_member = False
-    valid_channel = False
     valid_channel_message = False
-    valid_dm = False
     valid_dm_message = False
 
     if len(message)>1000:
@@ -965,10 +974,10 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
     
-    #Check message_id is valid
-    #Also check if the authorised user is not an owner member of the channel
+
 
     if dm_id == -1: # Share message from a DM to a channel
+        target_channel = seek_target_channel_and_errors(db_store, auth_user_id, channel_id)
         for dm in db_store['dms']:  
             for message in dm['messages']:
                 if message['message_id'] == og_message_id:
@@ -983,27 +992,25 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
                     is_source_member = True
             if not is_source_member:
                 raise InputError(description="User is not a member of the source DM")
-            for chan in db_store['channels']:
-                if chan['channel_id'] == channel_id:
-                    target_channel = chan
-                    valid_channel = True
-                    for user in target_channel['all_members']:
-                        if user['u_id'] == auth_user_id:
-                            is_sharing_member = True
-                    if not is_sharing_member:
-                        raise AccessError(description="User is not a member of target channel")
-            og_message = source_dm_msg['message']
-            print('og_message: ',og_message)
-            print('message: ', message)
-            shared_message = "Forwarded message: \n" + \
-                             message['message'] + '\n"""\n' + "Original message: \n" + \
-                             og_message + '\n"""\n'
-            shared_message_id = message_send_v1(token, channel_id, shared_message)
-            return {
-                'shared_message_id': shared_message_id,
-                }
+
+        for user in target_channel['all_members']:
+            if user['u_id'] == auth_user_id:
+                is_sharing_member = True
+        if not is_sharing_member:
+            raise AccessError(description="User is not a member of target channel")
+        og_message = source_dm_msg['message']
+        print('og_message: ',og_message)
+        print('message: ', message)
+        shared_message = "Forwarded message: \n" + \
+                         message['message'] + '\n"""\n' + "Original message: \n" + \
+                         og_message + '\n"""\n'
+        shared_message_id = message_send_v1(token, channel_id, shared_message)
+        return {
+            'shared_message_id': shared_message_id,
+            }
 
     elif channel_id == -1: # Share message from a channel to a DM
+        dm_details_v1(auth_user_id, dm_id)
         for channel in db_store['channels']:  
             for message in channel['messages']:
                 if message['message_id'] == og_message_id:
@@ -1021,26 +1028,22 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
             for dm in db_store['dms']:
                 if dm['dm_id'] == dm_id:
                     target_dm = dm
-                    valid_dm = True
-                    for u_id in target_dm['u_ids']:
-                        if u_id == auth_user_id:
-                            is_sharing_member = True
-                    if not is_sharing_member:
-                        raise AccessError(description="User is not a member of target channel")
-            og_message = source_channel_msg['message']
-            print('og_message: ',og_message)
-            print('message: ', message)
-            shared_message = "Forwarded message: \n" + \
-                             message['message'] + '\n"""\n' + "Original message: \n" + \
-                             og_message + '\n"""\n'
-            shared_message_id = message_senddm_v1(token, dm_id, shared_message)
-            return {
-                'shared_message_id': shared_message_id,
-                }
+            for u_id in target_dm['u_ids']:
+                if u_id == auth_user_id:
+                    is_sharing_member = True
+            if not is_sharing_member:
+                raise AccessError(description="User is not a member of target channel")
+        og_message = source_channel_msg['message']
+        print('og_message: ',og_message)
+        print('message: ', message)
+        shared_message = "Forwarded message: \n" + \
+                        message['message'] + '\n"""\n' + "Original message: \n" + \
+                        og_message + '\n"""\n'
+        shared_message_id = message_senddm_v1(token, dm_id, shared_message)
+        return {
+            'shared_message_id': shared_message_id,
+            }
                     
-
-    if not valid_dm and not valid_channel:
-        raise InputError(description="Both channel_id and dm_id are invalid")
         
 
 
