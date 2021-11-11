@@ -186,10 +186,11 @@ def test_http_standup_start_basic():
     standup_start_praram = {
         'token': owner['token'],
         'channel_id': channel['channel_id'],
-        'length': 100
+        'length': 1
     }
     response = requests.post(f"{BASE_URL}/standup/start/v1", json = standup_start_praram)
     assert response.status_code == 200
+    time_finish =  response.json()['time_finish']
 
     standup_active_praram = {
         'token': owner['token'],
@@ -197,3 +198,6 @@ def test_http_standup_start_basic():
     }
     response = requests.get(f"{BASE_URL}/standup/active/v1", params = standup_active_praram)
     assert response.status_code == 200
+
+    time.sleep(1)
+    assert response.json()['is_active'] and response.json()['time_finish'] == time_finish
