@@ -1,7 +1,7 @@
 import re
 import os
 import smtplib, ssl
-from src.helper import get_data, create_handle, create_permission_id, hash_encrypt, save_database_updates
+from src.helper import get_data, create_handle, create_permission_id, hash_encrypt, save_database_updates, datetime_to_unix_time_stamp
 from src.helper import create_reset_code, create_password_reset_jwt, decode_jwt
 from src.error import InputError
 from src.other import clear_v1
@@ -106,6 +106,9 @@ def auth_register_v1(email, password, name_first, name_last):
     # Generate id
     user_id = len(store['users']) + 1
 
+    # Get the current time stamp
+    timestamp = datetime_to_unix_time_stamp()
+
     # Create and store account
     user = {
         'u_id': user_id,
@@ -116,7 +119,16 @@ def auth_register_v1(email, password, name_first, name_last):
         'name_last': name_last,
         'handle_str': handle_str,
         'permission_id': permission_id,
-        'profile_img_url': f"{BASE_URL}static/default-profile.jpg"
+        'profile_img_url': f"{BASE_URL}static/default-profile.jpg",
+        'channels_joined': 0,
+        'dms_joined': 0,
+        'messages_sent': 0,
+        'user_stats' : {
+            'channels_joined': [{'num_channels_joined':0,'timestamp':timestamp}],
+            'dms_joined': [{'num_dms_joined':0,'timestamp':timestamp}],
+            'messages_sent': [{'num_msgs_sent':0,'timestamp':timestamp}],
+            'involvement_rate': 0
+            }
     }
     store['users'].append(user)
     save_database_updates(store)

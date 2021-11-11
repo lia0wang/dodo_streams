@@ -1,6 +1,6 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import get_data, save_database_updates
+from src.helper import get_data, save_database_updates, datetime_to_unix_time_stamp
 
 def channels_list_v1(auth_user_id):
     ''' 
@@ -146,6 +146,16 @@ def channels_create_v1(auth_user_id, name, is_public):
             'time_finish': None
         }
     }
+
+    # Get the current time stamp
+    timestamp = datetime_to_unix_time_stamp()
+    # Update the user stats         
+    for user in store['users']:
+        if user['u_id'] == auth_user_id:
+            num = user['channels_joined']
+            new_dict = {'num_channels_joined':num+1,'timestamp':timestamp}
+            user['user_stats']['channels_joined'].append(new_dict)
+            user['channels_joined'] += 1 
 
     # Append the created channel to channels database
     store['channels'].append(channel)
