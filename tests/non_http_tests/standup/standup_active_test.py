@@ -3,7 +3,7 @@ from src.error import AccessError, InputError
 from src.other import clear_v1
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
-from src.standup import standup_active_v1
+from src.standup import standup_active_v1, standup_start_v1
 
 def test_invalid_channel_id():
     '''
@@ -56,6 +56,23 @@ def test_standup_inactive():
     user = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
     channel = channels_create_v1(user['auth_user_id'], 'league', True)
     
-    standup_data = standup_active_v1(user['auth_user_id'], channel['channel_id'])
-    assert standup_data['is_active'] == False
-    assert standup_data['time_finish'] == None
+    active_return = standup_active_v1(user['auth_user_id'], channel['channel_id'])
+    assert active_return['is_active'] == False
+    assert active_return['time_finish'] == None
+
+def test_active_basic():
+    '''
+    Test if standup active working.
+    '''
+    clear_v1()
+    user = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+    channel = channels_create_v1(user['auth_user_id'], 'league', True)
+
+    active_return = standup_active_v1(user['auth_user_id'], channel['channel_id'])
+    assert active_return['is_active'] == False and active_return['time_finish'] == None
+    
+    start_return = standup_start_v1(user['auth_user_id'], channel['channel_id'], 1)
+    time_finish = start_return['time_finish']
+    active_return = standup_active_v1(user['auth_user_id'], channel['channel_id'])
+
+    assert active_return['is_active'] == True and active_return['time_finish'] == time_finish

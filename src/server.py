@@ -17,7 +17,7 @@ from src.channels import channels_create_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_messages_v1, dm_list_v1, dm_remove_v1
 from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_senddm_v1, message_send_later_v1, message_share_v1
 from src.message import message_send_later_dm_v1, message_pin_v1, message_unpin_v1, message_react_v1, message_unreact_v1
-from src.standup import standup_send_v1, standup_active_v1
+from src.standup import standup_send_v1, standup_active_v1, standup_start_v1
 from src.search import search_v1
 from src.error import InputError, AccessError
 from src import config
@@ -722,10 +722,10 @@ def standup_send():
     channel_id = request_data.get('channel_id')
     message = request_data.get('message')
     
-    standup_send_v1(int(decode_token['u_id']), channel_id, message)
+    standup_send_v1(decode_token['u_id'], channel_id, message)
     return dumps({})
 
-@APP.route("/standup/active/v1", methods=['GET'])
+@APP.route("/standup/active/v1", methods=["GET"])
 def standup_active():
     # Retrieve token
     request_data = request.args
@@ -735,7 +735,23 @@ def standup_active():
     decode_token = decode_jwt(token)
     channel_id = request_data.get('channel_id')
 
-    standup_stat = standup_active_v1(decode_token['u_id'], int(channel_id))
+    standup_stat = standup_active_v1(int(decode_token['u_id']), int(channel_id))
+
+    return dumps(standup_stat)
+
+@APP.route("/standup/start/v1", methods=["POST"])
+def standup_start():
+    # Retrieve token
+    request_data = request.get_json()
+    token = request_data['token']
+    check_valid_token(token)
+
+    # Decode token, retrieve parameters
+    decode_token = decode_jwt(token)
+    channel_id = request_data['channel_id']
+    length = request_data['length']
+
+    standup_stat = standup_start_v1(decode_token['u_id'], channel_id, length)
 
     return dumps(standup_stat)
 
