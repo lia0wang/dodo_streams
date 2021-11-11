@@ -7,6 +7,7 @@ empty = {
     "messages": [],
     "dms": [],
     "reset_tokens": [],
+    "log_history": [],
     "message_index": 0
 }
 

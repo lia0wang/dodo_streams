@@ -4,11 +4,91 @@ import os
 import string
 import random
 import hashlib
+
+from requests.api import get
 from src.error import InputError, AccessError
 from datetime import date, timezone, datetime
 import time
+import re
 SECRET = "DODO"
 SESSION_ID = 0
+
+def chan_check_tag(sender, message, target_channel):
+    chan_id = target_channel['channel_id']
+    dm_id = -1
+    chan_name = target_channel['name']
+    #notif_type = 'tagged'
+    preview_msg = message[0:20]
+
+    pattern = r'(@[a-z]{1,20}[0-9]*)|(@[a-z]{1,20})'
+
+    result = re.findall(pattern, message) 
+    # returns a list of tags without the @
+    tags1 = [tup[0].replace("@","") for tup in result]
+
+    tags = unique_list(tags1)
+
+    for tag in tags:
+        for user in target_channel['all_members']:
+            # checks the tag gotten is an existing user handle string 
+            if tag == user['handle_str']:
+                notified_u_id = user['u_id']
+                store_log_notif(notified_u_id, chan_id, dm_id, sender,\
+                    chan_name, preview_msg)
+                break               
+
+    return {
+    }
+
+def dm_check_tag(sender, message, target_dm):
+    chan_id = -1
+    dm_id = target_dm['dm_id']
+    chan_name = target_dm['dm_name']
+    #notif_type = 'tagged'
+    preview_msg = message[0:20]
+
+    pattern = r'(@[a-z]{1,20}[0-9]*)|(@[a-z]{1,20})'
+
+    result = re.findall(pattern, message) 
+    # returns a list of tags without the @
+    tags1 = [tup[0].replace("@","") for tup in result]
+
+    tags = unique_list(tags1)
+
+    store = get_data()
+    for tag in tags:
+        for user in store['users']:
+            # checks the tag gotten is an existing user handle string 
+            if tag == user['handle_str']:
+                notified_u_id = user['u_id']
+                store_log_notif(notified_u_id, chan_id, dm_id, sender,\
+                    chan_name, preview_msg)
+                break               
+
+    return {
+    }
+
+
+def unique_list(l):
+    unique_list = []
+    [unique_list.append(x) for x in l if x not in unique_list]
+    return unique_list
+
+
+def store_log_notif(notified_u_id, channel_id, dm_id, handle_str, dmchan_name, notif_type):
+    store = get_data()
+    # create a log history for the notfication
+    notif_log = {
+        'u_id': notified_u_id,
+        'channel_id': channel_id,
+        'dm_id': dm_id,
+        'handle_str': handle_str['handle_str'],
+        'channel/dm_name': dmchan_name,
+        'notif_type': notif_type
+    }
+    store['log_history'].append(notif_log)
+    save_database_updates(store)
+
 
 def create_jwt(u_id, session_id):
     '''
@@ -193,4 +273,34 @@ def create_reset_code():
             while decoded['reset_code'] == reset_code:
                 reset_code = (''.join(random.choice(characters) for i in range(6))).upper()
     return reset_code
+
+def search_channel_messages(u_id, channel, query_str):
+    '''
+    Given u_id, channel and query_str, returns list of messages with that query_str
+    '''
+    is_member = False
+    messages = []
+    for member in channel["all_members"]:
+        if member["u_id"] == u_id:
+            is_member = True
+    if is_member:
+        for message in channel["messages"]:
+            if message["u_id"] == u_id and query_str.lower() in message["message"].lower():
+                target_message = message
+                del target_message['channel_id']
+                messages.append(target_message)
+    return messages
+
+def search_dm_messages(u_id, dm, query_str):
+    '''
+    Given u_id, dm and query_str, returns list of messages with that query_str
+    '''
+    messages = []
+    if u_id in dm["u_ids"]:
+        for message in dm["messages"]:
+            if message["u_id"] == u_id and query_str.lower() in message["message"].lower():
+                target_message = message
+                del target_message['dm_id']
+                messages.append(target_message)
+    return messages
 

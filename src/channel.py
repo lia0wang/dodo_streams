@@ -1,7 +1,7 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
 from src.helper import get_data, seek_target_channel_and_errors, save_database_updates
-
+from src.helper import store_log_notif
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
     Invites a user with ID u_id to join a channel with ID channel_id.
@@ -77,7 +77,12 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     for index, channel in enumerate(store['channels']):
         if channel['channel_id'] == channel_id:
             store['channels'][index]['all_members'].append(invited_user)
+
     save_database_updates(store)
+
+    store_log_notif(u_id, target_channel['channel_id'], -1, auth_user,\
+        target_channel['name'], 'channel_invite')
+ 
     return {
     }
     
@@ -220,12 +225,17 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         #for message in reversed(messages):
         # [start:] is slicing where i am limiting it from start to the end
         for index, message in enumerate(messages[start:], start):
+            for react in message['reacts']:
+                if auth_user_id in react['u_ids']:
+                    react['is_this_user_reacted'] = True
+                    
             message_content = {
                     'message_id': message['message_id'],
                     'u_id': message['u_id'],
                     'message': message['message'],
                     'time_created': message['time_created'],
-                    'is_pinned': message['is_pinned']
+                    'is_pinned': message['is_pinned'],
+                    'reacts': message['reacts'],
             } 
             index+=1
             segment_messages.append(message_content)
