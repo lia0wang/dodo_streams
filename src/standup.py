@@ -166,7 +166,7 @@ def buffer_msg_send(target_user_id, channel):
     len_msg = len(channel['standup']['buffer'])
 
     # Check if there is any msgs to send
-    if len_msg > 0:
+    if len_msg != 0:
         # from the buffer, get the msgs
         msgs = ''
         for (handle_str, msg) in channel['standup']['buffer']:
