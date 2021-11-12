@@ -209,4 +209,97 @@ def test_http_standup_start_basic():
 
     time.sleep(1)
     assert response.json()['is_active'] and response.json()['time_finish'] == time_finish
-    
+
+def test_http_standup_start_send_msgs():
+    '''
+    Test if send message working in standup start.
+    '''
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+
+    register_param = {
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
+    }
+    owner = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+
+    channel_param = {
+        'token': owner['token'],
+        'name': 'league',
+        'is_public': True
+    }
+    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json() 
+
+    register_param1 = {
+        "email": "11037@gmail.com",
+        "password": "Ho11037",
+        "name_first": "Hol",
+        "name_last": "Boy"
+    }
+    owner2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param1).json()
+
+    channel_param1 = {
+        'token': owner2['token'],
+        'name': 'league2',
+        'is_public': True
+    }
+    channel2 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param1).json() 
+
+    standup_start_praram = {
+        'token': owner['token'],
+        'channel_id': channel['channel_id'],
+        'length': 2
+    }
+    response = requests.post(f"{BASE_URL}/standup/start/v1", json = standup_start_praram)
+    assert response.status_code == 200
+
+    standup_start_praram2 = {
+        'token': owner2['token'],
+        'channel_id': channel2['channel_id'],
+        'length': 2
+    }
+    response = requests.post(f"{BASE_URL}/standup/start/v1", json = standup_start_praram2)
+    assert response.status_code == 200
+
+    time_finish = response.json().get('time_finish')
+    expected = int(time.time()) + 2
+
+    message = "frontend alot fun?"
+    standup_send_praram = {
+        'token': owner['token'],
+        'channel_id': channel['channel_id'],
+        'message': message
+    }
+    response = requests.post(f"{BASE_URL}/standup/send/v1", json = standup_send_praram)
+
+    message = "frontend alot fun!"
+    standup_send_praram = {
+        'token': owner['token'],
+        'channel_id': channel['channel_id'],
+        'message': message
+    }
+    response = requests.post(f"{BASE_URL}/standup/send/v1", json = standup_send_praram)
+
+    message = "frontend alot fun."
+    standup_send_praram = {
+        'token': owner['token'],
+        'channel_id': channel['channel_id'],
+        'message': message
+    }
+    response = requests.post(f"{BASE_URL}/standup/send/v1", json = standup_send_praram)
+
+    assert response.status_code == 200
+    time.sleep(2)
+
+    channel_messages = {
+        'token': owner['token'],
+        'channel_id': channel['channel_id'],
+        'start': 0       
+    }
+    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
+    msg_return = chan_msg_return.json()
+    assert chan_msg_return.status_code == 200
+
+    assert time_finish == expected
+    assert len(msg_return['messages']) == 1
