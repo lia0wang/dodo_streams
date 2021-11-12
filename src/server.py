@@ -74,10 +74,10 @@ def echo():
 def register():
     # Retrieve Parameters
     request_data = request.get_json()
-    email = request_data['email']
-    password = request_data['password']
-    name_first = request_data['name_first']
-    name_last = request_data['name_last'] 
+    email = request_data.get('email')
+    password = request_data.get('password')
+    name_first = request_data.get('name_first')
+    name_last = request_data.get('name_last')
 
     # Register user
     register_return = auth_register_v1(email, password, name_first, name_last)
@@ -100,8 +100,8 @@ def register():
 @APP.route("/auth/login/v2", methods=['POST'])
 def login():
     request_data = request.get_json()
-    email = request_data['email']
-    password = request_data['password']
+    email = request_data.get('email')
+    password = request_data.get('password')
     
     auth_login = auth_login_v1(email, password)
     session_id = create_session_id()
@@ -123,12 +123,12 @@ def channels_create():
     # Retrieve token
     request_data = request.get_json()
 
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
-    name = request_data['name']
-    is_public = request_data['is_public']
+    name = request_data.get('name')
+    is_public = request_data.get('is_public')
 
     # Pass parameters
     channel = channels_create_v1(decode_token['u_id'], name, is_public)
@@ -166,8 +166,8 @@ def channel_listall():
 @APP.route("/auth/logout/v1", methods=['POST'])
 def logout():
     request_data = request.get_json()
-    check_valid_token(request_data['token'])
-    decoded_token = decode_jwt(request_data['token'])
+    check_valid_token(request_data.get('token'))
+    decoded_token = decode_jwt(request_data.get('token'))
         
     # Fetch data from database
     db_store = get_data()
@@ -183,12 +183,12 @@ def logout():
 def channel_join():
     # Retrieve token
     request_data = request.get_json()
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
-    channel_id = request_data['channel_id']
+    channel_id = request_data.get('channel_id')
 
     # Pass parameters
     channel_join_v1(decode_token['u_id'], channel_id)
@@ -199,12 +199,12 @@ def channel_join():
 def channel_leave():
     # Retrieve token
     request_data = request.get_json()
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
-    channel_id = request_data['channel_id']
+    channel_id = request_data.get('channel_id')
 
     # Pass parameters
     channel_leave_v1(decode_token['u_id'], channel_id)
@@ -215,13 +215,13 @@ def channel_leave():
 def channel_invite():
     # Retrieve token
     request_data = request.get_json()
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
-    channel_id = request_data['channel_id']
-    u_id = request_data['u_id']
+    channel_id = request_data.get('channel_id')
+    u_id = request_data.get('u_id')
 
     # Pass parameters
     channel_invite_v1(decode_token['u_id'], channel_id, u_id)
@@ -232,13 +232,13 @@ def channel_invite():
 def channel_addowner():
     # Retrieve token
     request_data = request.get_json()
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
     
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
-    channel_id = request_data['channel_id']
-    u_id = request_data['u_id']
+    channel_id = request_data.get('channel_id')
+    u_id = request_data.get('u_id')
 
     # Pass parameters
     channel_addowner_v1(decode_token['u_id'], channel_id, u_id)
@@ -248,13 +248,13 @@ def channel_addowner():
 def channel_removeowner():
     # Retrieve token
     request_data = request.get_json()
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
     
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
-    channel_id = request_data['channel_id']
-    u_id = request_data['u_id']
+    channel_id = request_data.get('channel_id')
+    u_id = request_data.get('u_id')
 
     # Pass parameters
     channel_removeowner_v1(decode_token['u_id'], channel_id, u_id)
@@ -273,12 +273,12 @@ def details():
 def dm_create():
     # Retrieve token
     request_data = request.get_json()
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
-    u_ids = request_data['u_ids']
+    u_ids = request_data.get('u_ids')
 
     # Pass parameters
     dm = dm_create_v1(decode_token['u_id'], u_ids)
@@ -290,13 +290,13 @@ def dm_leave():
 
     # Retrieve token
     request_data = request.get_json()
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
     target_u_id = decode_token['u_id']
-    target_dm_id = request_data['dm_id']
+    target_dm_id = request_data.get('dm_id')
 
     store = get_data()
 
@@ -356,11 +356,11 @@ def dm_details():
 def dm_remove():
     # Retrieve token
     request_data = request.get_json()
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Retrieve parameters
-    dm_id = request_data['dm_id']
+    dm_id = request_data.get('dm_id')
 
     # Pass parameters
     return dumps(dm_remove_v1(token, dm_id))
@@ -369,13 +369,13 @@ def dm_remove():
 def message_send():
     request_data = request.get_json()
     # Retrieve token
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Retrieve channel id
-    channel_id = request_data['channel_id']
+    channel_id = request_data.get('channel_id')
     # Retrieve message
-    message = request_data['message']
+    message = request_data.get('message')
     # Pass parameters
     new_message = message_send_v1(token,channel_id,message)
     return dumps(new_message)
@@ -384,15 +384,15 @@ def message_send():
 def message_sendlater():
     request_data = request.get_json()
     # Retrieve token
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Retrieve channel id
-    channel_id = request_data['channel_id']
+    channel_id = request_data.get('channel_id')
     # Retrieve message
-    message = request_data['message']
+    message = request_data.get('message')
     # Retrieve time sent
-    time_sent = request_data['time_sent']
+    time_sent = request_data.get('time_sent')
     # Pass parameters
     new_message = message_send_later_v1(token,channel_id,message, time_sent)
     return dumps(new_message)
@@ -401,13 +401,13 @@ def message_sendlater():
 def message_edit():
     request_data = request.get_json()
     # Retrieve token
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Retrieve message id
-    message_id = request_data['message_id']
+    message_id = request_data.get('message_id')
     # Retrieve message
-    message = request_data['message']
+    message = request_data.get('message')
     # Pass parameters
     message_edit_v1(token,message_id,message)
     return({})
@@ -416,11 +416,11 @@ def message_edit():
 def message_remove():
     request_data = request.get_json()
     # Retrieve token
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Retrieve message id
-    message_id = request_data['message_id']
+    message_id = request_data.get('message_id')
 
     # Pass parameters
     return dumps(message_remove_v1(token,message_id))
@@ -429,13 +429,13 @@ def message_remove():
 def message_senddm():
     request_data = request.get_json()
     # Retrieve token
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Retrieve channel id
-    dm_id = request_data['dm_id']
+    dm_id = request_data.get('dm_id')
     # Retrieve message
-    message = request_data['message']
+    message = request_data.get('message')
     # Pass parameters
     new_dm = message_senddm_v1(token,dm_id,message)
     return dumps(new_dm)
@@ -444,15 +444,15 @@ def message_senddm():
 def message_sendlaterdm():
     request_data = request.get_json()
     # Retrieve token
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Retrieve channel id
-    dm_id = request_data['dm_id']
+    dm_id = request_data.get('dm_id')
     # Retrieve message
-    message = request_data['message']
+    message = request_data.get('message')
     # Retrieve time sent
-    time_sent = request_data['time_sent']
+    time_sent = request_data.get('time_sent')
     # Pass parameters
     new_message = message_send_later_dm_v1(token, dm_id, message, time_sent)
     return dumps(new_message)
@@ -587,10 +587,10 @@ def profile():
 def setname():
     request_data = request.get_json()
     # check if token is valid
-    check_valid_token(request_data['token'])
-    name_first = request_data['name_first']
-    name_last = request_data['name_last']
-    decoded_jwt = decode_jwt(request_data['token'])
+    check_valid_token(request_data.get('token'))
+    name_first = request_data.get('name_first')
+    name_last = request_data.get('name_last')
+    decoded_jwt = decode_jwt(request_data.get('token'))
     user_profile_setname_v1(decoded_jwt['u_id'], name_first, name_last)
 
     return dumps({})
@@ -599,9 +599,9 @@ def setname():
 def set_email():
     request_data = request.get_json()
     # check if token is valid
-    check_valid_token(request_data['token'])
-    email = request_data['email']
-    decoded_jwt = decode_jwt(request_data['token'])
+    check_valid_token(request_data.get('token'))
+    email = request_data.get('email')
+    decoded_jwt = decode_jwt(request_data.get('token'))
     user_profile_setemail_v1(decoded_jwt['u_id'], email)
 
     return dumps({})
@@ -610,9 +610,9 @@ def set_email():
 def set_handle():
     request_data = request.get_json()
     # check if token is valid
-    check_valid_token(request_data['token'])
-    handle_str = request_data['handle_str']
-    decoded_jwt = decode_jwt(request_data['token'])
+    check_valid_token(request_data.get('token'))
+    handle_str = request_data.get('handle_str')
+    decoded_jwt = decode_jwt(request_data.get('token'))
     user_profile_sethandle_v1(decoded_jwt['u_id'], handle_str)
 
     return dumps({})
@@ -620,14 +620,14 @@ def set_handle():
 @APP.route("/user/profile/uploadphoto/v1", methods=['POST'])
 def uploadphoto():
     request_data = request.get_json()
-    check_valid_token(request_data['token'])
-    decoded_token = decode_jwt(request_data['token'])
+    check_valid_token(request_data.get('token'))
+    decoded_token = decode_jwt(request_data.get('token'))
     u_id = decoded_token["u_id"]
-    img_url = request_data["img_url"] 
-    x_start = request_data["x_start"] 
-    y_start = request_data["y_start"] 
-    x_end = request_data["x_end"] 
-    y_end = request_data["y_end"]
+    img_url = request_data.get("img_url")
+    x_start = request_data.get("x_start")
+    y_start = request_data.get("y_start")
+    x_end = request_data.get("x_end")
+    y_end = request_data.get("y_end")
     user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end)
     return dumps({})
 
@@ -688,7 +688,7 @@ def change_permission():
 def reset_request():
     # Retrieve email
     request_data = request.get_json()
-    email = request_data['email']
+    email = request_data.get('email')
     auth_passwordreset_request_v1(email)
     return dumps({})
 
@@ -696,8 +696,8 @@ def reset_request():
 def reset():
     # Retrieve reset code and new_password
     request_data = request.get_json()
-    reset_code = request_data['reset_code']
-    new_password = request_data['new_password']
+    reset_code = request_data.get('reset_code')
+    new_password = request_data.get('new_password')
     auth_passwordreset_reset_v1(reset_code, new_password)
     return dumps({})
 
@@ -719,13 +719,13 @@ def notifications_get():
 def standup_send():
     # Retrieve token
     request_data = request.get_json()
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     # Decode token, retrieve parameters
     decode_token = decode_jwt(token)
-    channel_id = request_data['channel_id']
-    message = request_data['message']
+    channel_id = request_data.get('channel_id')
+    message = request_data.get('message')
     
     standup_send_v1(decode_token['u_id'], channel_id, message)
     return dumps({})
@@ -734,11 +734,11 @@ def standup_send():
 def standup_active():
     # Retrieve token
     request_data = request.args
-    token = request_data['token']
+    token = request_data.get('token')
     check_valid_token(token)
 
     decode_token = decode_jwt(token)
-    channel_id = request_data['channel_id']
+    channel_id = request_data.get('channel_id')
 
     standup_stat = standup_active_v1(int(decode_token['u_id']), int(channel_id))
 

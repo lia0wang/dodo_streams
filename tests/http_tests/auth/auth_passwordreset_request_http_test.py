@@ -17,7 +17,7 @@ def test_one_reset_request():
     requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
     get_response = requests.post(f"{BASE_URL}/auth/passwordreset/request/v1", json = resetrequest_body)
     assert get_response.status_code == 200
-'''
+
 def test_multiple_reset_request():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param = {
@@ -34,7 +34,7 @@ def test_multiple_reset_request():
     assert get_response.status_code == 200
     get_response = requests.post(f"{BASE_URL}/auth/passwordreset/request/v1", json = resetrequest_body)
     assert get_response.status_code == 200
-'''
+
 def test_reset_request_logged_out():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     register_param = {
