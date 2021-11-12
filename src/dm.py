@@ -51,7 +51,7 @@ def dm_create_v1(auth_user_id, u_ids):
     dm_id = len(store['dms']) + 1
 
     # Get the current time stamp
-    timestamp = datetime_to_unix_time_stamp()
+    time_stamp = datetime_to_unix_time_stamp()
 
     # Generate dm_name based on the list of dm members
     member_ids = [auth_user_id] + u_ids
@@ -62,7 +62,7 @@ def dm_create_v1(auth_user_id, u_ids):
                 dm_name.append(user['handle_str'])
                 # Update the user stats       
                 num = user['dms_joined']
-                new_dict = {'num_dms_joined':num+1,'timestamp':timestamp}
+                new_dict = {'num_dms_joined':num+1,'time_stamp':time_stamp}
                 user['user_stats']['dms_joined'].append(new_dict)
                 user['dms_joined'] += 1 
 
@@ -80,6 +80,11 @@ def dm_create_v1(auth_user_id, u_ids):
 
     # Append the created dm to dms database
     store['dms'].append(dm)
+
+    # Update the workspace stats     
+    num_dms = len(store['dms'])
+    new_ws_dict = {'num_dms_exist':num_dms,'time_stamp':time_stamp}
+    store['workspace_stats']['dms_exist'].append(new_ws_dict)
 
     save_database_updates(store)
 
@@ -304,12 +309,12 @@ def dm_remove_v1(token, dm_id):
             db_store['dms'].remove(dm)
             
     # Get the current time stamp
-    timestamp = datetime_to_unix_time_stamp()
+    time_stamp = datetime_to_unix_time_stamp()
      
     for user in db_store['users']:
         if user['u_id'] == auth_user_id:
             num = user['dms_joined']
-            new_dict = {'num_dms_joined':num-1,'timestamp':timestamp}
+            new_dict = {'num_dms_joined':num-1,'time_stamp':time_stamp}
             user['user_stats']['dms_joined'].append(new_dict)
             user['dms_joined'] -= 1   
 

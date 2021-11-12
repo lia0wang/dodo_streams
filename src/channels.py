@@ -148,17 +148,23 @@ def channels_create_v1(auth_user_id, name, is_public):
     }
 
     # Get the current time stamp
-    timestamp = datetime_to_unix_time_stamp()
+    time_stamp = datetime_to_unix_time_stamp()
     # Update the user stats         
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             num = user['channels_joined']
-            new_dict = {'num_channels_joined':num+1,'timestamp':timestamp}
+            new_dict = {'num_channels_joined':num+1,'time_stamp':time_stamp}
             user['user_stats']['channels_joined'].append(new_dict)
             user['channels_joined'] += 1 
 
     # Append the created channel to channels database
     store['channels'].append(channel)
+
+    # Update the workspace stats     
+    num_channel = len(store['channels'])
+    new_ws_dict = {'num_channels_exist':num_channel,'time_stamp':time_stamp}
+    store['workspace_stats']['channels_exist'].append(new_ws_dict)
+
     save_database_updates(store)
 
     return {

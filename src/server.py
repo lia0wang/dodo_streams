@@ -652,14 +652,14 @@ def user_stats():
     token = request.args.get('token')
     check_valid_token(token)
     stats = user_stats_v1(token)
-    return dumps(stats)
+    return dumps({'user_stats': stats})
 
 @APP.route("/users/stats/v1", methods=['GET'])
 def users_stats():
     token = request.args.get('token')
-    check_valid_token(token)
+    check_valid_token(token)  
     stats = users_stats_v1(token)
-    return dumps(stats)
+    return dumps({'workspace_stats': stats})
 
 @APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def remove_user():

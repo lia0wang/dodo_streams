@@ -25,12 +25,24 @@ Example usage:
 '''
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
+
+from src.helper import datetime_to_unix_time_stamp
+
+time_stamp = datetime_to_unix_time_stamp()
+
 initial_object = {
     'users': [],
     'channels':[],
     'messages': [],
     'dms': [],
-    'message_index':0
+    'message_index':0,
+    'message_count':0,
+    'workspace_stats': {
+        'channels_exist': [{'num_channels_exist':0,'time_stamp':time_stamp}],
+        'dms_exist': [{'num_dms_exist':0,'time_stamp':time_stamp}],
+        'messages_exist': [{'num_messages_exist':0,'time_stamp':time_stamp}],
+        'utilization_rate': 0
+        }
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
