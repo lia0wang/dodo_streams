@@ -53,11 +53,11 @@ def standup_start_v1(auth_user_id, channel_id, length):
     add_utc_now = datetime.now(timezone.utc) + timedelta(seconds=length)
     time_finish = int(add_utc_now.timestamp())
     target_channel['standup']['time_finish'] = time_finish
-
-    # Send all msgs from the buffer after X-sec
-    timer = threading.Timer(int(length), buffer_msg_send, [auth_user_id, target_channel])
-    timer.start()
     
+    # Send all msgs from the buffer after X-sec
+    timer = threading.Timer(int(length), buffer_msg_send, [auth_user_id, target_channel['channel_id']])
+    timer.start()
+
     save_database_updates(store)
     
     return {
@@ -155,21 +155,28 @@ def standup_send_v1(auth_user_id, channel_id, message):
     
     msg = (auth_user['handle_str'], message)
     target_channel['standup']['buffer'].append(msg)
+    save_database_updates(store)
 
     return {}
 
-def buffer_msg_send(target_user_id, channel):
+def buffer_msg_send(target_user_id, channel_id):
     '''
     Excute sending messages to the channel from the standup
     '''
     store = get_data()
-    len_msg = len(channel['standup']['buffer'])
+
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            target_channel = channel
+
+    len_msg = len(target_channel['standup']['buffer'])
 
     # Check if there is any msgs to send
     if len_msg != 0:
         # from the buffer, get the msgs
         msgs = ''
-        for (handle_str, msg) in channel['standup']['buffer']:
+        # channel['standup']['buffer'] = (auth_user['handle_str'], message)
+        for (handle_str, msg) in target_channel['standup']['buffer']:
             a_msg = handle_str + ': ' + msg
             msgs = msgs + a_msg + '\n'
         
@@ -180,12 +187,12 @@ def buffer_msg_send(target_user_id, channel):
         message_id = store['message_index']
         store['message_index'] += 1
 
-        channel['messages'].append({
+        msg = {
             'message_id': message_id,
             'u_id': target_user_id,
             'message': msgs,
-            'channel_id': channel['channel_id'],
-            'time_created': channel['standup']['time_finish'],
+            'channel_id': target_channel['channel_id'],
+            'time_created': target_channel['standup']['time_finish'],
             'is_pinned': False,
             'reacts': [
                 {
@@ -194,9 +201,12 @@ def buffer_msg_send(target_user_id, channel):
                     'is_this_user_reacted': False
                 }
             ],
-        })
-
+        }
+        target_channel['messages'].append(msg)
+ 
         # clear the standup
-        channel['standup']['is_active'] = False
-        channel['standup']['time_finish'] = None
-        channel['standup']['buffer'] = []
+        target_channel['standup']['is_active'] = False
+        target_channel['standup']['time_finish'] = None
+        target_channel['standup']['buffer'] = []
+
+    save_database_updates(store)
