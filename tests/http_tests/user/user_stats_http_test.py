@@ -2,7 +2,7 @@ import requests
 import pytest
 from src import config
 BASE_URL = config.url
-'''
+
 def test_zero_activities_http():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
@@ -22,11 +22,11 @@ def test_zero_activities_http():
     user_1_stats = user_1_stats.json()
     print(user_1_stats)
 
-    assert user_1_stats['channels_joined'][-1]['num_channels_joined'] == 0
-    assert user_1_stats['dms_joined'][-1]['num_dms_joined'] == 0
-    assert user_1_stats['messages_sent'][-1]['num_msgs_sent'] == 0
-    assert user_1_stats['involvement_rate'] == 0
-'''
+    assert user_1_stats['user_stats']['channels_joined'][-1]['num_channels_joined'] == 0
+    assert user_1_stats['user_stats']['dms_joined'][-1]['num_dms_joined'] == 0
+    assert user_1_stats['user_stats']['messages_sent'][-1]['num_messages_sent'] == 0
+    assert user_1_stats['user_stats']['involvement_rate'] == 0
+
 def test_user_basic_dms_http():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
     
@@ -67,10 +67,10 @@ def test_user_basic_dms_http():
     assert user_1_stats.status_code == 200
     user_1_stats = user_1_stats.json()
 
-    assert user_1_stats['channels_joined'][-1]['num_channels_joined'] == 0
-    assert user_1_stats['dms_joined'][-1]['num_dms_joined'] == 1
-    assert user_1_stats['messages_sent'][-1]['num_msgs_sent'] == 0
-    assert user_1_stats['involvement_rate'] == 1
+    assert user_1_stats['user_stats']['channels_joined'][-1]['num_channels_joined'] == 0
+    assert user_1_stats['user_stats']['dms_joined'][-1]['num_dms_joined'] == 1
+    assert user_1_stats['user_stats']['messages_sent'][-1]['num_messages_sent'] == 0
+    assert user_1_stats['user_stats']['involvement_rate'] == 1
 
 def test_user_basic_channels_http():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -98,10 +98,10 @@ def test_user_basic_channels_http():
     assert user_1_stats.status_code == 200
     user_1_stats = user_1_stats.json()
 
-    assert user_1_stats['channels_joined'][-1]['num_channels_joined'] == 1
-    assert user_1_stats['dms_joined'][-1]['num_dms_joined'] == 0
-    assert user_1_stats['messages_sent'][-1]['num_msgs_sent'] == 0
-    assert user_1_stats['involvement_rate'] == 1
+    assert user_1_stats['user_stats']['channels_joined'][-1]['num_channels_joined'] == 1
+    assert user_1_stats['user_stats']['dms_joined'][-1]['num_dms_joined'] == 0
+    assert user_1_stats['user_stats']['messages_sent'][-1]['num_messages_sent'] == 0
+    assert user_1_stats['user_stats']['involvement_rate'] == 1
 
 def test_user_basic_msgs_http():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -139,10 +139,10 @@ def test_user_basic_msgs_http():
     assert user_1_stats.status_code == 200
     user_1_stats = user_1_stats.json()
 
-    assert user_1_stats['channels_joined'][-1]['num_channels_joined'] == 1
-    assert user_1_stats['dms_joined'][-1]['num_dms_joined'] == 0
-    assert user_1_stats['messages_sent'][-1]['num_msgs_sent'] == 1
-    assert user_1_stats['involvement_rate'] == 1 
+    assert user_1_stats['user_stats']['channels_joined'][-1]['num_channels_joined'] == 1
+    assert user_1_stats['user_stats']['dms_joined'][-1]['num_dms_joined'] == 0
+    assert user_1_stats['user_stats']['messages_sent'][-1]['num_messages_sent'] == 1
+    assert user_1_stats['user_stats']['involvement_rate'] == 1
 
 def test_user_basic_dm_msgs_http():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -188,10 +188,10 @@ def test_user_basic_dm_msgs_http():
     assert user_1_stats.status_code == 200
     user_1_stats = user_1_stats.json()
 
-    assert user_1_stats['channels_joined'][-1]['num_channels_joined'] == 0
-    assert user_1_stats['dms_joined'][-1]['num_dms_joined'] == 1
-    assert user_1_stats['messages_sent'][-1]['num_msgs_sent'] == 1
-    assert user_1_stats['involvement_rate'] == 1
+    assert user_1_stats['user_stats']['channels_joined'][-1]['num_channels_joined'] == 0
+    assert user_1_stats['user_stats']['dms_joined'][-1]['num_dms_joined'] == 1
+    assert user_1_stats['user_stats']['messages_sent'][-1]['num_messages_sent'] == 1
+    assert user_1_stats['user_stats']['involvement_rate'] == 1
 
 def test_user_mutiple_users_http_1():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -245,10 +245,10 @@ def test_user_mutiple_users_http_1():
     assert user_1_stats.status_code == 200
     user_1_stats = user_1_stats.json()
 
-    assert user_1_stats['channels_joined'][-1]['num_channels_joined'] == 1
-    assert user_1_stats['dms_joined'][-1]['num_dms_joined'] == 0
-    assert user_1_stats['messages_sent'][-1]['num_msgs_sent'] == 0
-    assert user_1_stats['involvement_rate'] == 0.5 
+    assert user_1_stats['user_stats']['channels_joined'][-1]['num_channels_joined'] == 1
+    assert user_1_stats['user_stats']['dms_joined'][-1]['num_dms_joined'] == 0
+    assert user_1_stats['user_stats']['messages_sent'][-1]['num_messages_sent'] == 0
+    assert user_1_stats['user_stats']['involvement_rate'] == 0.5
 
 def test_user_mutiple_users_http_2():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -303,10 +303,10 @@ def test_user_mutiple_users_http_2():
     assert user_1_stats.status_code == 200
     user_1_stats = user_1_stats.json()
 
-    assert user_1_stats['channels_joined'][-1]['num_channels_joined'] == 1
-    assert user_1_stats['dms_joined'][-1]['num_dms_joined'] == 0
-    assert user_1_stats['messages_sent'][-1]['num_msgs_sent'] == 0
-    assert user_1_stats['involvement_rate'] == 1/3 
+    assert user_1_stats['user_stats']['channels_joined'][-1]['num_channels_joined'] == 1
+    assert user_1_stats['user_stats']['dms_joined'][-1]['num_dms_joined'] == 0
+    assert user_1_stats['user_stats']['messages_sent'][-1]['num_messages_sent'] == 0
+    assert user_1_stats['user_stats']['involvement_rate'] == 1/3
 
 def test_user_mutiple_users_http_3():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -353,10 +353,10 @@ def test_user_mutiple_users_http_3():
     assert user_1_stats.status_code == 200
     user_1_stats = user_1_stats.json()
 
-    assert user_1_stats['channels_joined'][-1]['num_channels_joined'] == 0
-    assert user_1_stats['dms_joined'][-1]['num_dms_joined'] == 0
-    assert user_1_stats['messages_sent'][-1]['num_msgs_sent'] == 0
-    assert user_1_stats['involvement_rate'] == 0
+    assert user_1_stats['user_stats']['channels_joined'][-1]['num_channels_joined'] == 0
+    assert user_1_stats['user_stats']['dms_joined'][-1]['num_dms_joined'] == 0
+    assert user_1_stats['user_stats']['messages_sent'][-1]['num_messages_sent'] == 0
+    assert user_1_stats['user_stats']['involvement_rate'] == 0
 
 def test_user_mutiple_users_msgs_http_4():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -418,10 +418,10 @@ def test_user_mutiple_users_msgs_http_4():
     assert user_1_stats.status_code == 200
     user_1_stats = user_1_stats.json()
 
-    assert user_1_stats['channels_joined'][-1]['num_channels_joined'] == 1
-    assert user_1_stats['dms_joined'][-1]['num_dms_joined'] == 0
-    assert user_1_stats['messages_sent'][-1]['num_msgs_sent'] == 0
-    assert user_1_stats['involvement_rate'] == 1/4
+    assert user_1_stats['user_stats']['channels_joined'][-1]['num_channels_joined'] == 1
+    assert user_1_stats['user_stats']['dms_joined'][-1]['num_dms_joined'] == 0
+    assert user_1_stats['user_stats']['messages_sent'][-1]['num_messages_sent'] == 0
+    assert user_1_stats['user_stats']['involvement_rate'] == 1/4
 
 def test_user_mutiple_users_msgs_http_5():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -541,7 +541,7 @@ def test_user_mutiple_users_msgs_http_5():
     assert user_1_stats.status_code == 200
     user_1_stats = user_1_stats.json()
 
-    assert user_1_stats['channels_joined'][-1]['num_channels_joined'] == 2
-    assert user_1_stats['dms_joined'][-1]['num_dms_joined'] == 2
-    assert user_1_stats['messages_sent'][-1]['num_msgs_sent'] == 2
-    assert user_1_stats['involvement_rate'] == 6/11
+    assert user_1_stats['user_stats']['channels_joined'][-1]['num_channels_joined'] == 2
+    assert user_1_stats['user_stats']['dms_joined'][-1]['num_dms_joined'] == 2
+    assert user_1_stats['user_stats']['messages_sent'][-1]['num_messages_sent'] == 2
+    assert user_1_stats['user_stats']['involvement_rate'] == 6/11

@@ -79,12 +79,12 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
             store['channels'][index]['all_members'].append(invited_user)
 
     # Get the current time stamp
-    timestamp = datetime_to_unix_time_stamp()
+    time_stamp = datetime_to_unix_time_stamp()
     # Update the user stats         
     for user in store['users']:
         if user['u_id'] == invited_user['u_id']:
             num = user['channels_joined']
-            new_dict = {'num_channels_joined':num+1,'timestamp':timestamp}
+            new_dict = {'num_channels_joined':num+1,'time_stamp':time_stamp}
             user['user_stats']['channels_joined'].append(new_dict)
             user['channels_joined'] += 1 
 
@@ -323,12 +323,12 @@ def channel_join_v1(auth_user_id, channel_id):
             store['channels'][index]['all_members'].append(new_member)
 
     # Get the current time stamp
-    timestamp = datetime_to_unix_time_stamp()            
+    time_stamp = datetime_to_unix_time_stamp()            
     # Update the user stats         
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             num = user['channels_joined']
-            new_dict = {'num_channels_joined':num+1,'timestamp':timestamp}
+            new_dict = {'num_channels_joined':num+1,'time_stamp':time_stamp}
             user['user_stats']['channels_joined'].append(new_dict)
             user['channels_joined'] += 1 
             
@@ -402,12 +402,12 @@ def channel_leave_v1(auth_user_id, channel_id):
             store['channels'][index]['all_members'].remove(target_user)
             
     # Get the current time stamp
-    timestamp = datetime_to_unix_time_stamp()
+    time_stamp = datetime_to_unix_time_stamp()
     # Update the user stats         
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             num = user['channels_joined']
-            new_dict = {'num_channels_joined':num-1,'timestamp':timestamp}
+            new_dict = {'num_channels_joined':num-1,'time_stamp':time_stamp}
             user['user_stats']['channels_joined'].append(new_dict)
             user['channels_joined'] -= 1 
             
