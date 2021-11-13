@@ -137,6 +137,7 @@ def dm_details_v1(auth_user_id, dm_id):
                         'name_first': user['name_first'],
                         'name_last': user['name_last'],
                         'handle_str': user['handle_str'],
+                        'profile_img_url': user['profile_img_url']
                 }
                 members.append(member_details)
     # Return details

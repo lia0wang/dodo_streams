@@ -7,7 +7,7 @@ from src.error import InputError
 from src.other import clear_v1
 from src import config
 from src.data_store import data_store
-BASE_URL = "https://deplododo.alwaysdata.net/"
+BASE_URL = "https://dodof10adeploy.alwaysdata.net/"
 
 
 def auth_login_v1(email, password):

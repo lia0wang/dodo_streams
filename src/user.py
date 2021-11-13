@@ -11,7 +11,7 @@ import requests
 from src import config
 import time
 from src.data_store import data_store
-BASE_URL = "https://deplododo.alwaysdata.net/"
+BASE_URL = "https://dodof10adeploy.alwaysdata.net/"
 
 def user_profile_v1(u_id):
     """

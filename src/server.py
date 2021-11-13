@@ -1,12 +1,7 @@
-import sys
 import signal
-import re
-import requests
-import urllib.request
 from json import dump, dumps
 from flask import Flask, request, send_from_directory
 from flask_cors import CORS
-from src import message
 from src.channel import channel_addowner_v1, channel_invite_v1, channel_join_v1, channel_details_v1, channel_removeowner_v1, channel_messages_v1
 from src.channel import channel_leave_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_stats_v1
@@ -57,7 +52,7 @@ APP.register_error_handler(Exception, defaultHandler)
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear():
     clear_v1()
-    return dumps({"data": "hello"})
+    return dumps({})
 
 # Example
 @APP.route("/echo", methods=['GET'])
