@@ -2,12 +2,11 @@ import re
 import os
 import smtplib, ssl
 from src.helper import get_data, create_handle, create_permission_id, hash_encrypt, save_database_updates, datetime_to_unix_time_stamp
-from src.helper import create_reset_code, create_password_reset_jwt, decode_jwt
+from src.helper import create_reset_code, create_password_reset_jwt, decode_jwt, create_jwt, create_session_id
 from src.error import InputError
 from src.other import clear_v1
 from src import config
 BASE_URL = config.url
-
 
 def auth_login_v1(email, password):
     """
@@ -95,20 +94,17 @@ def auth_register_v1(email, password, name_first, name_last):
         if len(emails) != len(set(emails)):
             raise InputError("Error: email taken")
 
-
-
     # Generate handle
-    handle_str = create_handle(name_first, name_last, store)
-  
     # Generate permission_id
-    permission_id = create_permission_id(store)
- 
-    # Generate id
-    user_id = len(store['users']) + 1
-
+    # Generate user id
     # Get the current time stamp
+    # create session_id to generate token
+    handle_str = create_handle(name_first, name_last, store)
+    permission_id = create_permission_id(store)
+    user_id = len(store['users']) + 1
     time_stamp = datetime_to_unix_time_stamp()
-
+    session_id = create_session_id()
+    
     # Create and store account
     user = {
         'u_id': user_id,
@@ -128,13 +124,15 @@ def auth_register_v1(email, password, name_first, name_last):
             'dms_joined': [{'num_dms_joined':0,'time_stamp':time_stamp}],
             'messages_sent': [{'num_messages_sent':0,'time_stamp':time_stamp}],
             'involvement_rate': 0
-            }
+            },
+        'session_list': [session_id]
     }
     store['users'].append(user)
     save_database_updates(store)
 
     return {
         'auth_user_id': user_id,
+        'token': create_jwt(user_id, session_id)
     }
 
 def auth_passwordreset_request_v1(email):
@@ -204,7 +202,6 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
         new_password (string) - new passsword that user wants to change to
 
     Exceptions:
-        InputError - occurs when email is being used by another user
         InputError - occurs when reset_code is not a valid reset code
 
     Return Value:
