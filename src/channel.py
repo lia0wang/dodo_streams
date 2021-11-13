@@ -55,7 +55,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
                 'name_first': user['name_first'],
                 'name_last': user['name_last'],
                 'handle_str': user['handle_str'],
-                'permission_id': user['permission_id']
+                'permission_id': user['permission_id'], 
             } # Catch the invited_user without password
     if not valid:
         raise InputError(description="Invalid user ID!")
@@ -143,24 +143,30 @@ def channel_details_v1(auth_user_id, channel_id):
     all_members = []
 
     for owner_member in target_channel['owner_members']:
-        owner_member_details = {
-                'u_id': owner_member['u_id'],
-                'email': owner_member['email'],
-                'name_first': owner_member['name_first'],
-                'name_last': owner_member['name_last'],
-                'handle_str': owner_member['handle_str'],
-        }
-        owner_members.append(owner_member_details)
+        for user in store["users"]:
+            if user["u_id"] == owner_member["u_id"]:
+                owner_member_details = {
+                    'u_id': user['u_id'],
+                    'email': user['email'],
+                    'name_first': user['name_first'],
+                    'name_last': user['name_last'],
+                    'handle_str': user['handle_str'],
+                    'profile_img_url': user['profile_img_url']
+                }
+                owner_members.append(owner_member_details)
     
     for member in target_channel['all_members']:
-        member_details = {
-                'u_id': member['u_id'],
-                'email': member['email'],
-                'name_first': member['name_first'],
-                'name_last': member['name_last'],
-                'handle_str': member['handle_str'],
-        }
-        all_members.append(member_details)
+        for user in store["users"]:
+            if user["u_id"] == member["u_id"]:
+                member_details = {
+                    'u_id': user['u_id'],
+                    'email': user['email'],
+                    'name_first': user['name_first'],
+                    'name_last': user['name_last'],
+                    'handle_str': user['handle_str'],
+                    'profile_img_url': user['profile_img_url']
+                }
+                all_members.append(member_details)
 
     # Return details
     return {
@@ -293,7 +299,7 @@ def channel_join_v1(auth_user_id, channel_id):
                 'name_first': user['name_first'],
                 'name_last': user['name_last'],
                 'handle_str': user['handle_str'],
-                'permission_id': user['permission_id']
+                'permission_id': user['permission_id'],
             } # Catch the new_member without password
             valid = True
     if not valid:
@@ -364,7 +370,7 @@ def channel_leave_v1(auth_user_id, channel_id):
                 'name_first': user['name_first'],
                 'name_last': user['name_last'],
                 'handle_str': user['handle_str'],
-                'permission_id': user['permission_id']
+                'permission_id': user['permission_id'],
             } # Catch the new_member without password
             valid = True
     if not valid:
@@ -465,7 +471,7 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
                 'name_first': user['name_first'],
                 'name_last': user['name_last'],
                 'handle_str': user['handle_str'],
-                'permission_id': user['permission_id']
+                'permission_id': user['permission_id'],
             }
     if not valid:
         raise InputError(description="Invalid user ID!")
@@ -557,7 +563,7 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
                 'name_first': user['name_first'],
                 'name_last': user['name_last'],
                 'handle_str': user['handle_str'],
-                'permission_id': user['permission_id']
+                'permission_id': user['permission_id'],
             }
     if not valid:
         raise InputError(description="Invalid user ID!")
