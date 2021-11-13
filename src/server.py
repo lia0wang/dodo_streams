@@ -327,7 +327,7 @@ def dm_leave():
 
     target_dm['u_ids'].remove(target_u_id)
     
-    save_database_updates(store)
+    data_store.set(store)
     return dumps({}) 
 
 @APP.route("/dm/list/v1", methods=['GET'])
