@@ -418,7 +418,7 @@ def test_dm_future_notif():
     assert dm.status_code == 200
     dm_return = dm.json()
     
-    future_time = time.time() + 1
+    future_time = time.time() + 0.1
     dm_send_program = {
         'token': auth_user['token'],
         'dm_id': dm_return['dm_id'],
@@ -429,7 +429,7 @@ def test_dm_future_notif():
     assert response.status_code == 200    
 
     # time delay for 1 second, since time future is set 1 second in future
-    time.sleep(1)
+    time.sleep(0.1)
 
     token = {
         'token': user1['token']
@@ -461,7 +461,7 @@ def test_msg_future_notif():
     }
     channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json()
 
-    future_time = time.time() + 1
+    future_time = time.time() + 0.1
     message_sendlater_program = {
         'token': auth_user['token'],
         'channel_id': channel['channel_id'],
@@ -473,7 +473,7 @@ def test_msg_future_notif():
     assert response.status_code == 200
     
     # time delay for 1 second, since time future is set 1 second in future
-    time.sleep(1)
+    time.sleep(0.1)
 
     token = {
         'token': auth_user['token']
