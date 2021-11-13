@@ -22,15 +22,6 @@ def channels_list_v1(auth_user_id):
 
     # Creating dictionary
     channels_list = dict()
-    
-    # Checking if the auth_user_id is correct
-    valid = False
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            valid = True
-    
-    if not valid:
-        raise AccessError("Error: Invalid token")
 
     # Creating a list of channels
     channels_list['channels'] = []
@@ -67,15 +58,6 @@ def channels_listall_v1(auth_user_id):
     # Creating dictionary
     channels_list = dict()
     
-    # Checking if the auth_user_id is correct
-    valid = False
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            valid = True
-        
-    if not valid:
-        raise AccessError("Error: Invalid token")
-    
     # Creating a list of channels
     channels_list['channels'] = []
 
@@ -109,11 +91,8 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     store = get_data()
 
-    # Check if the auth_user_id is valid
-    valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
-            valid = True
             user_info = {
                 'u_id': auth_user_id,
                 'email': user['email'],
@@ -122,8 +101,6 @@ def channels_create_v1(auth_user_id, name, is_public):
                 'handle_str': user['handle_str'],
                 'permission_id': user['permission_id']
             }
-    if not valid:
-        raise AccessError(description="Invalid user ID!")
 
     # Raise an InputError when the channel's name is less than 1 char or greater than 20 char
     if len(name) < 1 or len(name) > 20:

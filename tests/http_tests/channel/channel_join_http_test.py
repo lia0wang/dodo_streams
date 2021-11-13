@@ -216,3 +216,43 @@ def test_http_duplicated_joins():
 
     response = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
     assert response.status_code == 400
+
+def test_http_invalid_token():
+    '''
+    Testing whether the v2 function can identify incorrect tokens
+    '''
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    invalid_user_json = {
+        "email": "bob123@gmail.com",
+        "password": "bobahe",
+        "name_first": "Bob",
+        "name_last": "Marley"
+    }
+    
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = invalid_user_json).json()
+    
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    user_1_json = {
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
+    }
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = user_1_json).json()
+
+    channel_json = {
+        'token': user['token'],
+        'name': 'league',
+        'is_public': True
+    }
+    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_json).json()
+    
+    channel_join_param = {
+        'token': invalid['token'],
+        'channel_id': channel['channel_id']
+    }
+    response = requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
+
+    assert response.status_code == 403
