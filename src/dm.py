@@ -24,14 +24,9 @@ def dm_create_v1(auth_user_id, u_ids):
  
     store = get_data()
 
-    # Check if the auth_user_id is valid
-    valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             auth_user = user
-            valid = True
-    if not valid:
-        raise InputError(description="Invalid authorized user ID!")
 
     # Check if the u_ids are valid
     for u_id in u_ids:
