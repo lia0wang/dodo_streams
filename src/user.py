@@ -11,7 +11,7 @@ import requests
 from src import config
 import time
 from src.data_store import data_store
-BASE_URL = "https://deploymentdodo.alwaysdata.net/"
+BASE_URL = "https://deplododo.alwaysdata.net/"
 
 def user_profile_v1(u_id):
     """
@@ -256,21 +256,10 @@ def user_stats_v1(token):
     db_store = data_store.get()
     
     auth_user_id = decode_jwt(token)['u_id']
-    channel_list = channels_list_v1(auth_user_id)
-    dm_list = dm_list_v1(token)
     
-    num_channels = 0
-    num_channels_joined = 0
-    num_dms = 0
-    num_dms_joined = 0
-    num_msgs = 0
-    num_msgs_sent = 0
-
-    if channel_list['channels'] != []:
-        num_channels_joined = len(channel_list['channels'])  
-
-    if dm_list['dms'] != []:
-        num_dms_joined = len(dm_list['dms'])
+    num_channels = len(db_store['channels'])
+    num_dms = len(db_store['dms'])
+    num_msgs = db_store['message_index']
 
     for user in db_store['users']:
         if user['u_id'] == auth_user_id:
@@ -280,16 +269,6 @@ def user_stats_v1(token):
     num_dms_joined = targer_user['dms_joined']
     num_msgs_sent = targer_user['messages_sent']
     
-    if db_store['channels'] != None:
-        num_channels = len(db_store['channels'])
-        for channel in db_store['channels']:
-            num_msgs += len(channel['messages'])
-
-    if db_store['dms'] != None:
-        num_dms = len(db_store['dms'])
-        for dm in db_store['dms']:
-            num_msgs += len(dm['messages'])
-    
     involved = num_channels_joined + num_dms_joined + num_msgs_sent
     _all = num_channels + num_dms + num_msgs
 
@@ -298,13 +277,24 @@ def user_stats_v1(token):
         involvement_rate = 0
     else:
         involvement_rate = involved/_all
+
+    if involvement_rate > 1:
+        involvement_rate = 1
         
-    user_stats = targer_user['user_stats']
+
     print('num_channels_joined: ',num_channels_joined)
     print('num_dms_joined: ',num_dms_joined)
-    print('user_stats: ', user_stats)
+    print('num_msgs_sent: ',num_msgs_sent)
+    print('involved', involved)
+    print('num_channels: ',num_channels)
+    print('num_dms: ',num_dms)
+    print('num_msgs: ',num_msgs)  
+    print('_all: ', _all) 
+
     targer_user['user_stats']['involvement_rate'] = involvement_rate
+    user_stats = targer_user['user_stats']
     data_store.set(db_store)
+
     return user_stats
         
                  

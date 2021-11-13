@@ -7,7 +7,7 @@ from src.error import InputError
 from src.other import clear_v1
 from src import config
 from src.data_store import data_store
-BASE_URL = "https://deploymentdodo.alwaysdata.net/"
+BASE_URL = "https://deplododo.alwaysdata.net/"
 
 
 def auth_login_v1(email, password):
@@ -106,7 +106,7 @@ def auth_register_v1(email, password, name_first, name_last):
     user_id = len(store['users']) + 1
 
     # Get the current time stamp
-    timestamp = datetime_to_unix_time_stamp()
+    time_stamp = datetime_to_unix_time_stamp()
 
     # Create and store account
     user = {
@@ -123,9 +123,9 @@ def auth_register_v1(email, password, name_first, name_last):
         'dms_joined': 0,
         'messages_sent': 0,
         'user_stats' : {
-            'channels_joined': [{'num_channels_joined':0,'timestamp':timestamp}],
-            'dms_joined': [{'num_dms_joined':0,'timestamp':timestamp}],
-            'messages_sent': [{'num_msgs_sent':0,'timestamp':timestamp}],
+            'channels_joined': [{'num_channels_joined':0,'time_stamp':time_stamp}],
+            'dms_joined': [{'num_dms_joined':0,'time_stamp':time_stamp}],
+            'messages_sent': [{'num_messages_sent':0,'time_stamp':time_stamp}],
             'involvement_rate': 0
             }
     }
@@ -162,7 +162,7 @@ def auth_passwordreset_request_v1(email):
             reset_code = create_reset_code()
             reset_token = create_password_reset_jwt(user['u_id'], reset_code)
             db_store['reset_tokens'].append(reset_token)
-            save_database_updates(db_store)
+            data_store.set(db_store)
 
             # Send reset code to user's email
             port = 465 
@@ -233,5 +233,5 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
     for user in db_store['users']:
         if user['u_id'] == target_u_id:
             user['password'] = hash_encrypt(new_password) 
-    data_store.get(db_store)
+    data_store.set(db_store)
     return {}

@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 from src.helper import datetime_to_unix_time_stamp, check_valid_token
 from src.data_store import data_store
+=======
+from src.helper import get_data
+from src.helper import save_database_updates
+
+>>>>>>> master
 def users_all_v1():
     '''
     Returns all users
@@ -43,24 +49,14 @@ def users_stats_v1(token):
     '''
     db_store = data_store.get()
 
-    num_channels_exist = 0
-    num_dms_exist = 0
-    num_messages_exist = 0
+    num_channels_exist = len(db_store['channels'])
+    num_dms_exist = len(db_store['dms'])
+    num_messages_exist = db_store['message_count']
 
-    num_users = 0
+    num_users = len(db_store['users'])
     num_utilization_users = 0 #num_users_who_have_joined_at_least_one_channel_or_dm = 0
     
     utilization_rate = 0
-
-    if db_store['channels'] != None:
-        num_channels_exist = len(db_store['channels'])
-        for channel in db_store['channels']:
-            num_messages_exist += len(channel['messages'])
-
-    if db_store['dms'] != None:
-        num_dms_exist = len(db_store['dms'])
-        for dm in db_store['dms']:
-            num_messages_exist += len(dm['messages'])
     
     if db_store['users'] != None:
         num_users = len(db_store['users'])
@@ -73,8 +69,11 @@ def users_stats_v1(token):
     utilization_rate = num_utilization_users/num_users
 
     print('num_channels_exist: ',num_channels_exist)
+    print('num_dms_exist: ',num_dms_exist)
+    print('num_messages_exist: ',num_messages_exist)
     print('num_utilization_users: ',num_utilization_users)
     print('num_users: ',num_users)
+<<<<<<< HEAD
     timestamp = datetime_to_unix_time_stamp()
     users_stats = {
         'channels_exist': [{'num_channels_exist':num_channels_exist,'timestamp':timestamp}],
@@ -85,3 +84,13 @@ def users_stats_v1(token):
     print(users_stats)
     data_store.set(db_store)
     return users_stats  
+=======
+
+    db_store['workspace_stats']['utilization_rate'] = utilization_rate
+    workspace_stats = db_store['workspace_stats']
+    save_database_updates(db_store) 
+     
+    print(workspace_stats)
+
+    return workspace_stats  
+>>>>>>> master

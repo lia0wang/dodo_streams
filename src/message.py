@@ -69,19 +69,18 @@ def message_send_v1(token, channel_id, message):
     if is_member == False:
         raise AccessError("Authorised user is not a member of the channel")
     
-
     message_id = db_store['message_index']
     db_store['message_index']+=1
     
     # creates the unix time_stamp
-    timestamp = datetime_to_unix_time_stamp()
+    time_stamp = datetime_to_unix_time_stamp()
 
     message = {
         'message_id': message_id,
         'u_id': auth_user_id,
         'message': message,
         'channel_id': channel_id,
-        'time_created': timestamp,
+        'time_created': time_stamp,
         'is_pinned': False,
         'reacts': [
             {
@@ -95,18 +94,26 @@ def message_send_v1(token, channel_id, message):
     for user in db_store['users']:
         if user['u_id'] == auth_user_id:
             num = user['messages_sent']
-            new_dict = {'num_msgs_sent':num+1,'timestamp':timestamp}
+            new_dict = {'num_messages_sent':num+1,'time_stamp':time_stamp}
             user['user_stats']['messages_sent'].append(new_dict)
             user['messages_sent']+=1     
 
     target_channel['messages'].append(message)  
+
+
+    # Update the workspace stats
+    db_store['message_count']+=1     
+    num_mgs = db_store['message_count']
+    new_ws_dict = {'num_messages_exist':num_mgs,'time_stamp':time_stamp}
+    db_store['workspace_stats']['messages_exist'].append(new_ws_dict)
+
     data_store.set(db_store)
 
     chan_check_tag(target_user, message_content, target_channel)
 
     return {
         'message_id': message_id,
-        'time_created': timestamp
+        'time_created': time_stamp
     }
 
 def message_edit_v1(token, message_id, new_message):
@@ -287,11 +294,14 @@ def message_remove_v1(token, message_id):
                     data_store.set(db_store)
 
     # Update user stats
-    timestamp = datetime_to_unix_time_stamp()
-    num = target_user['messages_sent']
-    new_dict = {'num_msgs_sent':num-1,'timestamp':timestamp}
-    target_user['user_stats']['messages_sent'].append(new_dict)
-    target_user['messages_sent']-=1
+    time_stamp = datetime_to_unix_time_stamp()
+
+    # Update the workspace stats 
+    db_store['message_count']-=1    
+    num_mgs = db_store['message_count']
+    new_ws_dict = {'num_messages_exist':num_mgs,'time_stamp':time_stamp}
+    db_store['workspace_stats']['messages_exist'].append(new_ws_dict)
+    
     data_store.set(db_store)  
 
     if valid_dm == False and valid_channel_message == False:
@@ -334,14 +344,14 @@ def message_senddm_v1(token, dm_id, message):
     db_store['message_index']+=1
 
     # creates the unix time_stamp
-    timestamp = datetime_to_unix_time_stamp()
+    time_stamp = datetime_to_unix_time_stamp()
     
     dm_message = {
         'message_id': message_id,
         'u_id': auth_user_id,
         'message': message,
         'dm_id':dm_id,
-        'time_created': timestamp,
+        'time_created': time_stamp,
         'is_pinned': False,
         'reacts': [
             {
@@ -353,11 +363,18 @@ def message_senddm_v1(token, dm_id, message):
     }
      # Update the user stats
     num = target_user['messages_sent']
-    new_dict = {'num_msgs_sent':num+1,'timestamp':timestamp}
+    new_dict = {'num_messages_sent':num+1,'time_stamp':time_stamp}
     target_user['user_stats']['messages_sent'].append(new_dict)
     target_user['messages_sent']+=1      
       
     target_dm['messages'].append(dm_message)
+
+    # Update the workspace stats  
+    db_store['message_count']+=1   
+    num_mgs = db_store['message_count']
+    new_ws_dict = {'num_messages_exist':num_mgs,'time_stamp':time_stamp}
+    db_store['workspace_stats']['messages_exist'].append(new_ws_dict)
+
     data_store.set(db_store)
 
     dm_check_tag(target_user, message, target_dm)
@@ -437,11 +454,19 @@ def message_send_later_dm_v1(token, dm_id, message, time_sent):
     delayed_msg.start()
     
      # Update the user stats
-    timestamp = datetime_to_unix_time_stamp()
+    time_stamp = datetime_to_unix_time_stamp()
     num = target_user['messages_sent']
-    new_dict = {'num_msgs_sent':num+1,'timestamp':timestamp}
+    new_dict = {'num_messages_sent':num+1,'time_stamp':time_stamp}
     target_user['user_stats']['messages_sent'].append(new_dict)
     target_user['messages_sent']+=1   
+
+    # Update the workspace stats 
+    db_store['message_count']+=1    
+    num_mgs = db_store['message_count']
+    new_ws_dict = {'num_messages_exist':num_mgs,'time_stamp':time_stamp}
+    db_store['workspace_stats']['messages_exist'].append(new_ws_dict)
+
+    data_store.set(db_store)  
             
     return {
         'message_id': message_id,
@@ -533,14 +558,20 @@ def message_send_later_v1(token, channel_id, message, time_sent):
     }
 
      # Update the user stats
-    timestamp = datetime_to_unix_time_stamp()
+    time_stamp = datetime_to_unix_time_stamp()
     for user in db_store['users']:
         if user['u_id'] == auth_user_id:
             num = user['messages_sent']
-            new_dict = {'num_msgs_sent':num+1,'timestamp':timestamp}
+            new_dict = {'num_messages_sent':num+1,'time_stamp':time_stamp}
             user['user_stats']['messages_sent'].append(new_dict)
-            user['messages_sent']+=1     
-            
+            user['messages_sent']+=1  
+
+    # Update the workspace stats  
+    db_store['message_count']+=1   
+    num_mgs = db_store['message_count']
+    new_ws_dict = {'num_messages_exist':num_mgs,'time_stamp':time_stamp}
+    db_store['workspace_stats']['messages_exist'].append(new_ws_dict)
+    data_store.set(db_store)           
     time_diff = time_sent - time.time()
 
     param = [target_channel, db_store, message, target_user, message_content]
