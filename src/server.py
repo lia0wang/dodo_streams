@@ -57,8 +57,7 @@ APP.register_error_handler(Exception, defaultHandler)
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear():
     clear_v1()
-    #open('database.json', 'w').close()
-    return dumps({})
+    return dumps({"data": "hello"})
 
 # Example
 @APP.route("/echo", methods=['GET'])

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-WORKING_DIRECTORY="~/www/cs1531deployment"
+WORKING_DIRECTORY="~/www/cs1531deploy"
 
-USERNAME="deploymentdodo"
-SSH_HOST="ssh-deploymentdodo.alwaysdata.net"
+USERNAME="deplododo"
+SSH_HOST="ssh-deplododo.alwaysdata.net"
 
 rm -rf ./**/__pycache__ ./**/.pytest_cache > /dev/null
 scp -r ./requirements.txt ./src "$USERNAME@$SSH_HOST:$WORKING_DIRECTORY"
