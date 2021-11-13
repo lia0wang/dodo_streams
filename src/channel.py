@@ -433,11 +433,8 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     if not valid:
         raise InputError(description="Invalid channel ID!")
 
-    # Check if the u_id are valid
-    valid = False
     for user in store['users']:
         if user['u_id'] == u_id:
-            valid = True
             user_info = {
                 'u_id': user['u_id'],
                 'email': user['email'],
@@ -446,8 +443,6 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
                 'handle_str': user['handle_str'],
                 'permission_id': user['permission_id']
             }
-    if not valid:
-        raise InputError(description="Invalid user ID!")
 
     # Check if the auth_user_id is in the all_members list
     auth_is_member = False
