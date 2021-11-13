@@ -1003,8 +1003,6 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
-    
-
 
     if dm_id == -1: # Share message from a DM to a channel
         target_channel = seek_target_channel_and_errors(db_store, auth_user_id, channel_id)

@@ -72,9 +72,9 @@ def test_basic_message_return():
     channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
     channel_return = channel.json()
 
-    # 1 user sends 124 messages
+    # 1 user sends 101 messages
     i = 0
-    while i < 124:
+    while i < 101:
         msg = 'Hi'
         message_send_program = {
             'token': user['token'],
@@ -105,14 +105,14 @@ def test_basic_message_return():
     # test the contents of the messages
     i = 0 
     while i < 50:
-        # 123 - i, because in this specifc tests, there is 124 messages,
-        # so message_id from 0 - 123, the channel/messages/v2 will return
-        # a latest message to least recent message and so its 123 and decrements.
+        # 100 - i, because in this specifc tests, there is 101 messages,
+        # so message_id from 0 - 100, the channel/messages/v2 will return
+        # a latest message to least recent message and so its 100 and decrements.
         # In this case it assumes the message_id is in numerical order
         # since messages are only created by one user only, in one channel only
         # even though message ids are unique, where another message may be sent
         # some where else by another user
-        assert msg_return['messages'][i]['message_id'] == 123 - i
+        assert msg_return['messages'][i]['message_id'] == 100 - i
         assert msg_return['messages'][i]['u_id'] == 1
         assert msg_return['messages'][i]['message'] == 'Hi'
         # checks that the time stamp is correct
@@ -340,9 +340,9 @@ def test_invalid_channel_id():
     channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
     channel_return = channel.json()
 
-    # 1 user sends 124 messages
+    # 1 user sends 101 messages
     i = 0
-    while i < 124:
+    while i < 101:
         msg = 'Hi'
         message_send_program = {
             'token': user['token'],
