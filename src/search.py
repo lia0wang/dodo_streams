@@ -1,5 +1,6 @@
-from src.helper import get_data, search_channel_messages, search_dm_messages
+from src.helper import  search_channel_messages, search_dm_messages
 from src.error import InputError
+from src.data_store import data_store
 
 def search_v1(u_id, query_str):
     """
@@ -26,7 +27,7 @@ def search_v1(u_id, query_str):
     if len(query_str) not in range(1, 1001):
         raise InputError(description="Error: query string is greater than 1000 characters")
     messages = []
-    db_store = get_data()
+    db_store = data_store.get()
     # Fetch and append channel messages with query_str
     for channel in db_store["channels"]:
         channel_messages = search_channel_messages(u_id, channel, query_str)

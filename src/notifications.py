@@ -1,6 +1,6 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import get_data
+
 
 def notifications_v1(auth_user_id):
     """
@@ -14,7 +14,7 @@ def notifications_v1(auth_user_id):
         Returns messages 
     """
 
-    store = get_data()
+    store = data_store.get()
     
     log_history = store['log_history']
     notifications = []

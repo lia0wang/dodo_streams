@@ -1,6 +1,6 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import get_data, save_database_updates, datetime_to_unix_time_stamp
+from src.helper import datetime_to_unix_time_stamp
 
 def channels_list_v1(auth_user_id):
     ''' 
@@ -18,7 +18,7 @@ def channels_list_v1(auth_user_id):
     '''
 
     # Fetching data
-    store = get_data()
+    store = data_store.get()
 
     # Creating dictionary
     channels_list = dict()
@@ -62,7 +62,7 @@ def channels_listall_v1(auth_user_id):
     '''
 
     # Fetch data
-    store = get_data()
+    store = data_store.get()
     
     # Creating dictionary
     channels_list = dict()
@@ -107,7 +107,7 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     # Fetch data
 
-    store = get_data()
+    store = data_store.get()
 
     # Check if the auth_user_id is valid
     valid = False
@@ -159,7 +159,7 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     # Append the created channel to channels database
     store['channels'].append(channel)
-    save_database_updates(store)
+    data_store.set(store)
 
     return {
         'channel_id': new_channel_id,

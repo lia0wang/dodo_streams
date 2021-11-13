@@ -1,6 +1,6 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import get_data, seek_target_channel_and_errors, save_database_updates, datetime_to_unix_time_stamp
+from src.helper import seek_target_channel_and_errors, datetime_to_unix_time_stamp
 from src.helper import store_log_notif
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
@@ -24,7 +24,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
     # Fetch data
 
-    store = get_data()
+    store = data_store.get()
 
     # Check if auth_user_id is valid
     valid = False
@@ -88,7 +88,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
             user['user_stats']['channels_joined'].append(new_dict)
             user['channels_joined'] += 1 
 
-    save_database_updates(store)
+    data_store.set(store)
 
     store_log_notif(u_id, target_channel['channel_id'], -1, auth_user,\
         target_channel['name'], 'channel_invite')
@@ -132,7 +132,7 @@ def channel_details_v1(auth_user_id, channel_id):
                     handle_str (string)
     '''
     # Fetch data
-    store = get_data()
+    store = data_store.get()
 
 
     target_channel = seek_target_channel_and_errors(store, auth_user_id, channel_id)
@@ -194,7 +194,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     """
         
 
-    store = get_data()
+    store = data_store.get()
 
     # Check if the channel_id is valid
     valid_channel = False
@@ -282,7 +282,7 @@ def channel_join_v1(auth_user_id, channel_id):
 
     # Fetch data
 
-    store = get_data()
+    store = data_store.get()
 
     valid = False
     for user in store['users']:
@@ -332,7 +332,7 @@ def channel_join_v1(auth_user_id, channel_id):
             user['user_stats']['channels_joined'].append(new_dict)
             user['channels_joined'] += 1 
             
-    save_database_updates(store)
+    data_store.set(store)
     return {
     }
 
@@ -352,7 +352,7 @@ def channel_leave_v1(auth_user_id, channel_id):
     """
         # Fetch data
    
-    store = get_data()
+    store = data_store.get()
 
     # Check if the auth_user_id is valid
     valid = False
@@ -411,7 +411,7 @@ def channel_leave_v1(auth_user_id, channel_id):
             user['user_stats']['channels_joined'].append(new_dict)
             user['channels_joined'] -= 1 
             
-    save_database_updates(store)
+    data_store.set(store)
     return {}
 
 def channel_addowner_v1(auth_user_id, channel_id, u_id):
@@ -435,7 +435,7 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     
     # Fetch data
   
-    store = get_data()
+    store = data_store.get()
 
     # Check if the auth_user_id is valid
     valid = False
@@ -513,7 +513,7 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     for index, channel in enumerate(store['channels']):
         if channel['channel_id'] == channel_id:
             store['channels'][index]['owner_members'].append(user_info)
-    save_database_updates(store)
+    data_store.set(store)
 
     return {}
 
@@ -535,7 +535,7 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
         Returns {} (dict) on success
     """
     # Fetch data:
-    store = get_data()
+    store = data_store.get()
 
     # Check if the channel_id is valid
     valid = False
@@ -602,6 +602,6 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
     for index, channel in enumerate(store['channels']):
         if channel['channel_id'] == channel_id:
             store['channels'][index]['owner_members'].remove(user_info)
-    save_database_updates(store)
+    data_store.set(store)
 
     return {}

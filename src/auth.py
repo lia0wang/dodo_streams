@@ -1,12 +1,13 @@
 import re
 import os
 import smtplib, ssl
-from src.helper import get_data, create_handle, create_permission_id, hash_encrypt, save_database_updates, datetime_to_unix_time_stamp
+from src.helper import create_handle, create_permission_id, hash_encrypt, datetime_to_unix_time_stamp
 from src.helper import create_reset_code, create_password_reset_jwt, decode_jwt
 from src.error import InputError
 from src.other import clear_v1
 from src import config
-BASE_URL = config.url
+from src.data_store import data_store
+BASE_URL = "https://deploymentdodo.alwaysdata.net/"
 
 
 def auth_login_v1(email, password):
@@ -28,7 +29,7 @@ def auth_login_v1(email, password):
         that has been registered and password is correct for that u_id.
 
     """
-    store = get_data()
+    store = data_store.get()
     for user in store['users']:
         if user['email'] == email:
             # check if encrypted password in database matches 
@@ -63,8 +64,6 @@ def auth_register_v1(email, password, name_first, name_last):
         Returns auth_user_id (integer in a dictionary accessed using key 'auth_user_id')
         on the condition that the email, password first and last names are all valid
     '''
-    if os.path.getsize("database.json") == 0:
-        clear_v1()  
 
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
@@ -80,7 +79,7 @@ def auth_register_v1(email, password, name_first, name_last):
 
     # Fetch data
  
-    store = get_data()
+    store = data_store.get()
 
     # Check for repeated email
         # Put all emails in list
@@ -131,7 +130,7 @@ def auth_register_v1(email, password, name_first, name_last):
             }
     }
     store['users'].append(user)
-    save_database_updates(store)
+    data_store.set(store)
 
     return {
         'auth_user_id': user_id,
@@ -151,7 +150,7 @@ def auth_passwordreset_request_v1(email):
     Return Value:
         empty dictionary
     '''
-    db_store = get_data()
+    db_store = data_store.get()
     # Find email in database. Send 'reset code' message if found.
     for index, user in enumerate(db_store['users']):
         if user['email'] == email:
@@ -215,7 +214,7 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
         raise InputError(description = "Error: Invalid new password")
 
     # Fetch data
-    db_store = get_data()
+    db_store = data_store.get()
     is_valid_code = False
     # See if the reset_code matches any reset_token in database.
     for reset_token in db_store['reset_tokens']:
@@ -234,5 +233,5 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
     for user in db_store['users']:
         if user['u_id'] == target_u_id:
             user['password'] = hash_encrypt(new_password) 
-    save_database_updates(db_store)
+    data_store.get(db_store)
     return {}

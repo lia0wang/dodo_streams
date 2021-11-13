@@ -1,8 +1,7 @@
 import threading
 from datetime import datetime, timezone, timedelta
-from src.helper import get_data, save_database_updates
 from src.error import AccessError, InputError
-        
+from src.data_store import data_store
 def standup_start_v1(auth_user_id, channel_id, length):
     '''
     Start a standup in the current channel for X sec.
@@ -20,7 +19,7 @@ def standup_start_v1(auth_user_id, channel_id, length):
             time_finish
         }
     '''
-    store = get_data()
+    store = data_store.get()
 
     # Check if the channel_id is valid
     valid = False
@@ -58,7 +57,7 @@ def standup_start_v1(auth_user_id, channel_id, length):
     timer = threading.Timer(int(length), buffer_msg_send, [auth_user_id, target_channel['channel_id']])
     timer.start()
 
-    save_database_updates(store)
+    data_store.set(store)
     
     return {
         'time_finish': target_channel['standup']['time_finish']
@@ -81,7 +80,7 @@ def standup_active_v1(auth_user_id, channel_id):
             time_finish
         }
     '''
-    store = get_data()
+    store = data_store.get()
 
     # Check if the channel_id is valid
     valid = False
@@ -122,7 +121,7 @@ def standup_send_v1(auth_user_id, channel_id, message):
     Return Value:
         {}
     '''
-    store = get_data()
+    store = data_store.get()
 
     for user in store['users']:
         if user['u_id'] == auth_user_id:
@@ -155,7 +154,7 @@ def standup_send_v1(auth_user_id, channel_id, message):
     
     msg = (auth_user['handle_str'], message)
     target_channel['standup']['buffer'].append(msg)
-    save_database_updates(store)
+    data_store.set(store)
 
     return {}
 
@@ -163,7 +162,7 @@ def buffer_msg_send(target_user_id, channel_id):
     '''
     Excute sending messages to the channel from the standup
     '''
-    store = get_data()
+    store = data_store.get()
 
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
@@ -209,4 +208,4 @@ def buffer_msg_send(target_user_id, channel_id):
         target_channel['standup']['time_finish'] = None
         target_channel['standup']['buffer'] = []
 
-    save_database_updates(store)
+    data_store.set(store)

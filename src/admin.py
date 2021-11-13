@@ -1,5 +1,6 @@
-from src.helper import check_valid_token, get_data, save_database_updates
+from src.helper import check_valid_token
 from src.helper import decode_jwt
+from src.data_store import data_store
 from src.error import InputError, AccessError
 
 def admin_user_remove_v1(token, u_id):
@@ -29,7 +30,7 @@ def admin_user_remove_v1(token, u_id):
     # Get data
     decoded_token = decode_jwt(token)
     auth_user_id = decoded_token['u_id']
-    store = get_data()
+    store = data_store.get()
     
     valid_u_id = False
     valid_auth = False
@@ -97,7 +98,7 @@ def admin_user_remove_v1(token, u_id):
                 if message['u_id'] == u_id:
                     message['message'] = "Removed user"
     
-    save_database_updates(store)
+    data_store.set(store)
     
     return {}
 
@@ -128,7 +129,7 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     # Get data
     decoded_token = decode_jwt(token)
     auth_user_id = decoded_token['u_id']
-    store = get_data()
+    store = data_store.get()
     
     valid_u_id = False
     valid_auth = False
@@ -172,6 +173,6 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
             if member['u_id'] == u_id:
                 member['permission_id'] = permission_id
 
-    save_database_updates(store)
+    data_store.set(store)
 
     return {}

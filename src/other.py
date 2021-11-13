@@ -1,5 +1,4 @@
 from src.data_store import data_store
-from src.helper import save_database_updates
 
 empty = {
     "users": [],
@@ -22,7 +21,5 @@ def clear_v1():
     Return Value:
         N/A  
     '''
-    data_store.set(empty)
-    save_database_updates(empty)    
-    return {
-    }
+    data_store.set(empty)    
+    return {}

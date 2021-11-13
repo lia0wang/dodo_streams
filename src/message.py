@@ -3,8 +3,8 @@ import os
 
 from requests.api import get
 from src.dm import dm_create_v1, dm_details_v1
-from src.helper import get_data, check_valid_token,\
-     decode_jwt,save_database_updates, datetime_to_unix_time_stamp,\
+from src.helper import check_valid_token,\
+     decode_jwt, datetime_to_unix_time_stamp,\
          store_log_notif, chan_check_tag, dm_check_tag,\
          seek_target_channel_and_errors
 from src.channel import channel_details_v1, channel_messages_v1
@@ -44,7 +44,7 @@ def message_send_v1(token, channel_id, message):
     if(len(message)<1 or len(message)>1000):
         raise InputError("Error: message too long or too short")
 
-    db_store = get_data()
+    db_store = data_store.get()
         
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
@@ -100,7 +100,7 @@ def message_send_v1(token, channel_id, message):
             user['messages_sent']+=1     
 
     target_channel['messages'].append(message)  
-    save_database_updates(db_store)
+    data_store.set(db_store)
 
     chan_check_tag(target_user, message_content, target_channel)
 
@@ -139,7 +139,7 @@ def message_edit_v1(token, message_id, new_message):
         message_remove_v1(token, message_id)
         return None
 
-    db_store = get_data()
+    db_store = data_store.get()
         
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
@@ -171,7 +171,7 @@ def message_edit_v1(token, message_id, new_message):
                 if msg['message_id'] == message_id:
                     target_channel = channel
                     msg['message'] = new_message
-                    save_database_updates(db_store)
+                    data_store.set(db_store)
                     chan_check_tag(target_user, new_message, target_channel)
  
     for dm in db_store['dms']:
@@ -196,7 +196,7 @@ def message_edit_v1(token, message_id, new_message):
                 if message['message_id'] == message_id:
                     target_dm = dm
                     message['message'] = new_message
-                    save_database_updates(db_store)
+                    data_store.set(db_store)
                     dm_check_tag(target_user, new_message, target_dm)
 
                     
@@ -228,7 +228,7 @@ def message_remove_v1(token, message_id):
     valid_channel_message = False
     valid_dm = False
 
-    db_store = get_data()
+    db_store = data_store.get()
         
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
@@ -261,7 +261,7 @@ def message_remove_v1(token, message_id):
             for message in channel['messages']:
                 if message['message_id'] == message_id:
                     channel['messages'].remove(message) 
-                    save_database_updates(db_store)
+                    data_store.set(db_store)
         
     # Remove dm messages
     for dm in db_store['dms']:
@@ -284,7 +284,7 @@ def message_remove_v1(token, message_id):
             for message in dm['messages']:
                 if message['message_id'] == message_id:
                     dm['messages'].remove(message)
-                    save_database_updates(db_store)
+                    data_store.set(db_store)
 
     # Update user stats
     timestamp = datetime_to_unix_time_stamp()
@@ -292,7 +292,7 @@ def message_remove_v1(token, message_id):
     new_dict = {'num_msgs_sent':num-1,'timestamp':timestamp}
     target_user['user_stats']['messages_sent'].append(new_dict)
     target_user['messages_sent']-=1
-    save_database_updates(db_store)  
+    data_store.set(db_store)  
 
     if valid_dm == False and valid_channel_message == False:
         raise InputError("Error: message_id oes not refer to a valid message within \
@@ -316,7 +316,7 @@ def message_senddm_v1(token, dm_id, message):
     if(len(message)<1 or len(message)>1000):
         raise InputError("Error: message too long or too short")
 
-    db_store = get_data()
+    db_store = data_store.get()
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
     
@@ -358,7 +358,7 @@ def message_senddm_v1(token, dm_id, message):
     target_user['messages_sent']+=1      
       
     target_dm['messages'].append(dm_message)
-    save_database_updates(db_store)
+    data_store.set(db_store)
 
     dm_check_tag(target_user, message, target_dm)
 
@@ -394,7 +394,7 @@ def message_send_later_dm_v1(token, dm_id, message, time_sent):
     if(len(message)<1 or len(message)>1000):
         raise InputError("Error: message too long or too short")
 
-    db_store = get_data()
+    db_store = data_store.get()
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']  
 
@@ -450,7 +450,7 @@ def message_send_later_dm_v1(token, dm_id, message, time_sent):
 def delayed_dm_message(target_dm, db_store, message, target_user, message_content):
     target_dm['messages'].append(message)
     db_store['messages'].append(message)
-    save_database_updates(db_store)
+    data_store.set(db_store)
     dm_check_tag(target_user, message_content, target_dm)
 
 
@@ -485,7 +485,7 @@ def message_send_later_v1(token, channel_id, message, time_sent):
     if(len(message)<1 or len(message)>1000):
         raise InputError("Error: message too long or too short")
 
-    db_store = get_data()
+    db_store = data_store.get()
         
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
@@ -554,7 +554,7 @@ def message_send_later_v1(token, channel_id, message, time_sent):
 def delayed_message(target_channel, db_store, message, target_user, message_content):
     target_channel['messages'].append(message)
     db_store['messages'].append(message)
-    save_database_updates(db_store)
+    data_store.set(db_store)
     chan_check_tag(target_user, message_content, target_channel)
 
 
@@ -577,7 +577,7 @@ def message_pin_v1(token, message_id):
     Return Value:
         Nothing is returned
     '''
-    store = get_data()
+    store = data_store.get()
 
     u_id = decode_jwt(token)['u_id']
 
@@ -623,7 +623,7 @@ def message_pin_v1(token, message_id):
             for message in channel['messages']:
                 if message['message_id'] == message_id:
                     message['is_pinned'] = True
-                    save_database_updates(store)
+                    data_store.set(store)
 
     in_channel_dm = False
     owner_permission = False
@@ -655,7 +655,7 @@ def message_pin_v1(token, message_id):
             for message in dm['messages']:
                 if message['message_id'] == message_id:
                     message['is_pinned'] = True
-                    save_database_updates(store)
+                    data_store.set(store)
 
     return {}
 
@@ -678,7 +678,7 @@ def message_unpin_v1(token, message_id):
     Return Value:
         Nothing is returned
     '''
-    store = get_data()
+    store = data_store.get()
 
     u_id = decode_jwt(token)['u_id']
 
@@ -724,7 +724,7 @@ def message_unpin_v1(token, message_id):
             for message in channel['messages']:
                 if message['message_id'] == message_id:
                     message['is_pinned'] = False
-                    save_database_updates(store)
+                    data_store.set(store)
 
     in_channel_dm = False
     owner_permission = False
@@ -756,7 +756,7 @@ def message_unpin_v1(token, message_id):
             for message in dm['messages']:
                 if message['message_id'] == message_id:
                     message['is_pinned'] = False
-                    save_database_updates(store)
+                    data_store.set(store)
 
     return {}
 
@@ -779,7 +779,7 @@ def message_react_v1(token, message_id, react_id):
     Return Value:
         Nothing is returned
     '''
-    store = get_data()
+    store = data_store.get()
 
     auth_user = decode_jwt(token)
 
@@ -824,7 +824,7 @@ def message_react_v1(token, message_id, react_id):
                     notified_user_id = message['u_id']
                     channel_id = channel['channel_id']
                     dm_name = channel['name']
-                    save_database_updates(store)
+                    data_store.set(store)
                     
     in_channel_dm = False
     
@@ -854,7 +854,7 @@ def message_react_v1(token, message_id, react_id):
                     notified_user_id = message['u_id']
                     dm_id = dm['dm_id']
                     dm_name = dm['dm_name']
-                    save_database_updates(store)
+                    data_store.set(store)
 
     # find the user who reacted
     for user in store['users']:
@@ -886,7 +886,7 @@ def message_unreact_v1(token, message_id, react_id):
     Return Value:
         Nothing is returned
     '''
-    store = get_data()
+    store = data_store.get()
 
     u_id = decode_jwt(token)['u_id']
 
@@ -922,7 +922,7 @@ def message_unreact_v1(token, message_id, react_id):
             for message in channel['messages']:
                 if message['message_id'] == message_id:
                     message['reacts'][react_id - 1]['u_ids'].remove(u_id)
-                    save_database_updates(store)
+                    data_store.set(store)
                     
     in_channel_dm = False
     
@@ -949,7 +949,7 @@ def message_unreact_v1(token, message_id, react_id):
             for message in dm['messages']:
                 if message['message_id'] == message_id:
                     message['reacts'][react_id - 1]['u_ids'].remove(u_id)
-                    save_database_updates(store)
+                    data_store.set(store)
                     
     return {}
 
@@ -969,7 +969,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     if len(message)>1000:
         raise InputError("Error: message too long")
 
-    db_store = get_data()
+    db_store = data_store.get()
         
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']

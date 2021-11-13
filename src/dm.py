@@ -1,5 +1,5 @@
 from src.error import AccessError, InputError
-from src.helper import get_data, save_database_updates, check_valid_token, decode_jwt, store_log_notif, datetime_to_unix_time_stamp
+from src.helper import check_valid_token, decode_jwt, store_log_notif, datetime_to_unix_time_stamp
 from src.data_store import data_store
 
 def dm_create_v1(auth_user_id, u_ids):
@@ -22,7 +22,7 @@ def dm_create_v1(auth_user_id, u_ids):
 
     # Fetch data
  
-    store = get_data()
+    store = data_store.get()
 
     # Check if the auth_user_id is valid
     valid = False
@@ -81,7 +81,7 @@ def dm_create_v1(auth_user_id, u_ids):
     # Append the created dm to dms database
     store['dms'].append(dm)
 
-    save_database_updates(store)
+    data_store.set(store)
 
     for u_id in u_ids:
         store_log_notif(u_id, -1, dm_id, auth_user,\
@@ -94,7 +94,7 @@ def dm_create_v1(auth_user_id, u_ids):
 def dm_details_v1(auth_user_id, dm_id):
     # Fetch data
 
-    store = get_data()
+    store = data_store.get()
     # Check if auth_user_id refers to existing user
     is_valid_user = False
     for user in store['users']:
@@ -162,7 +162,7 @@ def dm_messages_v1(auth_user_id, dm_id, start):
     """
         
 
-    store = get_data()
+    store = data_store.get()
 
     # Check if the dm_id is valid
     valid_dm = False
@@ -251,19 +251,17 @@ def dm_list_v1(token):
     u_id = decoded_jwt['u_id']
     
     # Getting dm data and making dms list
-    store = get_data()
+    store = data_store.get()
     dms = []
     
     # Traversing through dms, appending those that
     # have u_id as a member
     for dm in store['dms']:
         if u_id in dm['u_ids']:
-            new_dm = dm
-            del new_dm['auth_user_id']
-            del new_dm['u_ids']
-            del new_dm['messages']
-            new_dm['name'] = new_dm['dm_name']
-            del new_dm['dm_name']
+            new_dm = {
+                "dm_id": dm["dm_id"],
+                "name": dm["name"]
+            }
             dms.append(new_dm)
     return {"dms": dms}
 
@@ -283,7 +281,7 @@ def dm_remove_v1(token, dm_id):
     '''
     valid_dm = False
     auth_request = False
-    db_store = get_data()
+    db_store = data_store.get()
     auth_user_id = decode_jwt(token)['u_id']
     
     for dm in db_store['dms']:
@@ -313,4 +311,4 @@ def dm_remove_v1(token, dm_id):
             user['user_stats']['dms_joined'].append(new_dict)
             user['dms_joined'] -= 1   
 
-    save_database_updates(db_store)
+    data_store.set(db_store)

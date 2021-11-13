@@ -1,7 +1,5 @@
-from src.helper import get_data
-from src.helper import save_database_updates, \
-     datetime_to_unix_time_stamp, check_valid_token
-
+from src.helper import datetime_to_unix_time_stamp, check_valid_token
+from src.data_store import data_store
 def users_all_v1():
     '''
     Returns all users
@@ -22,15 +20,20 @@ def users_all_v1():
             handle_str (string)
     '''
     # Fetching data
-    store = get_data()
+    store = data_store.get()
        
     # Create list and add users to the list
     users = []
     for user in store['users']:
         if len(user['email']) != 0:
-            new_user = user
-            del new_user['password']
-            del new_user['session_list']
+            new_user = {
+                'u_id': user['u_id'],
+                'email': user['email'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last'],
+                'handle_str': user['handle_str'], 
+                'profile_img_url': user['profile_img_url']
+            }
             users.append(new_user)
     return {"users": users}
 
@@ -38,7 +41,7 @@ def users_stats_v1(token):
     '''
     Fetches the required statistics about the use of UNSW Streams.
     '''
-    db_store = get_data()
+    db_store = data_store.get()
 
     num_channels_exist = 0
     num_dms_exist = 0
@@ -80,5 +83,5 @@ def users_stats_v1(token):
         'utilization_rate': utilization_rate
         }
     print(users_stats)
-    save_database_updates(db_store)
+    data_store.set(db_store)
     return users_stats  

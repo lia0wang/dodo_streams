@@ -4,7 +4,7 @@ import os
 import string
 import random
 import hashlib
-
+from src.data_store import data_store
 from requests.api import get
 from src.error import InputError, AccessError
 from datetime import date, timezone, datetime
@@ -55,7 +55,7 @@ def dm_check_tag(sender, message, target_dm):
 
     tags = unique_list(tags1)
 
-    store = get_data()
+    store = data_store.get()
     for tag in tags:
         for user in store['users']:
             # checks the tag gotten is an existing user handle string 
@@ -76,7 +76,7 @@ def unique_list(l):
 
 
 def store_log_notif(notified_u_id, channel_id, dm_id, handle_str, dmchan_name, notif_type):
-    store = get_data()
+    store = data_store.get()
     # create a log history for the notfication
     notif_log = {
         'u_id': notified_u_id,
@@ -87,7 +87,7 @@ def store_log_notif(notified_u_id, channel_id, dm_id, handle_str, dmchan_name, n
         'notif_type': notif_type
     }
     store['log_history'].append(notif_log)
-    save_database_updates(store)
+    data_store.set(store)
 
 
 def create_jwt(u_id, session_id):
@@ -140,29 +140,6 @@ def create_session_id():
     global SESSION_ID 
     SESSION_ID  += 1
     return SESSION_ID
-
-def save_database_updates(updated_database):
-    '''
-    Saves updates to database.
-    Saves it to json database.
-    Arguments:
-        updated_database (dictionary)
-    '''
-    with open('database.json', 'w') as file:
-        json.dump(updated_database, file)
-    file.close()
-
-def get_data():
-    '''
-    Retrieves data from json file database
-    Returns:
-        dictionary in a smilar manner to datastore.get
-    '''
-    with open('database.json') as file:
-        data = json.load(file)
-    file.close()
-    return data
-  
 
 
 def create_handle(name_first, name_last, data):
@@ -228,7 +205,7 @@ def seek_target_channel_and_errors(data, auth_user_id, channel_id):
 
 
 def check_valid_token(token):
-    db_store = get_data()
+    db_store = data_store.get()
     try:
         decoded_jwt = decode_jwt(token)
     except Exception as error:
@@ -263,7 +240,7 @@ def create_reset_code():
     Returns:
         Random 6 character alphanumeric string
     """
-    db_store = get_data()
+    db_store = data_store.get()
     characters = string.ascii_letters + string.digits
     reset_code = (''.join(random.choice(characters) for i in range(6))).upper()
     if len(db_store) != 0:

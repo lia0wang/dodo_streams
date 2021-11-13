@@ -3,7 +3,6 @@ import signal
 import re
 import requests
 import urllib.request
-from PIL import Image
 from json import dump, dumps
 from flask import Flask, request, send_from_directory
 from flask_cors import CORS
@@ -24,11 +23,12 @@ from src import config
 from src.auth import auth_passwordreset_request_v1, auth_register_v1, auth_login_v1, auth_passwordreset_reset_v1
 from src.channels import channels_list_v1, channels_listall_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
-from src.helper import check_valid_token, get_data, create_session_id
-from src.helper import save_database_updates, create_jwt, decode_jwt
+from src.helper import check_valid_token, create_session_id
+from src.helper import  create_jwt, decode_jwt
 from src.other import clear_v1
 from src.notifications import notifications_v1
 from src import config
+from src.data_store import data_store
 BASE_URL = config.url
 
 def quit_gracefully(*args):
@@ -82,7 +82,7 @@ def register():
     # Register user
     register_return = auth_register_v1(email, password, name_first, name_last)
     # Fetch data from database
-    database_store = get_data()
+    database_store = data_store.get()
 
     # Find u_id and create session_id to generate token
     session_id = create_session_id()
@@ -93,7 +93,7 @@ def register():
             database_store['users'][index]['session_list'] = [session_id]
 
     # Update direct changes to database
-    save_database_updates(database_store)
+    data_store.set(database_store)
     register_return['token'] = create_jwt(u_id, session_id)
     return dumps(register_return)
 
@@ -108,14 +108,14 @@ def login():
     auth_login['token'] = create_jwt(auth_login['auth_user_id'], session_id)
     
     # Fetch data from database
-    database_store = get_data()
+    database_store = data_store.get()
 
     # Find u_id and create session_id to generate token
     for index, user in enumerate(database_store['users']):
         if user['u_id'] == auth_login['auth_user_id']:
             # Update user information with sessions_list and session_id 
             database_store['users'][index]['session_list'].append(session_id)
-            save_database_updates(database_store)
+            data_store.set(database_store)
     return dumps(auth_login)
 
 @APP.route("/channels/create/v2", methods=['POST'])
@@ -170,13 +170,13 @@ def logout():
     decoded_token = decode_jwt(request_data.get('token'))
         
     # Fetch data from database
-    db_store = get_data()
+    db_store = data_store.get()
     # invalidates session id by removing it from session list 
     for index, user in enumerate(db_store['users']):
         if user['u_id'] == decoded_token['u_id']:
             session_id = decoded_token['session_id']
             db_store['users'][index]['session_list'].remove(session_id)
-            save_database_updates(db_store)
+            data_store.set(db_store)
     return dumps({})
 
 @APP.route("/channel/join/v2", methods=['POST'])
@@ -298,7 +298,7 @@ def dm_leave():
     target_u_id = decode_token['u_id']
     target_dm_id = request_data.get('dm_id')
 
-    store = get_data()
+    store = data_store.get()
 
     # Check if auth_user_id refers to existing user
     is_valid_user = False
@@ -630,6 +630,7 @@ def uploadphoto():
     y_end = request_data.get("y_end")
     user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end)
     return dumps({})
+
 
 @APP.route('/static/<path:path>')
 def send_js(path):

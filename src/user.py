@@ -1,16 +1,17 @@
 import re
 import os
-from src.helper import get_data, save_database_updates, decode_jwt, \
+from src.helper import  decode_jwt, \
      datetime_to_unix_time_stamp
 from src.error import InputError
 from src.channels import channels_list_v1
-from src.dm import dm_list_v1
-import requests
 import urllib.request
 from PIL import Image
+from src.dm import dm_list_v1
+import requests
 from src import config
 import time
-BASE_URL = config.url
+from src.data_store import data_store
+BASE_URL = "https://deploymentdodo.alwaysdata.net/"
 
 def user_profile_v1(u_id):
     """
@@ -34,7 +35,7 @@ def user_profile_v1(u_id):
             handle_str (string)
     """
     is_valid_user = False
-    db_store = get_data()
+    db_store = data_store.get()
     for user in db_store['users']:
         if user['u_id'] == u_id:
             is_valid_user = True
@@ -74,7 +75,7 @@ def user_profile_setname_v1(u_id, name_first, name_last):
         empty dictionary
     """
     # fetch data
-    db_store = get_data()
+    db_store = data_store.get()
 
     # check name length errors
     if len(name_first) < 1 or len(name_first) > 50:
@@ -98,7 +99,7 @@ def user_profile_setname_v1(u_id, name_first, name_last):
                 db_store['channels'][index]['all_members'][index3]['name_first'] = name_first
                 db_store['channels'][index]['all_members'][index3]['name_last'] = name_last
 
-    save_database_updates(db_store)
+    data_store.set(db_store)
     return {}
 
 def user_profile_setemail_v1(u_id, email):
@@ -123,7 +124,7 @@ def user_profile_setemail_v1(u_id, email):
     if not re.fullmatch(regex, email):
         raise InputError(description="Error: Invalid email")
 
-    db_store = get_data()
+    db_store = data_store.get()
     for user in db_store['users']:
         if user['email'] == email:
             raise InputError(description="Error: email taken")
@@ -140,7 +141,7 @@ def user_profile_setemail_v1(u_id, email):
             if mem['u_id'] == u_id:
                 db_store['channels'][index]['all_members'][index3]['email'] = email
                 
-    save_database_updates(db_store)
+    data_store.set(db_store)
     return {}
 
 def user_profile_sethandle_v1(u_id, handle_str):
@@ -164,7 +165,7 @@ def user_profile_sethandle_v1(u_id, handle_str):
         raise InputError(description="Invalid handle")
     if not handle_str.isalnum():
         raise InputError(description="Invalid handle")
-    db_store = get_data()
+    db_store = data_store.get()
     for user in db_store['users']:
         if user['handle_str'] == handle_str:
             raise InputError(description="Invalid handle")
@@ -181,8 +182,9 @@ def user_profile_sethandle_v1(u_id, handle_str):
             if mem['u_id'] == u_id:
                 db_store['channels'][index]['all_members'][index3]['handle_str'] = handle_str
     
-    save_database_updates(db_store)
+    data_store.set(db_store)
     return {}
+
 
 def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
     '''
@@ -239,18 +241,19 @@ def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
 
     # Save served url of uploaded image
     profile_img_url = BASE_URL + "static/" + img_file
-    db_store = get_data()
+    db_store = data_store.get()
     for user in db_store["users"]:
         if user["u_id"] == u_id:
             user["profile_img_url"] = profile_img_url
         
-    save_database_updates(db_store)
+    data_store.set(db_store)
     return {}
+
 
 def user_stats_v1(token):
     '''
     '''
-    db_store = get_data()
+    db_store = data_store.get()
     
     auth_user_id = decode_jwt(token)['u_id']
     channel_list = channels_list_v1(auth_user_id)
@@ -301,7 +304,7 @@ def user_stats_v1(token):
     print('num_dms_joined: ',num_dms_joined)
     print('user_stats: ', user_stats)
     targer_user['user_stats']['involvement_rate'] = involvement_rate
-    save_database_updates(db_store)
+    data_store.set(db_store)
     return user_stats
         
                  

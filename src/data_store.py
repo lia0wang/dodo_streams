@@ -26,11 +26,13 @@ Example usage:
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'users': [],
-    'channels':[],
-    'messages': [],
-    'dms': [],
-    'message_index':0
+    "users": [],
+    "channels": [],
+    "messages": [],
+    "dms": [],
+    "reset_tokens": [],
+    "log_history": [],
+    "message_index": 0
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
