@@ -1,11 +1,7 @@
-<<<<<<< HEAD
 from src.helper import datetime_to_unix_time_stamp, check_valid_token
 from src.data_store import data_store
-=======
-from src.helper import get_data
-from src.helper import save_database_updates
 
->>>>>>> master
+
 def users_all_v1():
     '''
     Returns all users
@@ -73,7 +69,7 @@ def users_stats_v1(token):
     print('num_messages_exist: ',num_messages_exist)
     print('num_utilization_users: ',num_utilization_users)
     print('num_users: ',num_users)
-<<<<<<< HEAD
+    
     timestamp = datetime_to_unix_time_stamp()
     users_stats = {
         'channels_exist': [{'num_channels_exist':num_channels_exist,'timestamp':timestamp}],
@@ -84,13 +80,3 @@ def users_stats_v1(token):
     print(users_stats)
     data_store.set(db_store)
     return users_stats  
-=======
-
-    db_store['workspace_stats']['utilization_rate'] = utilization_rate
-    workspace_stats = db_store['workspace_stats']
-    save_database_updates(db_store) 
-     
-    print(workspace_stats)
-
-    return workspace_stats  
->>>>>>> master
