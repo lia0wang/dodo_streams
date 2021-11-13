@@ -265,7 +265,7 @@ def dm_list_v1(token):
         if u_id in dm['u_ids']:
             new_dm = {
                 "dm_id": dm["dm_id"],
-                "name": dm["name"]
+                "name": dm["dm_name"]
             }
             dms.append(new_dm)
     return {"dms": dms}
