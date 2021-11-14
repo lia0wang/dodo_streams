@@ -395,7 +395,7 @@ def message_send_later_dm_v1(token, dm_id, message, time_sent):
         token - Used to identify the user
         dm_id - Refers to the channel where message will be sent 
         message - The message needs to be send
-        time spent - 
+        time spent - The future time it is sent at
     Exceptions:
         InputError - dm_id does not refer to a valid channel
         InputError - the length of message is smaller than 1 or bigger than 1000
@@ -491,7 +491,7 @@ def message_send_later_v1(token, channel_id, message, time_sent):
         token - Used to identify the user
         channel_id - Refers to the channel where message will be sent 
         message - The message needs to be send
-        time spent - 
+        time spent - The future time it is sent at
     Exceptions:
         InputError - channel_id does not refer to a valid channel
         InputError - the length of message is smaller than 1 or bigger than 1000
@@ -1088,7 +1088,7 @@ def message_share_v1(token, og_message_id, message_str, channel_id, dm_id):
         shared_message_id = message_senddm_v1(token, dm_id, shared_message)
         return {
             'shared_message_id': shared_message_id,
-            }
+        }
                     
         
 
