@@ -32,8 +32,8 @@ def message_send_v1(token, channel_id, message):
         InputError - the length of message is smaller than 1 or bigger than 1000
         AccessError - channel_id is valid and the authorised user is not a
                       member of the channel
-         Return Value:
-         Return a dictionary containing the message id              
+    Return Value:
+        Return a dictionary containing the message id              
     '''
     is_member = False
     valid_channel = False
@@ -395,7 +395,7 @@ def message_send_later_dm_v1(token, dm_id, message, time_sent):
         token - Used to identify the user
         dm_id - Refers to the channel where message will be sent 
         message - The message needs to be send
-        time spent - 
+        time spent - The future time it is sent at
     Exceptions:
         InputError - dm_id does not refer to a valid channel
         InputError - the length of message is smaller than 1 or bigger than 1000
@@ -491,7 +491,7 @@ def message_send_later_v1(token, channel_id, message, time_sent):
         token - Used to identify the user
         channel_id - Refers to the channel where message will be sent 
         message - The message needs to be send
-        time spent - 
+        time spent - The future time it is sent at
     Exceptions:
         InputError - channel_id does not refer to a valid channel
         InputError - the length of message is smaller than 1 or bigger than 1000
@@ -985,6 +985,28 @@ def message_unreact_v1(token, message_id, react_id):
 
 def message_share_v1(token, og_message_id, message_str, channel_id, dm_id):
     '''
+    A new message will be sent to the channel/DM identified by the channel_id/dm_id 
+    that contains the contents of both the original message and the optional message. 
+    id
+    Arguments:
+        token - Used to identify the user
+        og_message_id - ID of the original message
+        message - the optional message in addition to the shared message, 
+                and will be an empty string '' if no message is given.
+        channel_id - Refers to the channel where message will be sent 
+        dm_id - Refers to the DM where message will be sent 
+
+    Exceptions:
+        InputError - channel_id does not refer to a valid channel or
+                    dm_id does not refer to a valid DM  
+        InputError - neither channel_id nor dm_id are -1  
+        InputError - og_message_id does not refer to a valid message within a 
+                    channel/DM that the authorised user has joined  
+        InputError - the length of message is longer than 1000 characters
+        AccessError - channel_id/dm_id is valid and the authorised user is not a
+                      member of the channel/DM
+    Return Value:
+        Return a dictionary containing the shared_message_id             
     '''
     if channel_id != -1 and dm_id != -1:
         raise InputError(description="Neither channel_id nor dm_id are -1")
@@ -1088,7 +1110,7 @@ def message_share_v1(token, og_message_id, message_str, channel_id, dm_id):
         shared_message_id = message_senddm_v1(token, dm_id, shared_message)
         return {
             'shared_message_id': shared_message_id,
-            }
+        }
                     
         
 

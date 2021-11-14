@@ -249,6 +249,11 @@ def user_profile_uploadphoto_v1(u_id, img_url, x_start, y_start, x_end, y_end):
 
 def user_stats_v1(token):
     '''
+    Fetches the required statistics about this user's use of UNSW Streams.
+    Arguments:
+        token - Used to identify the user
+    Return Value:
+        Return user_stats dictionary  
     '''
     db_store = get_data()
     

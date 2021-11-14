@@ -36,6 +36,11 @@ def users_all_v1():
 def users_stats_v1(token):
     '''
     Fetches the required statistics about the use of UNSW Streams.
+    Fetches the required statistics about this user's use of UNSW Streams.
+    Arguments:
+        token - Used to identify the user
+    Return Value:
+        Return workspace_stats dictionary    
     '''
     db_store = get_data()
 

@@ -57,7 +57,6 @@ APP.register_error_handler(Exception, defaultHandler)
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear():
     clear_v1()
-    #open('database.json', 'w').close()
     return dumps({})
 
 # Example
@@ -81,20 +80,6 @@ def register():
 
     # Register user
     register_return = auth_register_v1(email, password, name_first, name_last)
-    # Fetch data from database
-    database_store = get_data()
-
-    # Find u_id and create session_id to generate token
-    session_id = create_session_id()
-    for index, user in enumerate(database_store['users']):
-        if user['u_id'] == register_return['auth_user_id']:
-            u_id = user['u_id']
-            # Update user information with sessions_list and session_id 
-            database_store['users'][index]['session_list'] = [session_id]
-
-    # Update direct changes to database
-    save_database_updates(database_store)
-    register_return['token'] = create_jwt(u_id, session_id)
     return dumps(register_return)
 
 @APP.route("/auth/login/v2", methods=['POST'])
