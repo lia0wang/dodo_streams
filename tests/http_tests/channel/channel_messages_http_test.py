@@ -442,14 +442,16 @@ def test_auth_user_id_not_member_of_channel():
     channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
     channel_return = channel.json()
 
-    # logout to make token invalid
     register_param = {
-        'token': user['token']
+        "email": "das.666@gmail.com",
+        "password": "Hopdasdae11037",
+        "name_first": "Hodasdpeful",
+        "name_last": "Bodasdayyy"
     }
-    requests.post(f"{BASE_URL}/auth/logout/v1", json = register_param)
+    user2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
 
     channel_messages = {
-        'token': user['token'],
+        'token': user2['token'],
         'channel_id': channel_return['channel_id'],
         'start': 1       
     }

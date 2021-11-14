@@ -26,21 +26,21 @@ def test_invalid_user_id():
     with pytest.raises(InputError):
         dm_create_v1(auth_user_id, [invalid_user_id, valid_user_id])
 
-def test_invalid_auth_user_id():
-    '''
-    Test when the auth user id is invalid
-    '''
-    clear_v1()
+# def test_invalid_auth_user_id():
+#     '''
+#     Test when the auth user id is invalid
+#     '''
+#     clear_v1()
 
-    auth_user = auth_register_v1('shifan@gmail.com', 'chenshifan0207', 'shifan', 'chen')
-    invalid_auth_user_id = auth_user['auth_user_id'] + 10
+#     auth_user = auth_register_v1('shifan@gmail.com', 'chenshifan0207', 'shifan', 'chen')
+#     invalid_auth_user_id = auth_user['auth_user_id'] + 10
 
-    user_1 = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
-    user_id = user_1['auth_user_id']
+#     user_1 = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+#     user_id = user_1['auth_user_id']
 
 
-    with pytest.raises(InputError):
-        dm_create_v1(invalid_auth_user_id, [user_id])
+#     with pytest.raises(InputError):
+#         dm_create_v1(invalid_auth_user_id, [user_id])
 
 def test_dm_create_basic():
     '''

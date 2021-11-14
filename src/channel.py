@@ -2,6 +2,7 @@ from src.data_store import data_store
 from src.error import AccessError, InputError
 from src.helper import get_data, seek_target_channel_and_errors, save_database_updates, datetime_to_unix_time_stamp
 from src.helper import store_log_notif
+
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
     Invites a user with ID u_id to join a channel with ID channel_id.
@@ -26,14 +27,9 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     store = get_data()
 
-    # Check if auth_user_id is valid
-    valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
-            valid = True
             auth_user = user # catch the authorized user
-    if not valid:
-        raise AccessError(description="Invalid token!")
     
     # Check if the channel_id is valid
     valid = False
@@ -290,7 +286,6 @@ def channel_join_v1(auth_user_id, channel_id):
 
     store = get_data()
 
-    valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             new_member = {
@@ -301,9 +296,6 @@ def channel_join_v1(auth_user_id, channel_id):
                 'handle_str': user['handle_str'],
                 'permission_id': user['permission_id'],
             } # Catch the new_member without password
-            valid = True
-    if not valid:
-        raise AccessError(description="Invalid token!")
 
     # Check if the channel_id is valid
     valid = False
@@ -360,8 +352,6 @@ def channel_leave_v1(auth_user_id, channel_id):
    
     store = get_data()
 
-    # Check if the auth_user_id is valid
-    valid = False
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             target_user = {
@@ -372,9 +362,6 @@ def channel_leave_v1(auth_user_id, channel_id):
                 'handle_str': user['handle_str'],
                 'permission_id': user['permission_id'],
             } # Catch the new_member without password
-            valid = True
-    if not valid:
-        raise AccessError(description="Invalid token!")
 
     # Check if the channel_id is valid
     valid = False
@@ -443,14 +430,6 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
   
     store = get_data()
 
-    # Check if the auth_user_id is valid
-    valid = False
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            valid = True
-    if not valid:
-        raise AccessError(description="Invalid token!")
-
     # Check if the channel_id is valid
     valid = False
     for channel in store['channels']:
@@ -460,11 +439,8 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     if not valid:
         raise InputError(description="Invalid channel ID!")
 
-    # Check if the u_id are valid
-    valid = False
     for user in store['users']:
         if user['u_id'] == u_id:
-            valid = True
             user_info = {
                 'u_id': user['u_id'],
                 'email': user['email'],
@@ -473,8 +449,6 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
                 'handle_str': user['handle_str'],
                 'permission_id': user['permission_id'],
             }
-    if not valid:
-        raise InputError(description="Invalid user ID!")
 
     # Check if the auth_user_id is in the all_members list
     auth_is_member = False
@@ -552,11 +526,8 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
     if not valid:
         raise InputError(description="Invalid channel ID!")
 
-    # Check if the u_id are valid
-    valid = False
     for user in store['users']:
         if user['u_id'] == u_id:
-            valid = True
             user_info = {
                 'u_id': user['u_id'],
                 'email': user['email'],
@@ -565,8 +536,6 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
                 'handle_str': user['handle_str'],
                 'permission_id': user['permission_id'],
             }
-    if not valid:
-        raise InputError(description="Invalid user ID!")
 
     # Check if the authorized user is a member of the channel
     auth_is_member = False

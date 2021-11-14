@@ -40,20 +40,20 @@ def test_no_channel_name():
     with pytest.raises(InputError):
         channels_create_v1(user['auth_user_id'], "", True)
 
-def test_invalid_user_id():
-    '''
-    Test create the channels with invalid user ID.
-    '''
-    clear_v1()
-    user = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
-    invalid_user_id = user['auth_user_id'] + 1
+# def test_invalid_user_id():
+#     '''
+#     Test create the channels with invalid user ID.
+#     '''
+#     clear_v1()
+#     user = auth_register_v1('wangliao@gmail.com', 'liaowang0207', 'wang', 'liao')
+#     invalid_user_id = user['auth_user_id'] + 1
 
-    with pytest.raises(AccessError):
-        channels_create_v1(invalid_user_id, "name", False)
-    with pytest.raises(AccessError):
-        channels_create_v1(-1, "name", False)
-    with pytest.raises(AccessError):
-        channels_create_v1(0, "name", False)
+#     with pytest.raises(AccessError):
+#         channels_create_v1(invalid_user_id, "name", False)
+#     with pytest.raises(AccessError):
+#         channels_create_v1(-1, "name", False)
+#     with pytest.raises(AccessError):
+#         channels_create_v1(0, "name", False)
     
 def test_invalid_channel_name_short():
     '''

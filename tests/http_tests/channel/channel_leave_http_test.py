@@ -34,6 +34,19 @@ def test_http_invalid_channel_id():
     }
     user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
+    channel_param1 = {
+        'token': user_2['token'],
+        'name': 'league2',
+        'is_public': True
+    }
+    channel2 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param1).json() 
+    
+    channel_join_param = {
+        'token': user_1['token'],
+        'channel_id': channel2['channel_id']
+    }
+    requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
+
     channel_join_param = {
         'token': user_2['token'],
         'channel_id': channel['channel_id']
@@ -222,4 +235,44 @@ def test_http_swap_and_leave_owner():
         'channel_id': channel['channel_id']
     }
     response = requests.post(f"{BASE_URL}/channel/leave/v1", json = channel_leave_param)
+    assert response.status_code == 403
+
+def test_http_invalid_token():
+    '''
+    Testing whether the v2 function can identify incorrect tokens
+    '''
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    invalid_user_json = {
+        "email": "bob123@gmail.com",
+        "password": "bobahe",
+        "name_first": "Bob",
+        "name_last": "Marley"
+    }
+    
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = invalid_user_json).json()
+    
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    user_1_json = {
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
+    }
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = user_1_json).json()
+
+    channel_json = {
+        'token': user['token'],
+        'name': 'league',
+        'is_public': True
+    }
+    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_json).json()
+    
+    channel_leave_param = {
+        'token': invalid['token'],
+        'channel_id': channel['channel_id']
+    }
+    response = requests.post(f"{BASE_URL}/channel/leave/v1", json = channel_leave_param)
+
     assert response.status_code == 403

@@ -108,27 +108,30 @@ def test_http_one_member():
 
     assert dm.status_code == 403
 
-def test_http_invalid_auth_user_token():
+def test_http_invalid_token():
     '''
-    Test when any of the auth user token is invalid
+    Testing whether the v2 function can identify incorrect tokens
     '''
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
-
-    register_param = {
-        "email": "shifanchen@gmail.com",
-        "password": "djkadldjsa21",
-        "name_first": "shifan",
-        "name_last": "chen"
+    
+    invalid_user_json = {
+        "email": "bob123@gmail.com",
+        "password": "bobahe",
+        "name_first": "Bob",
+        "name_last": "Marley"
     }
-    auth_user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
-
-    register_param_1 = {
+    
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = invalid_user_json).json()
+    
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    user_1_json = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
         "name_first": "Hopeful",
         "name_last": "Boyyy"
     }
-    user_1 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = user_1_json).json()
 
     register_param_2 = {
         "email": "z5306312@gmail.com",
@@ -139,10 +142,10 @@ def test_http_invalid_auth_user_token():
     user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
 
     dm_create_param = {
-        "token": auth_user["token"] + "woaini",
-        "u_ids": [user_1["auth_user_id"], user_2["auth_user_id"]] # user1 id is invalid whi=ile user2 id is valid
+        'token': invalid['token'],
+        "u_ids": [user["auth_user_id"], user_2["auth_user_id"]] # user1 id is invalid whi=ile user2 id is valid
     }
+    response = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param)
 
-    dm = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param)
-
-    assert dm.status_code != 200
+    assert response.status_code == 403
+    

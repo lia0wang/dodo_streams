@@ -2,7 +2,7 @@ import pytest
 import requests
 import pytest
 import json
-from src import config
+from src import config, dm
 
 BASE_URL = config.url
 
@@ -229,3 +229,61 @@ def test_http_details_multiple_dms():
     assert request_data2["members"][1]["name_first"] == "shifan"
     assert request_data2["members"][1]["name_last"] == "chen"
     assert request_data2["members"][1]["handle_str"] == "shifanchen"  
+
+def test_http_invalid_token():
+    '''
+    Testing whether the v2 function can identify incorrect tokens
+    '''
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    invalid_user_json = {
+        "email": "bob123@gmail.com",
+        "password": "bobahe",
+        "name_first": "Bob",
+        "name_last": "Marley"
+    }
+    
+    invalid = requests.post(f"{BASE_URL}/auth/register/v2", json = invalid_user_json).json()
+    
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    
+    user_1_json = {
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
+    }
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = user_1_json).json()
+
+    register_param_2 = {
+        "email": "z5306312@gmail.com",
+        "password": "LeonLiao123",
+        "name_first": "Leon",
+        "name_last": "Liao"
+    }
+    user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
+
+    register_param_3 = {
+        "email": "zdsad12@gmail.com",
+        "password": "LeodasdasdnLiao123",
+        "name_first": "Ledasdon",
+        "name_last": "Lidasao"
+    }
+    user_3 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_3).json()
+
+    dm_create_param = {
+        'token': user_3['token'],
+        "u_ids": [user["auth_user_id"], user_2["auth_user_id"]] # user1 id is invalid whi=ile user2 id is valid
+    }
+    response = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_create_param)
+    dm = response.json()
+    assert response.status_code == 200
+
+    dm_details_param2 = {
+        "token": invalid["token"], 
+        "dm_id": dm["dm_id"]
+    }
+
+    response = requests.get(f"{BASE_URL}/dm/details/v1", params = dm_details_param2)
+    
+    assert response.status_code == 403
