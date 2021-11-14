@@ -17,7 +17,7 @@ def notifications_v1(auth_user_id):
     log_history = store['log_history']
     notifications = []
     log_history.reverse()
-    for notif in log_history:
+    for notif in log_history[0:20]:
         # finds the user who requested notifications
         if auth_user_id == notif['u_id']:
             notif_message = create_notification_message(notif)
