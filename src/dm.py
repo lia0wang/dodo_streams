@@ -95,13 +95,6 @@ def dm_details_v1(auth_user_id, dm_id):
     # Fetch data
 
     store = get_data()
-    # Check if auth_user_id refers to existing user
-    is_valid_user = False
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            is_valid_user = True
-    if is_valid_user == False:
-        raise AccessError(description="Error: Invalid user id")
     
     # Check if dm_id refers to valid dm
     # Find and save target dm if it exists
