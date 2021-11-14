@@ -20,8 +20,6 @@ def notifications_v1(auth_user_id):
     for notif in log_history:
         # finds the user who requested notifications
         if auth_user_id == notif['u_id']:
-            #channel_id = get_channel_id(notif)
-            #dm_id = get_dm_id(notif)
             notif_message = create_notification_message(notif)
             notification = {
                 'channel_id': notif['channel_id'],

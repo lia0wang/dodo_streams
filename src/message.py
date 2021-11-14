@@ -1088,7 +1088,7 @@ def message_share_v1(token, og_message_id, message_str, channel_id, dm_id):
         shared_message_id = message_senddm_v1(token, dm_id, shared_message)
         return {
             'shared_message_id': shared_message_id,
-            }
+        }
                     
         
 
