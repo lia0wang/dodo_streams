@@ -34,6 +34,19 @@ def test_http_invalid_channel_id():
     }
     user_2 = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_2).json()
     
+    channel_param1 = {
+        'token': user_2['token'],
+        'name': 'league2',
+        'is_public': True
+    }
+    channel2 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param1).json() 
+    
+    channel_join_param = {
+        'token': user_1['token'],
+        'channel_id': channel2['channel_id']
+    }
+    requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
+
     channel_join_param = {
         'token': user_2['token'],
         'channel_id': channel['channel_id']

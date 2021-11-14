@@ -304,6 +304,34 @@ def test_http_channel_removeowner_basic():
     }
     user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
 
+    channel_param2 = {
+        'token': user['token'],
+        'name': 'league',
+        'is_public': True
+    }
+    channel2 = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param2).json() 
+    
+    channel_join_param = {
+        'token': owner['token'],
+        'channel_id': channel2['channel_id']
+    }
+    requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_param)
+
+    channel_addowner_praram_1 = {
+        'token': user['token'],
+        'channel_id': channel2['channel_id'],
+        'u_id': owner['auth_user_id']
+    }
+    requests.post(f"{BASE_URL}/channel/addowner/v1", json = channel_addowner_praram_1)
+
+    channel_removeowner_praram_1 = {
+        'token': user['token'],
+        'channel_id': channel2['channel_id'],
+        'u_id': owner['auth_user_id']
+    }
+    response = requests.post(f"{BASE_URL}/channel/removeowner/v1", json = channel_removeowner_praram_1)
+    assert response.status_code  == 200
+
     channel_join_param = {
         'token': user['token'],
         'channel_id': channel['channel_id']
@@ -393,4 +421,41 @@ def test_http_invalid_token():
     }
     response = requests.post(f"{BASE_URL}/channel/removeowner/v1", json = channel_removeowner_praram)
 
+    assert response.status_code == 403
+
+def test_http_non_member_auth():
+    '''
+    Test if the auth user who is a member of the channel
+    '''
+    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+
+    register_param = {
+        "email": "11037.666@gmail.com",
+        "password": "Hope11037",
+        "name_first": "Hopeful",
+        "name_last": "Boyyy"
+    }
+    owner = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
+
+    channel_param = {
+        'token': owner['token'],
+        'name': 'league',
+        'is_public': True
+    }
+    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json() 
+
+    register_param_1 = {
+        "email": "liaowang@gmail.com",
+        "password": "liaowang0207",
+        "name_first": "wang",
+        "name_last": "liao"
+    }
+    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param_1).json()
+
+    channel_removeowner_praram = {
+        'token': user['token'],
+        'channel_id': channel['channel_id'],
+        'u_id': user['auth_user_id']
+    }
+    response = requests.post(f"{BASE_URL}/channel/removeowner/v1", json = channel_removeowner_praram)
     assert response.status_code == 403
