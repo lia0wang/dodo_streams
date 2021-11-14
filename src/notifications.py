@@ -32,8 +32,8 @@ def notifications_v1(auth_user_id):
 
 def create_notification_message(notif):
     if notif['notif_type'] == 'channel_invite' or notif['notif_type'] == 'dm_create':
-        return(f"added to a channel/DM: {notif['handle_str']} added you to {notif['channel/dm_name']}")
+        return(f"added to a channel/DM:{notif['handle_str']} added you to {notif['channel/dm_name']}")
     elif notif['notif_type'] == 'message_react':
-        return(f"{notif['handle_str']} reacted to your message in {notif['channel/dm_name']}")
-    return(f"{notif['handle_str']} tagged you in {notif['channel/dm_name']}: {notif['notif_type']}")
+        return(f"reacted message:{notif['handle_str']} reacted to your message in {notif['channel/dm_name']}")
+    return(f"tagged:{notif['handle_str']} tagged you in {notif['channel/dm_name']}: {notif['notif_type']}")
 

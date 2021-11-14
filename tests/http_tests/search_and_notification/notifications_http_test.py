@@ -48,7 +48,7 @@ def test_channel_invite_notif():
     assert notif['notifications'][0]['channel_id'] == 1
     assert notif['notifications'][0]['dm_id'] == -1
     assert notif['notifications'][0]['notification_message'] == \
-        'added to a channel/DM: hopefulboyyy added you to league'
+        'added to a channel/DM:hopefulboyyy added you to league'
 
 def test_dm_create_notif():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -95,7 +95,7 @@ def test_dm_create_notif():
     assert notif['notifications'][0]['channel_id'] == -1
     assert notif['notifications'][0]['dm_id'] == 1
     assert notif['notifications'][0]['notification_message'] == \
-        'added to a channel/DM: shifanchen added you to hopefulboyyy, leonliao, shifanchen'
+        'added to a channel/DM:shifanchen added you to hopefulboyyy, leonliao, shifanchen'
 
 def test_react_notif():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -157,7 +157,7 @@ def test_react_notif():
     assert notif['notifications'][0]['channel_id'] == 1
     assert notif['notifications'][0]['dm_id'] == -1
     assert notif['notifications'][0]['notification_message'] == \
-        'hopefulboyyy reacted to your message in league1'
+        'reacted message:hopefulboyyy reacted to your message in league1'
 
 def test_msg_normal_notif():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -197,7 +197,7 @@ def test_msg_normal_notif():
     assert notif['notifications'][0]['channel_id'] == 1
     assert notif['notifications'][0]['dm_id'] == -1
     assert notif['notifications'][0]['notification_message'] == \
-        'johnsmith tagged you in league: hi @johnsmith, how a'
+        'tagged:johnsmith tagged you in league: hi @johnsmith, how a'
 
 def test_dm_normal_notif():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -256,7 +256,7 @@ def test_dm_normal_notif():
     assert notif['notifications'][0]['channel_id'] == -1
     assert notif['notifications'][0]['dm_id'] == 1
     assert notif['notifications'][0]['notification_message'] == \
-        'johnsmith tagged you in agentjohnson, agentsmith, johnsmith: @agentsmith'
+        'tagged:johnsmith tagged you in agentjohnson, agentsmith, johnsmith: @agentsmith'
 
 def test_msg_edit_basics_channel_notif():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -308,7 +308,7 @@ def test_msg_edit_basics_channel_notif():
     assert notif['notifications'][0]['channel_id'] == 1
     assert notif['notifications'][0]['dm_id'] == -1
     assert notif['notifications'][0]['notification_message'] == \
-        'johnsmith tagged you in league: @johnsmith'
+        'tagged:johnsmith tagged you in league: @johnsmith'
 
 def test_msg_edit_basics_dms_notif():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -377,7 +377,7 @@ def test_msg_edit_basics_dms_notif():
     assert notif['notifications'][0]['channel_id'] == -1
     assert notif['notifications'][0]['dm_id'] == 1
     assert notif['notifications'][0]['notification_message'] == \
-        'agentsmith tagged you in agentjohnson, agentsmith, johnsmith: edited @agentjohnson'
+        'tagged:agentsmith tagged you in agentjohnson, agentsmith, johnsmith: edited @agentjohnson'
 
 def test_dm_future_notif():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -441,7 +441,7 @@ def test_dm_future_notif():
     assert notif['notifications'][0]['channel_id'] == -1
     assert notif['notifications'][0]['dm_id'] == 1
     assert notif['notifications'][0]['notification_message'] == \
-        'johnsmith tagged you in agentjohnson, agentsmith, johnsmith: @agentsmith well don'
+        'tagged:johnsmith tagged you in agentjohnson, agentsmith, johnsmith: @agentsmith well don'
 
 def test_msg_future_notif():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -485,4 +485,4 @@ def test_msg_future_notif():
     assert notif['notifications'][0]['channel_id'] == 1
     assert notif['notifications'][0]['dm_id'] == -1
     assert notif['notifications'][0]['notification_message'] == \
-        'johnsmith tagged you in league: @johnsmith do u know'
+        'tagged:johnsmith tagged you in league: @johnsmith do u know'
