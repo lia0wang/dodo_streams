@@ -7,7 +7,7 @@ from src import config
 BASE_URL = config.url
 
 def test_http_valid_login1():
-    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    requests.delete(f"{BASE_URL}/clear/v1")
     register_param1 = {
         "email": "11037.666@gmail.com",
         "password": "Hope11037",
@@ -27,6 +27,7 @@ def test_http_valid_login1():
 
 
 def test_http_valid_login2():
+    requests.delete(f"{BASE_URL}/clear/v1")
     register_param2 = {
         "email": "JoJo@gmail.com", 
         "password": "HermitPurple",
@@ -45,7 +46,7 @@ def test_http_valid_login2():
     
 
 def test_invalid_email1():
-    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    requests.delete(f"{BASE_URL}/clear/v1")
     register_param1 = {
         "email": "JoJo@gmail.com",
         "password": "HermitPurple",
@@ -63,7 +64,7 @@ def test_invalid_email1():
     assert login_1.status_code == 400
 
 def test_invalid_email2():
-    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    requests.delete(f"{BASE_URL}/clear/v1")
     register_param1 = {
         "email": "JoJo@gmail.com",
         "password": "HermitPurple",
@@ -81,7 +82,7 @@ def test_invalid_email2():
     assert login_1.status_code == 400
 
 def test_invalid_password():
-    requests.delete(f"{BASE_URL}/clear/v1", json = {})
+    requests.delete(f"{BASE_URL}/clear/v1")
     register_param1 = {
         "email": "JoJo@gmail.com",
         "password": "HermitPurple",

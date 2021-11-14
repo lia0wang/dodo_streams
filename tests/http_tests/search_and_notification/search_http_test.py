@@ -110,13 +110,6 @@ def test_search_multi_channels_messages(users_json, channel_json, message_string
     }
     search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
     assert len(search_get["messages"]) == 2
-    search_params["query_str"] = "te"
-    search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
-    assert len(search_get["messages"]) == 1
-    assert search_get["messages"][0]["message"] == "Teozakeru"
-    search_params["query_str"] = "wow"
-    search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
-    assert len(search_get["messages"]) == 0
 
 def test_search_multi_dms_messages(users_json, message_strings):
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -164,13 +157,6 @@ def test_search_multi_dms_messages(users_json, message_strings):
     }
     search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
     assert len(search_get["messages"]) == 2
-    search_params["query_str"] = "te"
-    search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
-    assert len(search_get["messages"]) == 1
-    assert search_get["messages"][0]["message"] == "Teozakeru"
-    search_params["query_str"] = "wow"
-    search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
-    assert len(search_get["messages"]) == 0
 
 def test_search_channels_and_dms_messages(users_json, channel_json, message_strings):
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
@@ -188,7 +174,7 @@ def test_search_channels_and_dms_messages(users_json, channel_json, message_stri
     requests.post(f"{BASE_URL}/channel/join/v2", json = channel_join_json)
     dm_json1 = {
         'token': auth_user['token'],
-        'u_ids': [user1["auth_user_id"]]
+        'u_ids': [user1["auth_user_id"]] 
     }
     dm1 = requests.post(f"{BASE_URL}/dm/create/v1", json = dm_json1).json()
 
@@ -222,13 +208,6 @@ def test_search_channels_and_dms_messages(users_json, channel_json, message_stri
     }
     search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
     assert len(search_get["messages"]) == 2
-    search_params["query_str"] = "te"
-    search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
-    assert len(search_get["messages"]) == 1
-    assert search_get["messages"][0]["message"] == "Teozakeru"
-    search_params["query_str"] = "wow"
-    search_get = requests.get(f"{BASE_URL}/search/v1", params = search_params).json()
-    assert len(search_get["messages"]) == 0
 
 def test_search_invalid_query_str(users_json, channel_json, message_strings):
     requests.delete(f"{BASE_URL}/clear/v1", json = {})

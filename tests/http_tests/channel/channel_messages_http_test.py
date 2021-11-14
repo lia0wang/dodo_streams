@@ -261,65 +261,6 @@ def test_total_messages_is_50():
     assert msg_return['start'] == 0
     assert msg_return['end'] == -1
 
-def test_total_messages_is_51():
-    requests.delete(f"{BASE_URL}/clear/v1", json = {})
-    
-    register_param = {
-        "email": "11037.666@gmail.com",
-        "password": "Hope11037",
-        "name_first": "Hopeful",
-        "name_last": "Boyyy"
-    }
-    user = requests.post(f"{BASE_URL}/auth/register/v2", json = register_param).json()
-
-    channel_param = {
-        'token': user['token'],
-        'name': 'league',
-        'is_public': True
-    }
-    channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param)
-    channel_return = channel.json()
-
-    channel_messages = {
-        'token': user['token'],
-        'channel_id': channel_return['channel_id'],
-        'start': 0       
-    }
-
-    # 1 user sends over 50 messages        
-    msg = 'Hi'
-    message_send_program = {
-        'token': user['token'],
-        'channel_id': channel_return['channel_id'],
-        'message': msg
-    }
-    i = 0
-    test = []
-    while i < 51:
-        i+=1
-        msg =requests.post(f"{BASE_URL}/message/send/v1",json = message_send_program)
-        send_msg = msg.json()
-        test.append(send_msg['message_id'])
-    test.reverse()
-
-    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
-    msg_return = chan_msg_return.json()
-    assert chan_msg_return.status_code == 200
-    assert msg_return['start'] == 0
-    assert msg_return['end'] == 50
-    channel_messages = {
-        'token': user['token'],
-        'channel_id': channel_return['channel_id'],
-        'start': 50       
-    }
-
-    chan_msg_return = requests.get(f"{BASE_URL}/channel/messages/v2",params = channel_messages)
-    msg_return = chan_msg_return.json()
-    assert chan_msg_return.status_code == 200
-    assert msg_return['start'] == 50
-    assert msg_return['end'] == -1
-
-    assert [test[-1]] == [m['message_id'] for m in msg_return['messages']] 
 
 def test_invalid_channel_id():
     requests.delete(f"{BASE_URL}/clear/v1", json = {})
