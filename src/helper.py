@@ -281,3 +281,33 @@ def search_dm_messages(u_id, dm, query_str):
                 messages.append(target_message)
     return messages
 
+
+def seek_target_dm_and_errors(data, auth_user_id, dm_id):
+   # Check if auth_user_id refers to existing user
+    is_valid_user = False
+    for user in data['users']:
+        if user['u_id'] == auth_user_id:
+            is_valid_user = True
+    if is_valid_user == False:
+        raise AccessError("Error: Invalid user id")
+    
+    # Check if channel_id refers to valid channel
+    # Find and save target channel if it exists
+    is_valid_dm = False
+    for dm in data['dms']:
+        if dm['dm_id'] == dm_id:
+            target_dm = dm
+            is_valid_dm = True
+    if is_valid_dm == False:
+        raise InputError("Error: Invalid dm id")
+
+    # Check if authorised user is a member of the target channel
+    # Search list of members in the target channel
+    is_member = False
+    for member_id in target_dm['u_ids']:
+        if member_id == auth_user_id:
+            is_member = True
+    if is_member == False:
+        raise AccessError("Error: Authorised user is not a member")
+
+    return target_dm

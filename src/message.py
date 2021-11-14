@@ -6,7 +6,7 @@ from src.dm import dm_create_v1, dm_details_v1
 from src.helper import check_valid_token,\
      decode_jwt, datetime_to_unix_time_stamp,\
          store_log_notif, chan_check_tag, dm_check_tag,\
-         seek_target_channel_and_errors
+         seek_target_channel_and_errors, seek_target_dm_and_errors
 from src.channel import channel_details_v1, channel_messages_v1
 from src.channels import channels_list_v1
 from src.dm import dm_list_v1, dm_details_v1
@@ -984,7 +984,7 @@ def message_unreact_v1(token, message_id, react_id):
                     
     return {}
 
-def message_share_v1(token, og_message_id, message, channel_id, dm_id):
+def message_share_v1(token, og_message_id, message_str, channel_id, dm_id):
     '''
     '''
     if channel_id != -1 and dm_id != -1:
@@ -992,88 +992,105 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     if channel_id == -1 and dm_id == -1:
         raise InputError(description="No forwarding direction")
     
-    is_source_member = False
-    is_sharing_member = False
     valid_channel_message = False
     valid_dm_message = False
 
-    if len(message)>1000:
+    if len(message_str)>1000:
         raise InputError("Error: message too long")
 
     db_store = data_store.get()
         
     #Get authorised user id 
     auth_user_id = decode_jwt(token)['u_id']
-    
 
+    if dm_id == -1: # Share message to a channel
+        seek_target_channel_and_errors(db_store, auth_user_id, channel_id) # Check if auth_user is a member of target channel
 
-    if dm_id == -1: # Share message from a DM to a channel
-        target_channel = seek_target_channel_and_errors(db_store, auth_user_id, channel_id)
         for dm in db_store['dms']:  
             for message in dm['messages']:
                 if message['message_id'] == og_message_id:
-                    source_dm = dm
-                    source_dm_msg = message
+                    is_member = False # Check if auth_user is a member of source DM
+                    for member_id in dm['u_ids']:
+                        if member_id == auth_user_id:
+                            is_member = True
+                    if is_member == False:
+                        raise InputError("Error: og_message_id does not refer to a valid message within a DM that the authorised user has joined")
+                    source_msg = message
                     valid_dm_message = True
-            if not valid_dm_message:
-                raise InputError(description="No such dm message")
-            #source_dm_id = source_dm['dm_id']
-            for u_id in source_dm['u_ids']:
-                if u_id == auth_user_id:
-                    is_source_member = True
-            if not is_source_member:
-                raise InputError(description="User is not a member of the source DM")
 
-        for user in target_channel['all_members']:
-            if user['u_id'] == auth_user_id:
-                is_sharing_member = True
-        if not is_sharing_member:
-            raise AccessError(description="User is not a member of target channel")
-        og_message = source_dm_msg['message']
+        for channel in db_store['channels']:  
+            for message in channel['messages']:
+                if message['message_id'] == og_message_id:
+                    is_member = False # Check if auth_user is a member of source Channel
+                    for member in channel['all_members']:
+                        if member['u_id'] == auth_user_id:
+                            is_member = True
+                    if is_member == False: 
+                        raise InputError("Error: og_message_id does not refer to a valid message within a channel that the authorised user has joined")
+                    source_msg = message
+                    valid_channel_message = True
+
+        if not valid_channel_message and not valid_dm_message:
+            raise InputError(description="Neither channel_id nor dm_id are valid")
+
+        og_message = source_msg['message']
         print('og_message: ',og_message)
-        print('message: ', message)
-        shared_message = "Forwarded message: \n" + \
-                         message['message'] + '\n"""\n' + "Original message: \n" + \
-                         og_message + '\n"""\n'
+        print('message: ', message_str)
+        shared_message = (
+            "Forwarded message: \n" 
+            + f"{message_str}\n"  
+            + f"Original message: \n" 
+            + f"{og_message} \n"
+        )
         shared_message_id = message_send_v1(token, channel_id, shared_message)
         return {
             'shared_message_id': shared_message_id,
             }
 
     elif channel_id == -1: # Share message from a channel to a DM
-        dm_details_v1(auth_user_id, dm_id)
+        seek_target_dm_and_errors(db_store, auth_user_id, dm_id) # Check if auth_user is a member of target DM
+
+        for dm in db_store['dms']:  
+            for message in dm['messages']:
+                if message['message_id'] == og_message_id:
+                    is_member = False # Check if auth_user is a member of source DM
+                    for member_id in dm['u_ids']:
+                        if member_id == auth_user_id:
+                            is_member = True
+                    if is_member == False:
+                        raise InputError("Error: og_message_id does not refer to a valid message within a DM that the authorised user has joined")
+                    source_msg = message
+                    valid_dm_message = True
+
         for channel in db_store['channels']:  
             for message in channel['messages']:
                 if message['message_id'] == og_message_id:
-                    source_channel = channel
-                    source_channel_msg = message
+                    is_member = False # Check if auth_user is a member of source Channel
+                    for member in channel['all_members']:
+                        if member['u_id'] == auth_user_id:
+                            is_member = True
+                    if is_member == False: 
+                        raise InputError("Error: og_message_id does not refer to a valid message within a channel that the authorised user has joined")
+                    source_msg = message
                     valid_channel_message = True
-            if not valid_channel_message:
-                raise InputError(description="No such channel message")
-            #source_channel_id = source_channel['channel_id']
-            for user in source_channel['all_members']:
-                if user['u_id']== auth_user_id:
-                    is_source_member = True
-            if not is_source_member:
-                raise InputError(description="User is not a member of the source channel")
-            for dm in db_store['dms']:
-                if dm['dm_id'] == dm_id:
-                    target_dm = dm
-            for u_id in target_dm['u_ids']:
-                if u_id == auth_user_id:
-                    is_sharing_member = True
-            if not is_sharing_member:
-                raise AccessError(description="User is not a member of target channel")
-        og_message = source_channel_msg['message']
+
+        if not valid_channel_message and not valid_dm_message:
+            raise InputError(description="Neither channel_id nor dm_id are valid")
+
+        og_message = source_msg['message']
         print('og_message: ',og_message)
-        print('message: ', message)
-        shared_message = "Forwarded message: \n" + \
-                        message['message'] + '\n"""\n' + "Original message: \n" + \
-                        og_message + '\n"""\n'
+        print('message: ', message_str)
+        shared_message = (
+            "Forwarded message: \n" 
+            + f"{message_str}\n"  
+            + f"Original message: \n" 
+            + f"{og_message} \n"
+        )
         shared_message_id = message_senddm_v1(token, dm_id, shared_message)
         return {
             'shared_message_id': shared_message_id,
             }
+
                     
         
 
