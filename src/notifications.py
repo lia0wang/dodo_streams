@@ -7,11 +7,9 @@ def notifications_v1(auth_user_id):
     Return the user's most recent 20 notifications, ordered from most recent to 
     least recent.   
     Arguments:
-
+        auth_user_id (int)  - The ID of the valid user.
     Return Value:
-        Returns start on condition that start <= total messages
-        Returns end 
-        Returns messages 
+        Returns {notifications} 
     """
 
     store = get_data()
