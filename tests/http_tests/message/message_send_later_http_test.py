@@ -23,7 +23,7 @@ def test_msg_future():
     }
     channel = requests.post(f"{BASE_URL}/channels/create/v2", json = channel_param).json()
 
-    future_time = time.time() + 1
+    future_time = time.time() + 0.1
     message_sendlater_program = {
         'token': auth_user['token'],
         'channel_id': channel['channel_id'],
@@ -49,7 +49,7 @@ def test_msg_future():
     assert msg_return['messages'] == []
     
     # time delay for 1 second, since time future is set 1 second in future
-    time.sleep(1)
+    time.sleep(0.1)
 
     channel_messages = {
         'token': auth_user['token'],
