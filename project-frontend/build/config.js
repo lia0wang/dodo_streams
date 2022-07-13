@@ -1,0 +1,1 @@
+var BACKEND_PORT = "8080";var DEPLOYED_URL = "http://dodof10adeploy.alwaysdata.net";
